@@ -1,0 +1,22 @@
+[pyrogram]
+api_id = [DATA EXPUNGED]
+api_hash = [DATA EXPUNGED]
+app_version = [DATA EXPUNGED]
+device_model = [DATA EXPUNGED]
+system_version = [DATA EXPUNGED]
+
+[proxy]
+enabled = [DATA EXPUNGED]
+hostname = [DATA EXPUNGED]
+port = [DATA EXPUNGED]
+
+[plugins]
+root = plugins
+include =
+    handlers.commands
+    handlers.callback
+
+[custom]
+token = [DATA EXPUNGED]
+creator_id = [DATA EXPUNGED]
+
