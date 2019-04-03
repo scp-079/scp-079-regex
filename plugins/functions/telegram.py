@@ -57,23 +57,22 @@ def send_inline_keyboard(client, cid):
         text="This is a InlineKeyboardMarkup example",
         reply_markup=InlineKeyboardMarkup(
             [
-                [  # First row
-                    InlineKeyboardButton(  # Generates a callback query when pressed
+                [
+                    InlineKeyboardButton(
                         "Button",
                         callback_data=b"data"
-                    ),  # Note how callback_data must be bytes
-                    InlineKeyboardButton(  # Opens a web URL
+                    ),
+                    InlineKeyboardButton(
                         "URL",
                         url="https://docs.pyrogram.ml"
                     ),
                 ],
-                [  # Second row
-                    # Opens the inline interface
+                [
                     InlineKeyboardButton(
                         "Choose chat",
                         switch_inline_query="pyrogram"
                     ),
-                    InlineKeyboardButton(  # Opens the inline interface in the current chat
+                    InlineKeyboardButton(
                         "Inline here",
                         switch_inline_query_current_chat="pyrogram"
                     )
