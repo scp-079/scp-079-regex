@@ -30,7 +30,7 @@ def send_message(client, cid, text, mid=None, markup=None):
                     reply_markup=markup
                 )
     except Exception as e:
-        logger.warning('Send message to ' + str(cid) + ' error: %s', e)
+        logger.warning(f"Send message to {cid} error: {e}")
 
 
 def send_reply_keyboard(client, cid):

@@ -17,7 +17,7 @@ def ping(client, message):
             t = Thread(target=send_message, args=(client, message.chat.id, text))
             t.start()
     except Exception as e:
-        logger.warning('Ping error: %s', e)
+        logger.warning(f"Ping error: {e}")
 
 
 @Client.on_message(Filters.incoming & Filters.private & Filters.command(glovar.list_commands))
@@ -28,7 +28,7 @@ def list_words(client, message):
             t = Thread(target=send_reply_keyboard, args=(client, message.chat.id))
             t.start()
     except Exception as e:
-        logger.warning('List words error: %s', e)
+        logger.warning(f"List words error: {e}")
 
 
 @Client.on_message(Filters.incoming & Filters.private & Filters.command(glovar.search_commands))
@@ -39,7 +39,7 @@ def search_words(client, message):
             t = Thread(target=send_reply_keyboard, args=(client, message.chat.id))
             t.start()
     except Exception as e:
-        logger.warning('Search words error: %s', e)
+        logger.warning(f"Search words error: {e}")
 
 
 @Client.on_message(Filters.incoming & Filters.private & Filters.command(glovar.add_commands))
@@ -50,7 +50,7 @@ def add_words(client, message):
             t = Thread(target=send_reply_keyboard, args=(client, message.chat.id))
             t.start()
     except Exception as e:
-        logger.warning('Add words error: %s', e)
+        logger.warning(f"Add words error: {e}")
 
 
 @Client.on_message(Filters.incoming & Filters.private & Filters.command(glovar.remove_commands))
@@ -61,4 +61,4 @@ def remove_words(client, message):
             t = Thread(target=send_reply_keyboard, args=(client, message.chat.id))
             t.start()
     except Exception as e:
-        logger.warning('Remove words error: %s', e)
+        logger.warning(f"Remove words error: {e}")

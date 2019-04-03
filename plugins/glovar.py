@@ -50,7 +50,7 @@ try:
         token = config["custom"].get("token", token)
         creator_id = int(config["custom"].get("creator_id", creator_id))
 except Exception as e:
-    logger.warning('Read data from config.ini error: %s', e)
+    logger.warning(f"Read data from config.ini error: {e}")
 
 if token == "" or creator_id == 0:
     logger.critical("No proper settings")
