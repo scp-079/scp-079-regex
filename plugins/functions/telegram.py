@@ -33,22 +33,24 @@ def send_message(client, cid, text, mid=None, markup=None):
         logger.warning(f"Send message to {cid} error: {e}")
 
 
+# Test
 def send_reply_keyboard(client, cid):
     client.send_message(
         chat_id=cid,
         text="This is a ReplyKeyboardMarkup example",
         reply_markup=ReplyKeyboardMarkup(
             [
-                ["A", "B", "C", "D"],  # First row
-                ["E", "F", "G"],  # Second row
-                ["H", "I"],  # Third row
-                ["J"]  # Fourth row
+                ["A", "B", "C", "D"],
+                ["E", "F", "G"],
+                ["H", "I"],
+                ["J"]
             ],
-            resize_keyboard=True  # Make the keyboard smaller
+            resize_keyboard=True
         )
     )
 
 
+# Test
 def send_inline_keyboard(client, cid):
     client.send_message(
         chat_id=cid,
