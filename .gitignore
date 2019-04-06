@@ -1,5 +1,8 @@
-config.ini
+data/*
 .idea/
+log
+config.ini
+*.session
 
 # Below copied from https://github.com/github/gitignore/blob/master/Python.gitignore
 

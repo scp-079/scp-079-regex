@@ -17,4 +17,5 @@ logger = logging.getLogger(__name__)
 
 # Start
 app = Client(glovar.token)
+app.start()
 app.idle()
