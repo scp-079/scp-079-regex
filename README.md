@@ -6,9 +6,11 @@ Not yet completed.
 ## To Do List
 
 - [ ] Complete phrase management for a single group
+- [ ] Check the pattern before add
 - [ ] Extend functionality to multiple groups
 - [ ] Choose the right way to store data
 - [ ] Interfacing with the whole project database
+- [ ] Support English
 
 ## Features
 
