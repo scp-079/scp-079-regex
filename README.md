@@ -5,18 +5,17 @@ Not yet completed.
 
 ## To Do List
 
-- [ ] Complete phrase management for a single group
-- [ ] Check the pattern before add
+- [x] Complete phrase management for a single group
+- [x] Check the pattern before add
 - [ ] Extend functionality to multiple groups
-- [ ] Choose the right way to store data
-- [ ] Interfacing with the whole project database
+- [x] Choose the right way to store data
+- [x] Interfacing with the whole project database
 - [ ] Support English
 
 ## Features
 
 - Easy to use
 - Can merge similar or mutually contained rules
-- Customizable rules for each group
 
 ## Requirements
 
@@ -27,13 +26,20 @@ Not yet completed.
 
 - plugins
     - functions
-        - `telegram.py` Some telegram functions
+        - `etc.py` : Miscellaneous
+        - `files.py` : Save files
+        - `telegram.py` : Some telegram functions
+        - `words.py` : Manage words
     - handlers
         - `callback.py` Handle callback
         - `commands` Handle commands
     - `glovar.py` Global variables
-- `.gitignore`
-- `config.ini.example` -> `config.ini`
+- `.gitignore` : Ignore
+- `config.ini.example` -> `config.ini` : Configures
+- `LICENSE` : GPLv3
+- `main.py` : Start here
+- `README.md` : This file
+- `requirements.txt` : Managed by pip
 
 ## Contribute
 
