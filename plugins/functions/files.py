@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 # SCP-079-REGEX - Manage the regex patterns
 # Copyright (C) 2019 SCP-079 <https://scp-079.org>
 #
@@ -20,23 +17,27 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from pyrogram import Client
-from plugins import glovar
+from pickle import dump
+from shutil import copyfile
+from threading import Thread
+
+from .. import glovar
 
 # Enable logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.WARNING,
-    filename='log',
-    filemode='w'
-)
-
 logger = logging.getLogger(__name__)
 
-# Start
-app = Client(
-    session_name="bot",
-    bot_token=glovar.token
-)
-app.start()
-app.idle()
+
+def save(file):
+    t = Thread(target=save_thread, args=(file,))
+    t.start()
+
+
+def save_thread(file):
+    try:
+        if glovar:
+            with open(f"data/.{file}", "wb") as f:
+                dump(eval(f"glovar.{file}"), f)
+
+            copyfile(f"data/.{file}", f"data/{file}")
+    except Exception as e:
+        logger.error(f"Save data error: {e}", exc_info=True)

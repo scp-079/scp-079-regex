@@ -1,22 +1,21 @@
 [pyrogram]
 api_id = [DATA EXPUNGED]
 api_hash = [DATA EXPUNGED]
-app_version = [DATA EXPUNGED]
-device_model = [DATA EXPUNGED]
-system_version = [DATA EXPUNGED]
 
 [proxy]
-enabled = [DATA EXPUNGED]
-hostname = [DATA EXPUNGED]
-port = [DATA EXPUNGED]
+enabled = False
+hostname = 127.0.0.1
+port = 1080
 
 [plugins]
 root = plugins
 include =
     handlers.commands
-    handlers.callback
+    handlers.callbacks
 
 [custom]
 token = [DATA EXPUNGED]
 creator_id = [DATA EXPUNGED]
+main_group_id = [DATA EXPUNGED]
+exchange_id = [DATA EXPUNGED]
 prefix = /!！
