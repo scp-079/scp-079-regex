@@ -29,9 +29,9 @@ Not yet completed.
         - `telegram.py` : Some telegram functions
         - `words.py` : Manage words
     - handlers
-        - `callback.py` Handle callback
-        - `commands` Handle commands
-    - `glovar.py` Global variables
+        - `callback.py` : Handle callback
+        - `commands` : Handle commands
+    - `glovar.py` : Global variables
 - `.gitignore` : Ignore
 - `config.ini.example` -> `config.ini` : Configures
 - `LICENSE` : GPLv3
