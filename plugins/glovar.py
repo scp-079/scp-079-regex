@@ -115,6 +115,7 @@ main_group_id: int = 0
 exchange_id: int = 0
 prefix: List[str] = []
 prefix_str: str = "/!！"
+reload_path = "data/compiled"
 
 try:
     config = ConfigParser()
@@ -126,6 +127,7 @@ try:
         main_group_id = int(config["custom"].get("main_group_id", main_group_id))
         exchange_id = int(config["custom"].get("exchange_id", exchange_id))
         prefix = list(config["custom"].get("prefix", prefix_str))
+        reload_path = config["custom"].get("reload_path", reload_path)
 except Exception as e:
     logger.warning(f"Read data from config.ini error: {e}")
 

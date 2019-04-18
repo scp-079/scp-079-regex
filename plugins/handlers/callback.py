@@ -57,7 +57,7 @@ def answer(client, callback_query):
                         receivers=["USER", "WATCHER"],
                         operation="update",
                         operation_type="reload",
-                        data="../scp-079-regex/data/compiled"
+                        data=glovar.reload_path
                     )
                     delay(
                         secs=5,
