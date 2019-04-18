@@ -42,8 +42,11 @@ def re_compile(word_type):
     text = text[0:len(text) - 1]
     if text != "":
         glovar.compiled[word_type] = re.compile(text, re.I | re.S | re.M)
-        save("compiled")
+    else:
+        glovar.compiled[word_type] = re.compile(f"预留{glovar.names[f'{word_type}']}词组 {random_str(16)}",
+                                                re.I | re.M | re.S)
 
+    save("compiled")
     save(f"{word_type}_words")
 
 
