@@ -57,7 +57,7 @@ def add_words(client, message):
                     receivers=["USER", "WATCHER"],
                     operation="update",
                     operation_type="reload",
-                    data="../scp-079-regex/data/compiled"
+                    data=glovar.reload_path
                 )
                 delay(5, send_message, [client, glovar.exchange_id, exchange_text])
     except Exception as e:
@@ -124,7 +124,7 @@ def remove_words(client, message):
                     receivers=["USER", "WATCHER"],
                     operation="update",
                     operation_type="reload",
-                    data="../scp-079-regex/data/compiled"
+                    data=glovar.reload_path
                 )
                 delay(5, send_message, [client, glovar.exchange_id, exchange_text])
     except Exception as e:
