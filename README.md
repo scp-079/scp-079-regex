@@ -3,19 +3,17 @@
 This project is used to manage regular expression rules adopted by other bots. 
 Not yet completed.
 
-## To Do List
-
-- [x] Complete phrase management for a single group
-- [x] Check the pattern before add
-- [ ] Extend functionality to multiple groups
-- [x] Choose the right way to store data
-- [x] Interfacing with the whole project database
-- [ ] Support English
-
 ## Features
 
 - Easy to use
 - Can merge similar or mutually contained rules
+
+## To Do List
+
+- [x] Complete phrase management for a single group
+- [x] Check the pattern before add
+- [x] Choose the right way to store data
+- [x] Interfacing with the whole project database
 
 ## Requirements
 
