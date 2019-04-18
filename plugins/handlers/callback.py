@@ -1,7 +1,7 @@
 # SCP-079-REGEX - Manage the regex patterns
 # Copyright (C) 2019 SCP-079 <https://scp-079.org>
 #
-# This file is part of SCP-079-PM.
+# This file is part of SCP-079-REGEX.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published
