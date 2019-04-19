@@ -3,6 +3,10 @@
 This project is used to manage regular expression rules adopted by other bots. 
 Not yet completed.
 
+## How to use
+
+See [this article](https://scp-079.org/regex/).
+
 ## Features
 
 - Easy to use
