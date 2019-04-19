@@ -27,8 +27,8 @@ logger = logging.getLogger(__name__)
 
 
 def answer_callback(client, query_id: int, text: str):
+    result = None
     try:
-        result = None
         while not result:
             try:
                 result = client.answer_callback_query(
@@ -41,11 +41,13 @@ def answer_callback(client, query_id: int, text: str):
     except Exception as e:
         logger.warning(f"Answer query to {query_id} error: {e}", exc_info=True)
 
+    return result
+
 
 def edit_message(client, cid: int, mid: int, text: str, markup=None):
+    result = None
     try:
         if text.strip() != "":
-            result = None
             while not result:
                 try:
                     result = client.edit_message_text(
@@ -61,10 +63,12 @@ def edit_message(client, cid: int, mid: int, text: str, markup=None):
     except Exception as e:
         logger.warning(f"Edit message at {cid} error: {e}", exc_info=True)
 
+    return result
+
 
 def send_document(client, cid: int, file: str, text: str = None, mid: int = None, markup=None):
+    result = None
     try:
-        result = None
         while not result:
             try:
                 result = client.send_document(
@@ -80,11 +84,13 @@ def send_document(client, cid: int, file: str, text: str = None, mid: int = None
     except Exception as e:
         logger.warning(f"Send document at {cid} error: {e}", exec_info=True)
 
+    return result
+
 
 def send_message(client, cid: int, text: str, mid: int = None, markup=None):
+    result = None
     try:
         if text.strip() != "":
-            result = None
             while not result:
                 try:
                     result = client.send_message(
@@ -99,3 +105,5 @@ def send_message(client, cid: int, text: str, mid: int = None, markup=None):
                     sleep(e.x + 1)
     except Exception as e:
         logger.warning(f"Send message to {cid} error: {e}", exc_info=True)
+
+    return result
