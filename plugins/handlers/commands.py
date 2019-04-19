@@ -131,7 +131,8 @@ def search_words(client, message):
             if len(command_list) == 2:
                 word_query = command_list[1]
                 include_words = [w for w in eval(f"glovar.{word_type}_words")
-                                 if re.search(word_query, w) or re.search(w, word_query)]
+                                 if (re.search(word_query, w, re.I | re.M | re.S)
+                                     or re.search(w, word_query, re.I | re.M | re.S))]
                 if include_words:
                     for w in include_words:
                         text += f"{code(w)}，"
