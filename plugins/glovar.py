@@ -115,7 +115,9 @@ main_group_id: int = 0
 exchange_id: int = 0
 prefix: List[str] = []
 prefix_str: str = "/!！"
-reload_path = "data/compiled"
+update_to: Union[str, list] = ""
+update_type: str = "reload"
+reload_path: str = ""
 
 try:
     config = ConfigParser()
@@ -127,11 +129,19 @@ try:
         main_group_id = int(config["custom"].get("main_group_id", main_group_id))
         exchange_id = int(config["custom"].get("exchange_id", exchange_id))
         prefix = list(config["custom"].get("prefix", prefix_str))
+        update_to = config["custom"].get("update_to", update_to)
+        update_to = update_to.split(" ")
+        update_type = config["custom"].get("update_type", update_type)
         reload_path = config["custom"].get("reload_path", reload_path)
 except Exception as e:
     logger.warning(f"Read data from config.ini error: {e}")
 
-if token == "" or creator_id == 0 or main_group_id == 0 or exchange_id == 0 or prefix == []:
+if (token in {"", "[DATA EXPUNGED]"}
+        or creator_id == 0
+        or main_group_id == 0
+        or exchange_id == 0
+        or prefix == []
+        or (update_type == "reload" and reload_path in {"", "[DATA EXPUNGED]"})):
     logger.critical("No proper settings")
     raise SystemExit('No proper settings')
 

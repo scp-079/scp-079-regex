@@ -22,9 +22,9 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
-from ..functions.etc import code, thread, delay, send_data, user_mention
+from ..functions.etc import code, thread, user_mention
 from ..functions.telegram import send_message
-from .. functions.words import words_add, words_list, words_remove
+from .. functions.words import data_exchange, words_add, words_list, words_remove
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -52,14 +52,7 @@ def add_words(client, message):
             text = f"管理：{user_mention(aid)}\n" + text
             thread(send_message, (client, cid, text, mid, markup))
             if "已添加" in text:
-                exchange_text = send_data(
-                    sender="REGEX",
-                    receivers=["USER", "WATCHER"],
-                    operation="update",
-                    operation_type="reload",
-                    data=glovar.reload_path
-                )
-                delay(5, send_message, [client, glovar.exchange_id, exchange_text])
+                data_exchange(client)
     except Exception as e:
         logger.warning(f"Add words error: {e}", exc_info=True)
 
@@ -119,14 +112,7 @@ def remove_words(client, message):
             text = f"管理：{user_mention(aid)}\n" + text
             thread(send_message, (client, cid, text, mid))
             if "已移除" in text:
-                exchange_text = send_data(
-                    sender="REGEX",
-                    receivers=["USER", "WATCHER"],
-                    operation="update",
-                    operation_type="reload",
-                    data=glovar.reload_path
-                )
-                delay(5, send_message, [client, glovar.exchange_id, exchange_text])
+                data_exchange(client)
     except Exception as e:
         logger.warning(f"Remove words error: {e}", exc_info=True)
 
