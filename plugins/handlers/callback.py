@@ -52,7 +52,7 @@ def answer(client, callback_query):
                 text = f"管理：{user_mention(aid)}\n" + text
                 thread(edit_message, (client, cid, mid, text))
                 if "已添加" in text:
-                    data_exchange(client)
+                    thread(data_exchange, (client,))
 
             thread(answer_callback, (client, callback_query.id, ""))
     except Exception as e:

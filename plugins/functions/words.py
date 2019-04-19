@@ -19,13 +19,14 @@
 import logging
 import re
 from copy import deepcopy
+from time import sleep
 
 from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
 from xeger import Xeger
 
 from .. import glovar
-from .etc import code, button_data, delay, random_str, send_data
-from .files import save
+from .etc import code, button_data, delay, random_str, send_data, thread
+from .files import crypt_file, save
 from .telegram import send_document, send_message
 
 # Enable logging
@@ -53,7 +54,9 @@ def data_exchange(client):
             operation="update",
             operation_type="download"
         )
-        delay(5, send_document, [client, glovar.exchange_id, "data/compiled", exchange_text])
+        sleep(5)
+        crypt_file("encrypt", "data/compiled", "tmp/compiled")
+        thread(send_document, (client, glovar.exchange_id, "tmp/compiled", exchange_text))
 
 
 def re_compile(word_type):
@@ -72,13 +75,20 @@ def re_compile(word_type):
     save(f"{word_type}_words")
 
 
-def similar(a, b):
-    i = 0
-    while i < 3:
-        if not (re.search(a, xg.xeger(b), re.I | re.M | re.S) or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
-            return False
+def similar(mode, a, b):
+    if mode == "strict":
+        i = 0
+        while i < 3:
+            if not (re.search(a, xg.xeger(b), re.I | re.M | re.S) or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
+                return False
 
-        i += 1
+            i += 1
+    else:
+        if not (re.search(a, b, re.I | re.M | re.S)
+                or re.search(b, a, re.I | re.M | re.S)
+                or re.search(a, xg.xeger(b), re.I | re.M | re.S)
+                or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
+            return False
 
     return True
 
@@ -129,7 +139,7 @@ def words_add(word_type, word):
         "old": []
     }
     for old in eval(f"glovar.{word_type}_words"):
-        if similar(old, word):
+        if similar("strict", old, word):
             glovar.ask_words[word_key]["old"].append(old)
 
     if glovar.ask_words[word_key]["old"]:

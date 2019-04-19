@@ -22,6 +22,7 @@ import re
 from configparser import ConfigParser
 from os import mkdir
 from os.path import exists
+from shutil import rmtree
 from typing import Dict, List, Union
 
 from .functions.etc import random_str
@@ -54,8 +55,10 @@ for operation in ["list", "search", "add", "remove"]:
     locals()[f"{operation}_commands"] = [f"{operation}_{word}" for word in names]
 
 # Load data form pickle
-if not exists("data"):
-    mkdir("data")
+rmtree("tmp")
+for path in ["data", "tmp"]:
+    if not exists(path):
+        mkdir(path)
 
 avatar_words: set = set()
 bad_words: set = set()
@@ -109,44 +112,47 @@ except Exception as e:
     raise SystemExit("[DATA CORRUPTION]")
 
 # Read data from config.ini
-token: str = ""
 creator_id: int = 0
-main_group_id: int = 0
 exchange_id: int = 0
+main_group_id: int = 0
+password: str = ""
+per_page: int = 15
 prefix: List[str] = []
 prefix_str: str = "/!！"
-per_page: int = 15
+reload_path: str = ""
+token: str = ""
 update_to: Union[str, list] = ""
 update_type: str = "reload"
-reload_path: str = ""
 
 try:
     config = ConfigParser()
     config.read("config.ini")
 
     if "custom" in config:
-        token = config["custom"].get("token", token)
         creator_id = int(config["custom"].get("creator_id", creator_id))
-        main_group_id = int(config["custom"].get("main_group_id", main_group_id))
         exchange_id = int(config["custom"].get("exchange_id", exchange_id))
-        prefix = list(config["custom"].get("prefix", prefix_str))
+        main_group_id = int(config["custom"].get("main_group_id", main_group_id))
+        password = config["custom"].get("password", password)
         per_page = int(config["custom"].get("per_page", per_page))
+        prefix = list(config["custom"].get("prefix", prefix_str))
+        reload_path = config["custom"].get("reload_path", reload_path)
+        token = config["custom"].get("token", token)
         update_to = config["custom"].get("update_to", update_to)
         update_to = update_to.split(" ")
         update_type = config["custom"].get("update_type", update_type)
-        reload_path = config["custom"].get("reload_path", reload_path)
 except Exception as e:
     logger.warning(f"Read data from config.ini error: {e}")
 
-if (token in {"", "[DATA EXPUNGED]"}
-        or creator_id == 0
-        or main_group_id == 0
+if (creator_id == 0
         or exchange_id == 0
+        or main_group_id == 0
+        or password in {"", "[DATA EXPUNGED]"}
         or prefix == []
+        or token in {"", "[DATA EXPUNGED]"}
         or (update_type == "reload" and reload_path in {"", "[DATA EXPUNGED]"})):
     logger.critical("No proper settings")
     raise SystemExit('No proper settings')
 
-copyright_text = ("SCP-079-REGEX v0.1.1, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
+copyright_text = ("SCP-079-REGEX v0.1.2, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
                   "Licensed under the terms of the GNU General Public License v3 or later (GPLv3+)\n")
 print(copyright_text)
