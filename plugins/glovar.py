@@ -55,7 +55,11 @@ for operation in ["list", "search", "add", "remove"]:
     locals()[f"{operation}_commands"] = [f"{operation}_{word}" for word in names]
 
 # Load data form pickle
-rmtree("tmp")
+try:
+    rmtree("tmp")
+except Exception as e:
+    logger.info(f"Remove tmp error: {e}")
+
 for path in ["data", "tmp"]:
     if not exists(path):
         mkdir(path)
