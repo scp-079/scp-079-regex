@@ -223,16 +223,16 @@ def words_list(word_type, page):
     words = eval(f"glovar.{word_type}_words")
     if words:
         word = list(deepcopy(words))
-        quo = int(len(words) / 20)
+        quo = int(len(words) / glovar.per_page)
         if quo != 0:
             page_count = quo + 1
-            if len(words) % 20 == 0:
+            if len(words) % glovar.per_page == 0:
                 page_count = page_count - 1
 
             if page != page_count:
-                word = word[(page - 1) * 20:page * 20]
+                word = word[(page - 1) * glovar.per_page:page * glovar.per_page]
             else:
-                word = word[(page - 1) * 20:len(word)]
+                word = word[(page - 1) * glovar.per_page:len(word)]
             if page_count > 1:
                 if page == 1:
                     markup = InlineKeyboardMarkup(
