@@ -75,7 +75,7 @@ def re_compile(word_type):
 def similar(a, b):
     i = 0
     while i < 3:
-        if not (re.search(a, xg.xeger(b)) or re.search(a, xg.xeger(b))):
+        if not (re.search(a, xg.xeger(b), re.I | re.M | re.S) or re.search(a, xg.xeger(b), re.I | re.M | re.S)):
             return False
 
         i += 1
