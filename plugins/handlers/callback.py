@@ -22,9 +22,9 @@ from json import loads
 from pyrogram import Client
 
 from .. import glovar
-from ..functions.etc import delay, send_data, thread, user_mention
-from .. functions.words import words_ask, words_list
-from ..functions.telegram import answer_callback, edit_message, send_document, send_message
+from ..functions.etc import thread, user_mention
+from .. functions.words import data_exchange, words_ask, words_list
+from ..functions.telegram import answer_callback, edit_message
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -52,23 +52,7 @@ def answer(client, callback_query):
                 text = f"管理：{user_mention(aid)}\n" + text
                 thread(edit_message, (client, cid, mid, text))
                 if "已添加" in text:
-                    if glovar.update_type == "reload":
-                        exchange_text = send_data(
-                            sender="REGEX",
-                            receivers=["USER", "WATCHER"],
-                            operation="update",
-                            operation_type="reload",
-                            data=glovar.reload_path
-                        )
-                        delay(5, send_message, [client, glovar.exchange_id, exchange_text])
-                    else:
-                        exchange_text = send_data(
-                            sender="REGEX",
-                            receivers=["USER", "WATCHER"],
-                            operation="update",
-                            operation_type="download"
-                        )
-                        delay(5, send_document, [client, glovar.exchange_id, "data/compiled", exchange_text])
+                    data_exchange(client)
 
             thread(answer_callback, (client, callback_query.id, ""))
     except Exception as e:

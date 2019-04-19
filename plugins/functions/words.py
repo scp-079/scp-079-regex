@@ -24,14 +24,36 @@ from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
 from xeger import Xeger
 
 from .. import glovar
-from .etc import code, code_block, button_data, random_str
+from .etc import code, code_block, button_data, delay, random_str, send_data
 from .files import save
+from .telegram import send_document, send_message
 
 # Enable logging
 logger = logging.getLogger(__name__)
 
 # Xeger config
 xg = Xeger(limit=32)
+
+
+def data_exchange(client):
+    receivers = glovar.update_to
+    if glovar.update_type == "reload":
+        exchange_text = send_data(
+            sender="REGEX",
+            receivers=receivers,
+            operation="update",
+            operation_type="reload",
+            data=glovar.reload_path
+        )
+        delay(5, send_message, [client, glovar.exchange_id, exchange_text])
+    else:
+        exchange_text = send_data(
+            sender="REGEX",
+            receivers=receivers,
+            operation="update",
+            operation_type="download"
+        )
+        delay(5, send_document, [client, glovar.exchange_id, "data/compiled", exchange_text])
 
 
 def re_compile(word_type):
