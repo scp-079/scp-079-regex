@@ -141,7 +141,7 @@ try:
         channel_id = int(config["custom"].get("channel_id", channel_id))
         creator_id = int(config["custom"].get("creator_id", creator_id))
         exchange_id = int(config["custom"].get("exchange_id", exchange_id))
-        group_id = int(config["custom"].get("main_group_id", group_id))
+        group_id = int(config["custom"].get("group_id", group_id))
         password = config["custom"].get("password", password)
         per_page = int(config["custom"].get("per_page", per_page))
         prefix = list(config["custom"].get("prefix", prefix_str))
@@ -153,8 +153,6 @@ try:
 except Exception as e:
     logger.warning(f"Read data from config.ini error: {e}")
 
-logger.warning(channel_id)
-logger.warning(creator_id)
 if (channel_id == 0
         or creator_id == 0
         or exchange_id == 0
