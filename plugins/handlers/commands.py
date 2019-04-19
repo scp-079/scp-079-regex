@@ -34,13 +34,13 @@ logger = logging.getLogger(__name__)
 def add_words(client, message):
     try:
         cid = message.chat.id
-        if cid == glovar.main_group_id:
+        if cid == glovar.group_id:
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
             word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word = get_text(message)[1:].lstrip(f"{command_list[0]} ")
+                word = get_text(message)[len(command_list[0]) + 2:]
                 text, markup = words_add(word_type, word)
             else:
                 text = (f"类别：{code(glovar.names[word_type])}\n"
@@ -73,7 +73,7 @@ def ping(client, message):
 def list_words(client, message):
     try:
         cid = message.chat.id
-        if cid == glovar.main_group_id:
+        if cid == glovar.group_id:
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
@@ -97,13 +97,13 @@ def list_words(client, message):
 def remove_words(client, message):
     try:
         cid = message.chat.id
-        if cid == glovar.main_group_id:
+        if cid == glovar.group_id:
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
             word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word = get_text(message)[1:].lstrip(f"{command_list[0]} ")
+                word = get_text(message)[len(command_list[0]) + 2:]
                 text = words_remove(word_type, word)
             else:
                 text = (f"类别：{code(glovar.names[word_type])}\n"
@@ -123,14 +123,17 @@ def remove_words(client, message):
 def search_words(client, message):
     try:
         cid = message.chat.id
-        if cid == glovar.main_group_id:
+        if cid == glovar.group_id:
             text = ""
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
             word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word_query = get_text(message)[1:].lstrip(f"{command_list[0]} ")
+                word_query = get_text(message)[len(command_list[0]) + 2:]
+                logger.warning(f"{get_text(message)}")
+                logger.warning(f"{get_text(message)[1:]}")
+                logger.warning(f"{command_list[0]} ")
                 logger.warning(f"{word_query}")
                 include_words = [w for w in eval(f"glovar.{word_type}_words") if similar("loose", w, word_query)]
                 if include_words:

@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 def answer(client, callback_query):
     try:
         cid = callback_query.message.chat.id
-        if cid == glovar.main_group_id:
+        if cid == glovar.group_id:
             aid = callback_query.from_user.id
             mid = callback_query.message.message_id
             callback_data = loads(callback_query.data)

@@ -66,10 +66,12 @@ for path in ["data", "tmp"]:
     if not exists(path):
         mkdir(path)
 
+ad_words: set = set()
 avatar_words: set = set()
 bad_words: set = set()
 ban_words: set = set()
 bio_words: set = set()
+contact_words: set = set()
 delete_words: set = set()
 emergency_words: set = set()
 nick_words: set = set()
@@ -118,9 +120,10 @@ except Exception as e:
     raise SystemExit("[DATA CORRUPTION]")
 
 # Read data from config.ini
+channel_id: int = 0
 creator_id: int = 0
 exchange_id: int = 0
-main_group_id: int = 0
+group_id: int = 0
 password: str = ""
 per_page: int = 15
 prefix: List[str] = []
@@ -135,9 +138,10 @@ try:
     config.read("config.ini")
 
     if "custom" in config:
+        channel_id = int(config["custom"].get("channel_id", channel_id))
         creator_id = int(config["custom"].get("creator_id", creator_id))
         exchange_id = int(config["custom"].get("exchange_id", exchange_id))
-        main_group_id = int(config["custom"].get("main_group_id", main_group_id))
+        group_id = int(config["custom"].get("main_group_id", group_id))
         password = config["custom"].get("password", password)
         per_page = int(config["custom"].get("per_page", per_page))
         prefix = list(config["custom"].get("prefix", prefix_str))
@@ -149,9 +153,10 @@ try:
 except Exception as e:
     logger.warning(f"Read data from config.ini error: {e}")
 
-if (creator_id == 0
+if (channel_id == 0
+        or creator_id == 0
         or exchange_id == 0
-        or main_group_id == 0
+        or group_id == 0
         or password in {"", "[DATA EXPUNGED]"}
         or prefix == []
         or token in {"", "[DATA EXPUNGED]"}
@@ -159,6 +164,6 @@ if (creator_id == 0
     logger.critical("No proper settings")
     raise SystemExit('No proper settings')
 
-copyright_text = ("SCP-079-REGEX v0.1.2, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
+copyright_text = ("SCP-079-REGEX v0.1.3, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
                   "Licensed under the terms of the GNU General Public License v3 or later (GPLv3+)\n")
 print(copyright_text)

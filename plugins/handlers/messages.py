@@ -27,7 +27,7 @@ from ..functions.etc import thread
 logger = logging.getLogger(__name__)
 
 
-@Client.on_message(Filters.incoming & Filters.private)
+@Client.on_message(Filters.incoming & Filters.channel)
 def test(client, message):
     try:
         pass

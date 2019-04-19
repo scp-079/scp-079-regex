@@ -14,6 +14,7 @@ include =
     handlers.callbacks
 
 [custom]
+channel_id = [DATA EXPUNGED]
 creator_id = [DATA EXPUNGED]
 exchange_id = [DATA EXPUNGED]
 main_group_id = [DATA EXPUNGED]
