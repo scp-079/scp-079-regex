@@ -137,12 +137,12 @@ def search_words(client, message):
                                      or re.search(w, word_query, re.I | re.M | re.S))]
                 if include_words:
                     for w in include_words:
-                        text += f"{code(w)}\n----------------\n"
+                        text += f"{code(w)}\n\n"
 
-                    text = text[:-18]
+                    text = text[:-2]
                     text = (f"类别：{code(glovar.names[word_type])}\n"
                             f"查询：{code(word_query)}\n"
-                            f"结果：----------------\n{text}")
+                            f"结果：------------------------\n\n{text}")
                 else:
                     text = (f"类别：{code(glovar.names[word_type])}\n"
                             f"查询：{code(word_query)}\n"

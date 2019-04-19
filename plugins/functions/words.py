@@ -135,14 +135,14 @@ def words_add(word_type, word):
     if glovar.ask_words[word_key]["old"]:
         text = ""
         for old in glovar.ask_words[word_key]["old"]:
-            text += f"{code(old)}\n----------------\n"
+            text += f"{code(old)}\n\n"
 
-        text = text[:-18]
+        text = text[:-2]
         text = (f"状态：{code('未添加')}\n"
                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
                 f"词组：{code(word)}\n"
                 f"原因：{code('等待确认')}\n"
-                f"重复：----------------\n{text}")
+                f"重复：------------------------\n\n{text}")
         add_new = button_data("ask", "new", word_key)
         replace_all = button_data("ask", "replace", word_key)
         cancel = button_data("ask", "cancel", word_key)
@@ -285,12 +285,12 @@ def words_list(word_type, page):
                     )
 
         for w in word:
-            text += f"{code(w)}\n----------------\n"
+            text += f"{code(w)}\n\n"
 
-        text = text[:-18]
+        text = text[:-2]
         text = (f"类别：{code(glovar.names[word_type])}\n"
                 f"查询：{code('全部')}\n"
-                f"结果：----------------\n{text}")
+                f"结果：------------------------\n\n{text}")
     else:
         text = (f"类别：{code(glovar.names[word_type])}\n"
                 f"查询：{code('全部')}\n"
