@@ -72,6 +72,17 @@ def re_compile(word_type):
     save(f"{word_type}_words")
 
 
+def similar(a, b):
+    i = 0
+    while i < 3:
+        if not (re.search(a, xg.xeger(b)) or re.search(a, xg.xeger(b))):
+            return False
+
+        i += 1
+
+    return True
+
+
 def words_add(word_type, word):
     # Check if the word already exits
     if word in eval(f"glovar.{word_type}_words"):
@@ -118,7 +129,7 @@ def words_add(word_type, word):
         "old": []
     }
     for old in eval(f"glovar.{word_type}_words"):
-        if re.search(word, xg.xeger(old)) or re.search(old, xg.xeger(word)):
+        if similar(old, word):
             glovar.ask_words[word_key]["old"].append(old)
 
     if glovar.ask_words[word_key]["old"]:
