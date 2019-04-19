@@ -115,6 +115,7 @@ main_group_id: int = 0
 exchange_id: int = 0
 prefix: List[str] = []
 prefix_str: str = "/!！"
+per_page: int = 15
 update_to: Union[str, list] = ""
 update_type: str = "reload"
 reload_path: str = ""
@@ -129,6 +130,7 @@ try:
         main_group_id = int(config["custom"].get("main_group_id", main_group_id))
         exchange_id = int(config["custom"].get("exchange_id", exchange_id))
         prefix = list(config["custom"].get("prefix", prefix_str))
+        per_page = int(config["custom"].get("per_page", per_page))
         update_to = config["custom"].get("update_to", update_to)
         update_to = update_to.split(" ")
         update_type = config["custom"].get("update_type", update_type)

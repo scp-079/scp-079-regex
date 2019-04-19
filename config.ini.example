@@ -19,6 +19,7 @@ creator_id = [DATA EXPUNGED]
 main_group_id = [DATA EXPUNGED]
 exchange_id = [DATA EXPUNGED]
 prefix = /!！
+per_page = 15
 update_to = USER WATCHER
 update_type = reload
 reload_path = [DATA EXPUNGED]
