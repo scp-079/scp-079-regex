@@ -18,9 +18,9 @@
 
 import logging
 from json import dumps, loads
-from threading import Thread, Timer
 from random import choice
 from string import ascii_letters, digits
+from threading import Thread, Timer
 from typing import Callable, List, Union
 
 # Enable logging
@@ -71,8 +71,9 @@ def random_str(i):
 
 
 def receive_data(message) -> dict:
-    text = message.text or message.caption
+    text = get_text(message)
     try:
+        assert text is not None, f"Can't get text from message: {message}"
         data = loads(text)
         return data
     except Exception as e:
