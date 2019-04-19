@@ -75,13 +75,20 @@ def re_compile(word_type):
     save(f"{word_type}_words")
 
 
-def similar(a, b):
-    i = 0
-    while i < 3:
-        if not (re.search(a, xg.xeger(b), re.I | re.M | re.S) or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
-            return False
+def similar(mode, a, b):
+    if mode == "strict":
+        i = 0
+        while i < 3:
+            if not (re.search(a, xg.xeger(b), re.I | re.M | re.S) or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
+                return False
 
-        i += 1
+            i += 1
+    else:
+        if not (re.search(a, b, re.I | re.M | re.S)
+                or re.search(b, a, re.I | re.M | re.S)
+                or re.search(a, xg.xeger(b), re.I | re.M | re.S)
+                or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
+            return False
 
     return True
 
@@ -132,7 +139,7 @@ def words_add(word_type, word):
         "old": []
     }
     for old in eval(f"glovar.{word_type}_words"):
-        if similar(old, word):
+        if similar("strict", old, word):
             glovar.ask_words[word_key]["old"].append(old)
 
     if glovar.ask_words[word_key]["old"]:

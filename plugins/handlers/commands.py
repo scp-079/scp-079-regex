@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import re
 import logging
 
 from pyrogram import Client, Filters
@@ -24,7 +23,7 @@ from pyrogram import Client, Filters
 from .. import glovar
 from ..functions.etc import code, get_text, thread, user_mention
 from ..functions.telegram import send_message
-from .. functions.words import data_exchange, words_add, words_list, words_remove
+from .. functions.words import data_exchange, similar, words_add, words_list, words_remove
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -132,9 +131,7 @@ def search_words(client, message):
             word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
                 word_query = get_text(message)[1:].lstrip(f"{command_list[0]} ")
-                include_words = [w for w in eval(f"glovar.{word_type}_words")
-                                 if (re.search(word_query, w, re.I | re.M | re.S)
-                                     or re.search(w, word_query, re.I | re.M | re.S))]
+                include_words = [w for w in eval(f"glovar.{word_type}_words") if similar("loose", w, word_type)]
                 if include_words:
                     for w in include_words:
                         text += f"{code(w)}\n\n"
