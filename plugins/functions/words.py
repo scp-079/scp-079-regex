@@ -24,7 +24,7 @@ from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
 from xeger import Xeger
 
 from .. import glovar
-from .etc import code, code_block, button_data, delay, random_str, send_data
+from .etc import code, button_data, delay, random_str, send_data
 from .files import save
 from .telegram import send_document, send_message
 
@@ -89,8 +89,8 @@ def words_add(word_type, word):
         text = (f"状态：{code('未添加')}\n"
                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
                 f"词组：{code(word)}\n"
-                f"原因：{code_block('出现错误')}\n"
-                f"错误：{code_block(e)}")
+                f"原因：{code('出现错误')}\n"
+                f"错误：{code(e)}")
         markup = None
         return text, markup
 
