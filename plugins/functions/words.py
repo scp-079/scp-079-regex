@@ -76,6 +76,8 @@ def words_add(word_type, word):
     # Check if the word already exits
     if word in eval(f"glovar.{word_type}_words"):
         text = (f"状态：{code('未添加')}\n"
+                f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                f"词组：{code(word)}\n"
                 f"原因：{code('已存在')}")
         markup = None
         return text, markup
@@ -85,8 +87,10 @@ def words_add(word_type, word):
         pattern = re.compile(word, re.I | re.M | re.S)
     except Exception as e:
         text = (f"状态：{code('未添加')}\n"
-                f"原因：{code_block('出现错误')}\n\n"
-                f"{code_block(e)}\n")
+                f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                f"词组：{code(word)}\n"
+                f"原因：{code_block('出现错误')}\n"
+                f"错误：{code_block(e)}")
         markup = None
         return text, markup
 
@@ -97,7 +101,9 @@ def words_add(word_type, word):
                  ]:
         if pattern.search(test):
             text = (f"状态：{code('未添加')}\n"
-                    f"原因：{code('不具有特殊性')}\n")
+                    f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                    f"词组：{code(word)}\n"
+                    f"原因：{code('不具有特殊性')}")
             markup = None
             return text, markup
 
@@ -123,6 +129,7 @@ def words_add(word_type, word):
         text = text[:-1]
         text = (f"状态：{code('未添加')}\n"
                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                f"词组：{code(word)}\n"
                 f"原因：{code('等待确认')}\n"
                 f"重复：{text}")
         add_new = button_data("ask", "new", word_key)
@@ -155,7 +162,7 @@ def words_add(word_type, word):
         re_compile(word_type)
         text = (f"状态：{code(f'已添加')}\n"
                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                f"词组：{code(word)}\n")
+                f"词组：{code(word)}")
         markup = None
         return text, markup
 
