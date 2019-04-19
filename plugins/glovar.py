@@ -153,6 +153,8 @@ try:
 except Exception as e:
     logger.warning(f"Read data from config.ini error: {e}")
 
+logger.warning(channel_id)
+logger.warning(creator_id)
 if (channel_id == 0
         or creator_id == 0
         or exchange_id == 0
