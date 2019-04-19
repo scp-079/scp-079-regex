@@ -19,13 +19,14 @@
 import logging
 import re
 from copy import deepcopy
+from time import sleep
 
 from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
 from xeger import Xeger
 
 from .. import glovar
-from .etc import code, button_data, delay, random_str, send_data
-from .files import save
+from .etc import code, button_data, delay, random_str, send_data, thread
+from .files import crypt_file, save
 from .telegram import send_document, send_message
 
 # Enable logging
@@ -53,7 +54,9 @@ def data_exchange(client):
             operation="update",
             operation_type="download"
         )
-        delay(5, send_document, [client, glovar.exchange_id, "data/compiled", exchange_text])
+        sleep(5)
+        crypt_file("encrypt", "data/compiled", "tmp/compiled")
+        thread(send_document, (client, glovar.exchange_id, "tmp/compiled", exchange_text))
 
 
 def re_compile(word_type):

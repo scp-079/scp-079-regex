@@ -52,7 +52,7 @@ def add_words(client, message):
             text = f"管理：{user_mention(aid)}\n" + text
             thread(send_message, (client, cid, text, mid, markup))
             if "已添加" in text:
-                data_exchange(client)
+                thread(data_exchange, (client,))
     except Exception as e:
         logger.warning(f"Add words error: {e}", exc_info=True)
 
@@ -114,7 +114,7 @@ def remove_words(client, message):
             text = f"管理：{user_mention(aid)}\n" + text
             thread(send_message, (client, cid, text, mid))
             if "已移除" in text:
-                data_exchange(client)
+                thread(data_exchange, (client,))
     except Exception as e:
         logger.warning(f"Remove words error: {e}", exc_info=True)
 

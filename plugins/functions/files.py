@@ -21,10 +21,20 @@ from pickle import dump
 from shutil import copyfile
 from threading import Thread
 
+from pyAesCrypt import decryptFile, encryptFile
+
 from .. import glovar
 
 # Enable logging
 logger = logging.getLogger(__name__)
+
+
+def crypt_file(operation, file_in, file_out):
+    buffer = 64 * 1024
+    if operation == "decrypt":
+        decryptFile(file_in, file_out, glovar.password, buffer)
+    else:
+        encryptFile(file_in, file_out, glovar.password, buffer)
 
 
 def save(file):
