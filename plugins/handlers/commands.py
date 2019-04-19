@@ -131,6 +131,7 @@ def search_words(client, message):
             word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
                 word_query = get_text(message)[1:].lstrip(f"{command_list[0]} ")
+                logger.warning(f"{word_query}")
                 include_words = [w for w in eval(f"glovar.{word_type}_words") if similar("loose", w, word_query)]
                 if include_words:
                     for w in include_words:
