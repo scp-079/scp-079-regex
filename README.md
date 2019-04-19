@@ -18,6 +18,8 @@ See [this article](https://scp-079.org/regex/).
 - [x] Check the pattern before add
 - [x] Choose the right way to store data
 - [x] Interfacing with the whole project database
+- [ ] Simplified Chinese to Traditional Chinese
+- [ ] More groups
 
 ## Requirements
 
