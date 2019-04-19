@@ -135,9 +135,9 @@ def words_add(word_type, word):
     if glovar.ask_words[word_key]["old"]:
         text = ""
         for old in glovar.ask_words[word_key]["old"]:
-            text += f"{code(old)}\n"
+            text += f"{code(old)}\n----------------\n"
 
-        text = text[:-1]
+        text = text[:-18]
         text = (f"状态：{code('未添加')}\n"
                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
                 f"词组：{code(word)}\n"
@@ -223,16 +223,16 @@ def words_list(word_type, page):
     words = eval(f"glovar.{word_type}_words")
     if words:
         word = list(deepcopy(words))
-        quo = int(len(words) / 50)
+        quo = int(len(words) / 20)
         if quo != 0:
             page_count = quo + 1
-            if len(words) % 50 == 0:
+            if len(words) % 20 == 0:
                 page_count = page_count - 1
 
             if page != page_count:
-                word = word[(page - 1) * 50:page * 50]
+                word = word[(page - 1) * 20:page * 20]
             else:
-                word = word[(page - 1) * 50:len(word)]
+                word = word[(page - 1) * 20:len(word)]
             if page_count > 1:
                 if page == 1:
                     markup = InlineKeyboardMarkup(
@@ -285,9 +285,9 @@ def words_list(word_type, page):
                     )
 
         for w in word:
-            text += f"{code(w)}\n"
+            text += f"{code(w)}\n----------------\n"
 
-        text = text[:-1]
+        text = text[:-18]
         text = (f"类别：{code(glovar.names[word_type])}\n"
                 f"查询：{code('全部')}\n"
                 f"结果：----------------\n{text}")

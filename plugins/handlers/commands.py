@@ -39,7 +39,7 @@ def add_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
-            if len(command_list) == 2:
+            if len(command_list) > 1:
                 word_type = command_list[0].partition("_")[2]
                 word = command_list[1]
                 text, markup = words_add(word_type, word)
@@ -135,9 +135,9 @@ def search_words(client, message):
                                      or re.search(w, word_query, re.I | re.M | re.S))]
                 if include_words:
                     for w in include_words:
-                        text += f"{code(w)}\n"
+                        text += f"{code(w)}\n----------------\n"
 
-                    text = text[:-1]
+                    text = text[:-18]
                     text = (f"类别：{code(glovar.names[word_type])}\n"
                             f"查询：{code(word_query)}\n"
                             f"结果：----------------\n{text}")
