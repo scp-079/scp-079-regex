@@ -22,8 +22,8 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
-from ..functions.etc import code, thread, delay, send_data, user_mention
-from ..functions.telegram import send_document, send_message
+from ..functions.etc import code, thread, user_mention
+from ..functions.telegram import send_message
 from .. functions.words import data_exchange, words_add, words_list, words_remove
 
 # Enable logging
