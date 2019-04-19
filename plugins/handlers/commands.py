@@ -41,7 +41,7 @@ def add_words(client, message):
             command_list = message.command
             word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word = get_text(message)[1:].lstrip(command_list[0])
+                word = get_text(message)[1:].lstrip(f"{command_list[0]} ")
                 text, markup = words_add(word_type, word)
             else:
                 text = (f"类别：{code(glovar.names[word_type])}\n"
@@ -104,7 +104,7 @@ def remove_words(client, message):
             command_list = message.command
             word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word = get_text(message)[1:].lstrip(command_list[0])
+                word = get_text(message)[1:].lstrip(f"{command_list[0]} ")
                 text = words_remove(word_type, word)
             else:
                 text = (f"类别：{code(glovar.names[word_type])}\n"
@@ -131,7 +131,7 @@ def search_words(client, message):
             command_list = message.command
             word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word_query = get_text(message)[1:].lstrip(command_list[0])
+                word_query = get_text(message)[1:].lstrip(f"{command_list[0]} ")
                 include_words = [w for w in eval(f"glovar.{word_type}_words")
                                  if (re.search(word_query, w, re.I | re.M | re.S)
                                      or re.search(w, word_query, re.I | re.M | re.S))]
