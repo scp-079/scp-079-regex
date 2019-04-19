@@ -140,7 +140,7 @@ def search_words(client, message):
                     text = text[:-1]
                     text = (f"类别：{code(glovar.names[word_type])}\n"
                             f"查询：{code(word_query)}\n"
-                            f"结果：--------\n{text}")
+                            f"结果：----------------\n{text}")
                 else:
                     text = (f"类别：{code(glovar.names[word_type])}\n"
                             f"查询：{code(word_query)}\n"
