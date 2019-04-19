@@ -32,10 +32,12 @@ logger = logging.getLogger(__name__)
 
 # Init
 names: dict = {
+    "ad": "广告用语",
     "avatar": "头像分析",
     "bad": "敏感检测",
     "ban": "自动封禁",
     "bio": "简介封禁",
+    "contact": "联系方式",
     "delete": "自动删除",
     "emergency": "应急模式",
     "nick": "昵称封禁",
