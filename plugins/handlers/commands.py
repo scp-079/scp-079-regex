@@ -22,7 +22,7 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
-from ..functions.etc import code, thread, user_mention
+from ..functions.etc import code, get_text, thread, user_mention
 from ..functions.telegram import send_message
 from .. functions.words import data_exchange, words_add, words_list, words_remove
 
@@ -39,13 +39,13 @@ def add_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
+            word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word_type = command_list[0].partition("_")[2]
-                word = command_list[1]
+                word = get_text(message)[1:].lstrip(command_list[0])
                 text, markup = words_add(word_type, word)
-
             else:
-                text = (f"状态：{code('未添加')}\n"
+                text = (f"类别：{code(glovar.names[word_type])}\n"
+                        f"状态：{code('未添加')}\n"
                         f"原因：{code('格式有误')}")
                 markup = None
 
@@ -78,11 +78,12 @@ def list_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
+            word_type = command_list[0].split("_")[1]
             if len(command_list) == 1:
-                word_type = command_list[0].partition("_")[2]
                 text, markup = words_list(word_type, 1)
             else:
-                text = (f"结果：{code('无法显示')}\n"
+                text = (f"类别：{code(glovar.names[word_type])}\n"
+                        f"结果：{code('无法显示')}\n"
                         f"原因：{code('格式有误')}")
                 markup = None
 
@@ -101,12 +102,13 @@ def remove_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
-            if len(command_list) == 2:
-                word_type = command_list[0].partition("_")[2]
-                word = command_list[1]
+            word_type = command_list[0].split("_")[1]
+            if len(command_list) > 1:
+                word = get_text(message)[1:].lstrip(command_list[0])
                 text = words_remove(word_type, word)
             else:
-                text = (f"状态：{code('未添加')}\n"
+                text = (f"类别：{code(glovar.names[word_type])}\n"
+                        f"状态：{code('未添加')}\n"
                         f"原因：{code('格式有误')}")
 
             text = f"管理：{user_mention(aid)}\n" + text
@@ -127,9 +129,9 @@ def search_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
-            word_type = command_list[0].partition("_")[2]
-            if len(command_list) == 2:
-                word_query = command_list[1]
+            word_type = command_list[0].split("_")[1]
+            if len(command_list) > 1:
+                word_query = get_text(message)[1:].lstrip(command_list[0])
                 include_words = [w for w in eval(f"glovar.{word_type}_words")
                                  if (re.search(word_query, w, re.I | re.M | re.S)
                                      or re.search(w, word_query, re.I | re.M | re.S))]

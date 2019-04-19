@@ -27,6 +27,15 @@ from typing import Callable, List, Union
 logger = logging.getLogger(__name__)
 
 
+def button_data(operation: str, operation_type: str = None, data: Union[int, str] = None) -> bytes:
+    button = {
+        "o": operation,
+        "t": operation_type,
+        "d": data
+    }
+    return dumps(button).replace(" ", "").encode("utf-8")
+
+
 def code(text) -> str:
     if text != "":
         return f"`{text}`"
@@ -41,25 +50,20 @@ def code_block(text) -> str:
     return ""
 
 
-def thread(target: Callable, args: tuple):
-    t = Thread(target=target, args=args)
-    t.daemon = True
-    t.start()
-
-
 def delay(secs, target: Callable, args: list):
     t = Timer(secs, target, args)
     t.daemon = True
     t.start()
 
 
-def button_data(operation: str, operation_type: str = None, data: Union[int, str] = None) -> bytes:
-    button = {
-        "o": operation,
-        "t": operation_type,
-        "d": data
-    }
-    return dumps(button).replace(" ", "").encode("utf-8")
+def get_text(message) -> str:
+    text = None
+    if message.text:
+        text = message.text
+    elif message.caption:
+        text = message.caption
+
+    return text
 
 
 def random_str(i):
@@ -128,6 +132,12 @@ def send_data(sender: str, receivers: List[str], operation: str, operation_type:
     }
 
     return code_block(dumps(data, indent=4))
+
+
+def thread(target: Callable, args: tuple):
+    t = Thread(target=target, args=args)
+    t.daemon = True
+    t.start()
 
 
 def user_mention(uid: int):
