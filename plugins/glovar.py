@@ -153,6 +153,6 @@ if (creator_id == 0
     logger.critical("No proper settings")
     raise SystemExit('No proper settings')
 
-copyright_text = ("SCP-079-REGEX v0.1.1, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
+copyright_text = ("SCP-079-REGEX v0.1.2, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
                   "Licensed under the terms of the GNU General Public License v3 or later (GPLv3+)\n")
 print(copyright_text)
