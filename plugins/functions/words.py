@@ -84,10 +84,16 @@ def similar(mode, a, b):
 
             i += 1
     else:
+        logger.warning(f"{(re.search(a, b, re.I | re.M | re.S) or re.search(b, a, re.I | re.M | re.S) or re.search(a, xg.xeger(b), re.I | re.M | re.S) or re.search(b, xg.xeger(a), re.I | re.M | re.S))}")
         if not (re.search(a, b, re.I | re.M | re.S)
                 or re.search(b, a, re.I | re.M | re.S)
                 or re.search(a, xg.xeger(b), re.I | re.M | re.S)
                 or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
+            logger.warning(f"{re.search(a, b, re.I | re.M | re.S)}")
+            logger.warning(f"{re.search(b, a, re.I | re.M | re.S)}")
+            logger.warning(f"{re.search(a, xg.xeger(b), re.I | re.M | re.S)}")
+            logger.warning(f"{re.search(b, xg.xeger(a), re.I | re.M | re.S)}")
+
             return False
 
     return True
