@@ -21,7 +21,7 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
-from ..functions.etc import code, get_text, thread
+from ..functions.etc import bold, code, get_text, thread
 from ..functions.telegram import send_message
 from ..functions.words import similar
 
@@ -37,6 +37,7 @@ def test(client, message):
             result = ""
             mid = message.message_id
             if text:
+                result += f"{bold('文字内容')}\n"
                 for word_type in glovar.names:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
@@ -66,7 +67,7 @@ def test(client, message):
                     chat = message.forward_from_chat
                     text = chat.title
 
-                result += f"来源名称：{code(text)}\n"
+                result += f"{bold('来源名称：')}{code(text)}\n"
                 for word_type in ["nm", "wb"]:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]

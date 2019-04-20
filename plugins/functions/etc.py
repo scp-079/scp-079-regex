@@ -27,6 +27,13 @@ from typing import Callable, List, Union
 logger = logging.getLogger(__name__)
 
 
+def bold(text) -> str:
+    if text != "":
+        return f"**{text}**"
+
+    return ""
+
+
 def button_data(action: str, action_type: str = None, data: Union[int, str] = None) -> bytes:
     button = {
         "a": action,
