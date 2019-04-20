@@ -32,7 +32,6 @@ logger = logging.getLogger(__name__)
 @Client.on_message(Filters.incoming & Filters.channel)
 def test(client, message):
     try:
-        logger.warning(f"{message}")
         if message.chat.id == glovar.channel_id:
             text = get_text(message)
             if text:
