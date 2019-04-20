@@ -61,6 +61,17 @@ def add_words(client, message):
         logger.warning(f"Add words error: {e}", exc_info=True)
 
 
+@Client.on_message(Filters.incoming & Filters.private & Filters.command(commands=["backup"],
+                                                                        prefix=glovar.prefix))
+def backup(client, message):
+    try:
+        aid = message.from_user.id
+        if aid == glovar.creator_id:
+            thread(backup, (client,))
+    except Exception as e:
+        logger.warning(f"Manual backup error: {e}", exc_info=True)
+
+
 @Client.on_message(Filters.incoming & Filters.private & Filters.command(commands=["ping"],
                                                                         prefix=glovar.prefix))
 def ping(client, message):

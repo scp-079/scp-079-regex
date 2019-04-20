@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from time import sleep
 
 from .. import glovar
 from .etc import send_data, thread
@@ -29,14 +30,19 @@ logger = logging.getLogger(__name__)
 
 def backup(client):
     try:
-        exchange_text = send_data(
-            sender="REGEX",
-            receivers=["ALL"],
-            action="backup",
-            action_type="pickle",
-            data="compiled"
-        )
-        crypt_file("encrypt", "data/compiled", "tmp/compiled")
-        thread(send_document, (client, glovar.exchange_id, "tmp/compiled", exchange_text))
+        for file in [f for f in glovar.names] + ["compiled"]:
+            try:
+                exchange_text = send_data(
+                    sender="REGEX",
+                    receivers=["ALL"],
+                    action="backup",
+                    action_type="pickle",
+                    data=file
+                )
+                crypt_file("encrypt", f"data/{file}", f"tmp/{file}")
+                thread(send_document, (client, glovar.exchange_id, f"tmp/{file}", exchange_text))
+                sleep(5)
+            except Exception as e:
+                logger.warning(f"Send backup file {file} error: {e}", exc_info=True)
     except Exception as e:
         logger.warning(f"Backup error: {e}", exc_info=True)
