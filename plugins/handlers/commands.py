@@ -85,8 +85,9 @@ def ping(client, message):
 
 
 @Client.on_message(Filters.incoming & Filters.group & Filters.command(commands=glovar.list_commands,
-                                                                      prefix=glovar.prefix), group=-1)
+                                                                      prefix=glovar.prefix))
 def list_words(client, message):
+    logger.warning("list_Words")
     try:
         cid = message.chat.id
         if cid == glovar.group_id:
