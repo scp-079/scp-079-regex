@@ -33,7 +33,7 @@ def backup(client):
             sender="REGEX",
             receivers=["ALL"],
             action="backup",
-            action_type="encrypted",
+            action_type="pickle",
             data="compiled"
         )
         crypt_file("encrypt", "data/compiled", "tmp/compiled")

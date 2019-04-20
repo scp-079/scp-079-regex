@@ -23,6 +23,8 @@ from string import ascii_letters, digits
 from threading import Thread, Timer
 from typing import Callable, List, Union
 
+from cryptography.fernet import Fernet
+
 # Enable logging
 logger = logging.getLogger(__name__)
 
@@ -55,6 +57,18 @@ def code_block(text) -> str:
         return f"```{text}```"
 
     return ""
+
+
+def crypt_str(operation, text, key) -> str:
+    f = Fernet(key)
+    if operation == "decrypt":
+        text = text.encode("utf-8")
+        result = f.decrypt(text)
+    else:
+        result = f.encrypt(text)
+        result = result.decode("utf-8")
+
+    return result
 
 
 def delay(secs, target: Callable, args: list):
@@ -106,6 +120,7 @@ def send_data(sender: str, receivers: List[str], action: str, action_type: str, 
         action (str):
             The operation that the data receivers need to perform. It can be any of the followings:
                 add - Add id to some list
+                backup - Announce backup data
                 remove - Remove id in some list
                 update - Update some data
 
@@ -121,9 +136,13 @@ def send_data(sender: str, receivers: List[str], action: str, action_type: str, 
                     watch delete - Suspicious user.
                                    Recommended to delete messages from the user when meets certain conditions
 
+                When operation is backup:
+                    pickle - Pickle file
+
                 When operation is update:
                     download - Download the data, then update
                     reload - Update the data from local machines
+
 
         data (optional):
             Additional data required for operation.

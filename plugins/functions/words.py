@@ -25,7 +25,7 @@ from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
 from xeger import Xeger
 
 from .. import glovar
-from .etc import code, button_data, delay, random_str, send_data, thread
+from .etc import code, crypt_str, button_data, delay, random_str, send_data, thread
 from .files import crypt_file, save
 from .telegram import send_document, send_message
 
@@ -44,7 +44,7 @@ def data_exchange(client):
             receivers=receivers,
             action="update",
             action_type="reload",
-            data=glovar.reload_path
+            data=crypt_str("encrypt", glovar.reload_path, glovar.key)
         )
         delay(5, send_message, [client, glovar.exchange_id, exchange_text])
     else:
@@ -52,7 +52,8 @@ def data_exchange(client):
             sender="REGEX",
             receivers=receivers,
             action="update",
-            action_type="download"
+            action_type="download",
+            data=crypt_str("encrypt", glovar.reload_path, glovar.key)
         )
         sleep(5)
         crypt_file("encrypt", "data/compiled", "tmp/compiled")

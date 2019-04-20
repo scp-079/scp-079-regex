@@ -121,6 +121,7 @@ channel_id: int = 0
 creator_id: int = 0
 exchange_id: int = 0
 group_id: int = 0
+key: Union[str, bytes] = ""
 password: str = ""
 per_page: int = 15
 prefix: List[str] = []
@@ -139,6 +140,8 @@ try:
         creator_id = int(config["custom"].get("creator_id", creator_id))
         exchange_id = int(config["custom"].get("exchange_id", exchange_id))
         group_id = int(config["custom"].get("group_id", group_id))
+        key = config["custom"].get("key", key)
+        key = key.encode("utf-8")
         password = config["custom"].get("password", password)
         per_page = int(config["custom"].get("per_page", per_page))
         prefix = list(config["custom"].get("prefix", prefix_str))
@@ -154,6 +157,7 @@ if (channel_id == 0
         or creator_id == 0
         or exchange_id == 0
         or group_id == 0
+        or key in {"", b"[DATA EXPUNGED]"}
         or password in {"", "[DATA EXPUNGED]"}
         or prefix == []
         or token in {"", "[DATA EXPUNGED]"}
@@ -161,6 +165,6 @@ if (channel_id == 0
     logger.critical("No proper settings")
     raise SystemExit('No proper settings')
 
-copyright_text = ("SCP-079-REGEX v0.1.3, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
+copyright_text = ("SCP-079-REGEX v0.1.4, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
                   "Licensed under the terms of the GNU General Public License v3 or later (GPLv3+)\n")
 print(copyright_text)
