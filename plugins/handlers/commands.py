@@ -24,7 +24,7 @@ from .. import glovar
 from ..functions.etc import code, get_text, thread, user_mention
 from ..functions.telegram import send_message
 from ..functions.timer import backup_files
-from .. functions.words import data_exchange, similar, words_add, words_list, words_remove
+from .. functions.words import data_exchange, get_type, similar, words_add, words_list, words_remove
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -40,12 +40,7 @@ def add_words(client, message):
             mid = message.message_id
             command_list = message.command
             if len(command_list) > 1:
-                i = 1
-                word_type = command_list[i]
-                while word_type == "" and i < len(command_list):
-                    i += 1
-                    word_type = command_list[i]
-
+                i, word_type = get_type(command_list)
                 if len(command_list) > 2 and word_type in glovar.names:
                     word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
                     text, markup = words_add(word_type, word)
@@ -100,12 +95,7 @@ def list_words(client, message):
             mid = message.message_id
             command_list = message.command
             if len(command_list) > 1:
-                i = 1
-                word_type = command_list[i]
-                while word_type == "" and i < len(command_list):
-                    i += 1
-                    word_type = command_list[i]
-
+                i, word_type = get_type(command_list)
                 if word_type in glovar.names:
                     text, markup = words_list(word_type, 1)
                 else:
@@ -134,12 +124,7 @@ def remove_words(client, message):
             mid = message.message_id
             command_list = message.command
             if len(command_list) > 1:
-                i = 1
-                word_type = command_list[i]
-                while word_type == "" and i < len(command_list):
-                    i += 1
-                    word_type = command_list[i]
-
+                i, word_type = get_type(command_list)
                 if len(command_list) > 2 and word_type in glovar.names:
                     word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
                     text = words_remove(word_type, word)
@@ -170,12 +155,7 @@ def search_words(client, message):
             mid = message.message_id
             command_list = message.command
             if len(command_list) > 1:
-                i = 1
-                word_type = command_list[i]
-                while word_type == "" and i < len(command_list):
-                    i += 1
-                    word_type = command_list[i]
-
+                i, word_type = get_type(command_list)
                 if len(command_list) > 2 and word_type in glovar.names:
                     word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
                     include_words = [w for w in eval(f"glovar.{word_type}_words") if similar("loose", w, word)]

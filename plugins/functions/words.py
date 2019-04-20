@@ -63,6 +63,16 @@ def data_exchange(client):
         logger.warning(f"Data exchange error: {e}")
 
 
+def get_type(command_list):
+    i = 1
+    word_type = command_list[i]
+    while word_type == "" and i < len(command_list):
+        i += 1
+        word_type = command_list[i]
+
+    return i, word_type
+
+
 def re_compile(word_type):
     text = '|'.join(eval(f"glovar.{word_type}_words"))
     if text != "":
