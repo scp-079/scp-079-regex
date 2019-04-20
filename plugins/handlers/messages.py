@@ -36,6 +36,7 @@ def test(client, message):
             text = get_text(message)
             if text:
                 result = ""
+                mid = message.message_id
                 for word_type in glovar.names:
                     if word_type != "sti":
                         if glovar.compiled[word_type].search(text):
@@ -57,6 +58,6 @@ def test(client, message):
                 else:
                     result = "并无匹配的各项检测结果"
 
-                thread(send_message, (client, message.chat.id, result))
+                thread(send_message, (client, message.chat.id, result, mid))
     except Exception as e:
         logger.warning(f"Test error: {e}", exc_info=True)

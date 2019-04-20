@@ -148,7 +148,10 @@ def search_words(client, message):
                     word = get_text(message)[len(command_list[0]) + len(command_list[1]) + 2:].strip()
                     include_words = [w for w in eval(f"glovar.{word_type}_words") if similar("loose", w, word)]
                     if include_words:
-                        text = '\n\n'.join(include_words)
+                        for w in include_words:
+                            text += f"{code(w)}\n\n"
+
+                        text = text[:-2]
                         text = (f"类别：{code(glovar.names[word_type])}\n"
                                 f"查询：{code(word)}\n"
                                 f"结果：------------------------\n\n{text}")

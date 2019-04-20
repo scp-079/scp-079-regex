@@ -146,7 +146,11 @@ def words_add(word_type, word):
             glovar.ask_words[word_key]["old"].append(old)
 
     if glovar.ask_words[word_key]["old"]:
-        text = '\n\n'.join(glovar.ask_words[word_key]["old"])
+        text = ""
+        for old in glovar.ask_words[word_key]["old"]:
+            text += f"{code(old)}\n\n"
+
+        text = text[:-2]
         text = (f"状态：{code('未添加')}\n"
                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
                 f"词组：{code(word)}\n"
@@ -227,6 +231,7 @@ def words_ask(operation: str, word_key):
 
 
 def words_list(word_type, page):
+    text = ""
     markup = None
     words = eval(f"glovar.{word_type}_words")
     if words:
@@ -291,8 +296,11 @@ def words_list(word_type, page):
                             ]
                         ]
                     )
-        
-        text = '\n\n'.join(w_list)
+
+        for w in w_list:
+            text += f"{code(w)}\n\n"
+
+        text = text[:-2]
         text = (f"类别：{code(glovar.names[word_type])}\n"
                 f"查询：{code('全部')}\n"
                 f"结果：------------------------\n\n{text}")
