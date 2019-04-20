@@ -67,7 +67,7 @@ def test(client, message):
                     chat = message.forward_from_chat
                     text = chat.title
 
-                result += f"{bold('来源名称：')}{code(text)}\n\n"
+                result += f"{bold('来源名称：')}{code(text)}\n\t\t\t\t|\n"
                 for word_type in ["nm", "wb"]:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
