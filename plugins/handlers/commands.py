@@ -42,9 +42,9 @@ def add_words(client, message):
             if len(command_list) > 1:
                 i = 1
                 word_type = command_list[i]
-                while word_type != "" and i < len(command_list):
-                    word_type = command_list[i]
+                while word_type == "" and i < len(command_list):
                     i += 1
+                    word_type = command_list[i]
 
                 if len(command_list) > 2 and word_type in glovar.names:
                     word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
@@ -102,9 +102,9 @@ def list_words(client, message):
             if len(command_list) > 1:
                 i = 1
                 word_type = command_list[i]
-                while word_type != "" and i < len(command_list):
-                    word_type = command_list[i]
+                while word_type == "" and i < len(command_list):
                     i += 1
+                    word_type = command_list[i]
 
                 if word_type in glovar.names:
                     text, markup = words_list(word_type, 1)
@@ -136,9 +136,9 @@ def remove_words(client, message):
             if len(command_list) > 1:
                 i = 1
                 word_type = command_list[i]
-                while word_type != "" and i < len(command_list):
-                    word_type = command_list[i]
+                while word_type == "" and i < len(command_list):
                     i += 1
+                    word_type = command_list[i]
 
                 if len(command_list) > 2 and word_type in glovar.names:
                     word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
@@ -172,9 +172,9 @@ def search_words(client, message):
             if len(command_list) > 1:
                 i = 1
                 word_type = command_list[i]
-                while word_type != "" and i < len(command_list):
-                    word_type = command_list[i]
+                while word_type == "" and i < len(command_list):
                     i += 1
+                    word_type = command_list[i]
 
                 if len(command_list) > 2 and word_type in glovar.names:
                     word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
