@@ -28,7 +28,7 @@ from .telegram import send_document
 logger = logging.getLogger(__name__)
 
 
-def backup(client):
+def backup_files(client):
     try:
         for file in [f for f in glovar.names] + ["compiled"]:
             try:

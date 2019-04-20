@@ -21,7 +21,7 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
-from ..functions.etc import code, get_text, thread, user_mention
+from ..functions.etc import backup_files, code, get_text, thread, user_mention
 from ..functions.telegram import send_message
 from .. functions.words import data_exchange, similar, words_add, words_list, words_remove
 
@@ -67,7 +67,7 @@ def backup(client, message):
     try:
         aid = message.from_user.id
         if aid == glovar.creator_id:
-            thread(backup, (client,))
+            thread(backup_files, (client,))
     except Exception as e:
         logger.warning(f"Manual backup error: {e}", exc_info=True)
 
