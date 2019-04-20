@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 def backup_files(client):
     try:
-        for file in [f for f in glovar.names] + ["compiled"]:
+        for file in [f"{f}_words" for f in glovar.names] + ["compiled"]:
             try:
                 exchange_text = send_data(
                     sender="REGEX",
