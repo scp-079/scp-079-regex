@@ -60,11 +60,7 @@ def data_exchange(client):
 
 
 def re_compile(word_type):
-    text = ""
-    for word in eval(f"glovar.{word_type}_words"):
-        text += word + "|"
-
-    text = text[0:len(text) - 1]
+    text = '|'.join(eval(f"glovar.{word_type}_words"))
     if text != "":
         glovar.compiled[word_type] = re.compile(text, re.I | re.S | re.M)
     else:
