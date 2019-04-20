@@ -42,20 +42,18 @@ def test(client, message):
                         if glovar.compiled[word_type].search(text):
                             w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
                             result += f"{glovar.names[word_type]}：------------------------\n\n"
-                            result += '\n\n'.join(w_list)
-                            result += "\n\n"
+                            for w in w_list:
+                                result += f"{code(w)}\n\n"
 
                 if message.sticker and message.sticker.set_name:
                     result += f"贴纸名称：{code(message.sticker.set_name)}\n"
                     if glovar.compiled["sti"].search(text):
                         w_list = [w for w in glovar.sti_words if similar("test", w, text)]
                         result += f"{glovar.names['sti']}：------------------------\n\n"
-                        result += '\n\n'.join(w_list)
-                        result += "\n\n"
+                        for w in w_list:
+                            result += f"{code(w)}\n\n"
 
-                if result != "":
-                    result = result[:-2]
-                else:
+                if result == "":
                     result = "并无匹配的各项检测结果"
 
                 thread(send_message, (client, message.chat.id, result, mid))
