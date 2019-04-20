@@ -41,6 +41,7 @@ def add_words(client, message):
             command_list = message.command
             if len(command_list) > 1:
                 i, word_type = get_type(command_list)
+                logger.warning("i gotten")
                 if len(command_list) > 2 and word_type in glovar.names:
                     word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
                     text, markup = words_add(word_type, word)

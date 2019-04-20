@@ -142,6 +142,7 @@ def words_add(word_type, word):
             return text, markup
 
     # Check similar patterns
+    logger.warning("check similar")
     word_key = random_str(8)
     while word_key in glovar.ask_words:
         word_key = random_str(8)
