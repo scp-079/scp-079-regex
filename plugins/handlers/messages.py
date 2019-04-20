@@ -45,15 +45,19 @@ def test(client, message):
                         for w in w_list:
                             result += f"\t\t\t\t{code(w)}\n\t\t\t\t|\n"
 
+                        result = result[:-6] + "\n"
+
             if message.sticker and message.sticker.set_name:
                 text = message.sticker.set_name
-                result += f"贴纸名称：{code(text)}\n\t\t\t\t|\n"
+                result += f"贴纸名称：{code(text)}\n\n"
                 for word_type in ["sti"]:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
                         result += f"\t\t\t\t{glovar.names[word_type]}：----------------\n\t\t\t\t|\n"
                         for w in w_list:
                             result += f"\t\t\t\t{code(w)}\n\t\t\t\t|\n"
+
+                        result = result[:-6] + "\n"
 
             if message.forward_from or message.forward_from_name or message.forward_from_chat:
                 if message.forward_from:
@@ -67,13 +71,15 @@ def test(client, message):
                     chat = message.forward_from_chat
                     text = chat.title
 
-                result += f"{bold('来源名称：')}{code(text)}\n\t\t\t\t|\n"
+                result += f"{bold('来源名称：')}{code(text)}\n\n"
                 for word_type in ["nm", "wb"]:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
                         result += f"\t\t\t\t{glovar.names[word_type]}：----------------\n\t\t\t\t|\n"
                         for w in w_list:
                             result += f"\t\t\t\t{code(w)}\n\t\t\t\t|\n"
+
+                        result = result[:-6] + "\n"
 
             if result == "":
                 result = "并无匹配的各项检测结果"
