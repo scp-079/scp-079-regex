@@ -54,8 +54,8 @@ def test(client, message):
                         result += f"{code(w)}\n\n"
 
             if message.forward_from or message.forward_from_name or message.forward_from_chat:
-                if message.forward_from_user:
-                    user = message.forward_from_user
+                if message.forward_from:
+                    user = message.forward_from
                     name = user.first_name
                     if user.last_name:
                         name += f" {user.last_name}"
