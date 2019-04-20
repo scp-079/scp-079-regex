@@ -41,7 +41,7 @@ def test(client, message):
                 for word_type in glovar.names:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                        result += f"\t\t\t\t{glovar.names[word_type]}：----------------\n\n"
+                        result += "\t" * 4 + f"{glovar.names[word_type]}：----------------\n\n"
                         for w in w_list:
                             result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -51,7 +51,7 @@ def test(client, message):
                 for word_type in ["sti"]:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                        result += f"\t\t\t\t{glovar.names[word_type]}：----------------\n\n"
+                        result += "\t" * 4 + f"{glovar.names[word_type]}：----------------\n\n"
                         for w in w_list:
                             result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -71,7 +71,7 @@ def test(client, message):
                 for word_type in ["nm", "wb"]:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                        result += f"\t\t\t\t{glovar.names[word_type]}：----------------\n\n"
+                        result += "\t" * 4 + f"{glovar.names[word_type]}：----------------\n\n"
                         for w in w_list:
                             result += "\t" * 8 + f"{code(w)}\n\n"
 
