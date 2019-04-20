@@ -67,7 +67,7 @@ def test(client, message):
 
                 result += f"来源名称：{code(name)}\n"
                 if glovar.compiled["nm"].search(name):
-                    w_list = [w for w in glovar.sti_words if similar("test", w, name)]
+                    w_list = [w for w in glovar.nm_words if similar("test", w, name)]
                     result += f"{glovar.names['nm']}：------------------------\n\n"
                     for w in w_list:
                         result += f"{code(w)}\n\n"
