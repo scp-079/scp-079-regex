@@ -37,23 +37,23 @@ def test(client, message):
             result = ""
             mid = message.message_id
             if text:
-                result += f"{bold('文字内容')}\n"
+                result += f"{bold('文字内容')}\n\n"
                 for word_type in glovar.names:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                        result += f"{glovar.names[word_type]}：------------------------\n\n"
+                        result += f"\t{glovar.names[word_type]}：------------------------\n\n"
                         for w in w_list:
-                            result += f"{code(w)}\n\n"
+                            result += f"\t{code(w)}\n\n"
 
             if message.sticker and message.sticker.set_name:
                 text = message.sticker.set_name
-                result += f"贴纸名称：{code(text)}\n"
+                result += f"贴纸名称：{code(text)}\n\n"
                 for word_type in ["sti"]:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                        result += f"{glovar.names[word_type]}：------------------------\n\n"
+                        result += f"\t{glovar.names[word_type]}：------------------------\n\n"
                         for w in w_list:
-                            result += f"{code(w)}\n\n"
+                            result += f"\t{code(w)}\n\n"
 
             if message.forward_from or message.forward_from_name or message.forward_from_chat:
                 if message.forward_from:
@@ -71,9 +71,9 @@ def test(client, message):
                 for word_type in ["nm", "wb"]:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                        result += f"{glovar.names[word_type]}：------------------------\n\n"
+                        result += f"\t{glovar.names[word_type]}：------------------------\n\n"
                         for w in w_list:
-                            result += f"{code(w)}\n\n"
+                            result += f"\t{code(w)}\n\n"
 
             if result == "":
                 result = "并无匹配的各项检测结果"
