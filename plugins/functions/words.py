@@ -37,27 +37,30 @@ xg = Xeger(limit=32)
 
 
 def data_exchange(client):
-    receivers = glovar.update_to
-    if glovar.update_type == "reload":
-        exchange_text = send_data(
-            sender="REGEX",
-            receivers=receivers,
-            action="update",
-            action_type="reload",
-            data=crypt_str("encrypt", glovar.reload_path, glovar.key)
-        )
-        delay(5, send_message, [client, glovar.exchange_id, exchange_text])
-    else:
-        exchange_text = send_data(
-            sender="REGEX",
-            receivers=receivers,
-            action="update",
-            action_type="download",
-            data=crypt_str("encrypt", glovar.reload_path, glovar.key)
-        )
-        sleep(5)
-        crypt_file("encrypt", "data/compiled", "tmp/compiled")
-        thread(send_document, (client, glovar.exchange_id, "tmp/compiled", exchange_text))
+    try:
+        receivers = glovar.update_to
+        if glovar.update_type == "reload":
+            exchange_text = send_data(
+                sender="REGEX",
+                receivers=receivers,
+                action="update",
+                action_type="reload",
+                data=crypt_str("encrypt", glovar.reload_path, glovar.key)
+            )
+            delay(5, send_message, [client, glovar.exchange_id, exchange_text])
+        else:
+            exchange_text = send_data(
+                sender="REGEX",
+                receivers=receivers,
+                action="update",
+                action_type="download",
+                data=crypt_str("encrypt", glovar.reload_path, glovar.key)
+            )
+            sleep(5)
+            crypt_file("encrypt", "data/compiled", "tmp/compiled")
+            thread(send_document, (client, glovar.exchange_id, "tmp/compiled", exchange_text))
+    except Exception as e:
+        logger.warning(f"Data exchange error: {e}")
 
 
 def re_compile(word_type):
