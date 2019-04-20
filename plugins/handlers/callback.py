@@ -40,7 +40,7 @@ def answer(client, callback_query):
             if uid == aid:
                 mid = callback_query.message.message_id
                 callback_data = loads(callback_query.data)
-                operation = callback_data["o"]
+                operation = callback_data["a"]
                 operation_type = callback_data["t"]
                 data = callback_data["d"]
                 if operation == "list":

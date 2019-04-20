@@ -27,10 +27,10 @@ from typing import Callable, List, Union
 logger = logging.getLogger(__name__)
 
 
-def button_data(operation: str, operation_type: str = None, data: Union[int, str] = None) -> bytes:
+def button_data(action: str, action_type: str = None, data: Union[int, str] = None) -> bytes:
     button = {
-        "o": operation,
-        "t": operation_type,
+        "a": action,
+        "t": action_type,
         "d": data
     }
     return dumps(button).replace(" ", "").encode("utf-8")
@@ -81,7 +81,7 @@ def receive_data(message) -> dict:
         return {}
 
 
-def send_data(sender: str, receivers: List[str], operation: str, operation_type: str, data=None) -> str:
+def send_data(sender: str, receivers: List[str], action: str, action_type: str, data=None) -> str:
     """Make a unified format string for data exchange.
 
     Args:
@@ -96,13 +96,13 @@ def send_data(sender: str, receivers: List[str], operation: str, operation_type:
                 USER - Stands for SCP-079-USER
                 WATCH - Stands for SCP-079-WATCHER
 
-        operation (str):
+        action (str):
             The operation that the data receivers need to perform. It can be any of the followings:
                 add - Add id to some list
                 remove - Remove id in some list
                 update - Update some data
 
-        operation_type (str):
+        action_type (str):
             Type of operation. It can be any of the followings:
                 When operation is add or remove:
                     bad channel - Spam channel
@@ -127,8 +127,8 @@ def send_data(sender: str, receivers: List[str], operation: str, operation_type:
     data = {
         "from": sender,
         "to": receivers,
-        "action": operation,
-        "type": operation_type,
+        "action": action,
+        "type": action_type,
         "data": data
     }
 

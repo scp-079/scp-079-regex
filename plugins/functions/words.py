@@ -42,8 +42,8 @@ def data_exchange(client):
         exchange_text = send_data(
             sender="REGEX",
             receivers=receivers,
-            operation="update",
-            operation_type="reload",
+            action="update",
+            action_type="reload",
             data=glovar.reload_path
         )
         delay(5, send_message, [client, glovar.exchange_id, exchange_text])
@@ -51,8 +51,8 @@ def data_exchange(client):
         exchange_text = send_data(
             sender="REGEX",
             receivers=receivers,
-            operation="update",
-            operation_type="download"
+            action="update",
+            action_type="download"
         )
         sleep(5)
         crypt_file("encrypt", "data/compiled", "tmp/compiled")
