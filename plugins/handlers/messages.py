@@ -38,12 +38,11 @@ def test(client, message):
             mid = message.message_id
             if text:
                 for word_type in glovar.names:
-                    if word_type != "sti":
-                        if glovar.compiled[word_type].search(text):
-                            w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                            result += f"{glovar.names[word_type]}：------------------------\n\n"
-                            for w in w_list:
-                                result += f"{code(w)}\n\n"
+                    if glovar.compiled[word_type].search(text):
+                        w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
+                        result += f"{glovar.names[word_type]}：------------------------\n\n"
+                        for w in w_list:
+                            result += f"{code(w)}\n\n"
 
             if message.sticker and message.sticker.set_name:
                 text = message.sticker.set_name
@@ -51,6 +50,23 @@ def test(client, message):
                 if glovar.compiled["sti"].search(text):
                     w_list = [w for w in glovar.sti_words if similar("test", w, text)]
                     result += f"{glovar.names['sti']}：------------------------\n\n"
+                    for w in w_list:
+                        result += f"{code(w)}\n\n"
+
+            if message.forward_from_user or message.forward_from_chat:
+                if message.forward_from_user:
+                    user = message.forward_from_user
+                    name = user.first_name
+                    if user.last_name:
+                        name += f" {user.last_name}"
+                else:
+                    chat = message.forward_from_chat
+                    name = chat.title
+
+                result += f"来源名称：{code(name)}\n"
+                if glovar.compiled["nm"].search(name):
+                    w_list = [w for w in glovar.sti_words if similar("test", w, text)]
+                    result += f"{glovar.names['nm']}：------------------------\n\n"
                     for w in w_list:
                         result += f"{code(w)}\n\n"
 
