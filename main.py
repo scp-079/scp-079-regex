@@ -20,8 +20,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+
+from apscheduler.schedulers.background import BackgroundScheduler
 from pyrogram import Client
+
 from plugins import glovar
+from plugins.functions import timer
 
 # Enable logging
 logging.basicConfig(
@@ -39,4 +43,11 @@ app = Client(
     bot_token=glovar.token
 )
 app.start()
+
+# Timer
+scheduler = BackgroundScheduler()
+scheduler.add_job(timer.backup, "cron", [app], hour=0)
+scheduler.start()
+
+# Hold
 app.idle()

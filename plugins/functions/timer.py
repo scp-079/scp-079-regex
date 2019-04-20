@@ -17,40 +17,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from pickle import dump
-from shutil import copyfile
-from threading import Thread
-
-from pyAesCrypt import decryptFile, encryptFile
 
 from .. import glovar
+from .etc import send_data, thread
+from .files import crypt_file
+from .telegram import send_document
 
 # Enable logging
 logger = logging.getLogger(__name__)
 
 
-def crypt_file(operation, file_in, file_out):
+def backup(client):
     try:
-        buffer = 64 * 1024
-        if operation == "decrypt":
-            decryptFile(file_in, file_out, glovar.password, buffer)
-        else:
-            encryptFile(file_in, file_out, glovar.password, buffer)
+        exchange_text = send_data(
+            sender="REGEX",
+            receivers=["ALL"],
+            action="backup",
+            action_type="encrypted",
+            data="compiled"
+        )
+        crypt_file("encrypt", "data/compiled", "tmp/compiled")
+        thread(send_document, (client, glovar.exchange_id, "tmp/compiled", exchange_text))
     except Exception as e:
-        logger.warning(f"Crypt file error: {e}", exc_info=True)
-
-
-def save(file):
-    t = Thread(target=save_thread, args=(file,))
-    t.start()
-
-
-def save_thread(file):
-    try:
-        if glovar:
-            with open(f"data/.{file}", "wb") as f:
-                dump(eval(f"glovar.{file}"), f)
-
-            copyfile(f"data/.{file}", f"data/{file}")
-    except Exception as e:
-        logger.error(f"Save data error: {e}", exc_info=True)
+        logger.warning(f"Backup error: {e}", exc_info=True)
