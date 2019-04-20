@@ -34,9 +34,9 @@ def test(client, message):
     try:
         if message.chat.id == glovar.channel_id:
             text = get_text(message)
+            result = ""
+            mid = message.message_id
             if text:
-                result = ""
-                mid = message.message_id
                 for word_type in glovar.names:
                     if word_type != "sti":
                         if glovar.compiled[word_type].search(text):
@@ -45,17 +45,17 @@ def test(client, message):
                             for w in w_list:
                                 result += f"{code(w)}\n\n"
 
-                if message.sticker and message.sticker.set_name:
-                    result += f"贴纸名称：{code(message.sticker.set_name)}\n"
-                    if glovar.compiled["sti"].search(text):
-                        w_list = [w for w in glovar.sti_words if similar("test", w, text)]
-                        result += f"{glovar.names['sti']}：------------------------\n\n"
-                        for w in w_list:
-                            result += f"{code(w)}\n\n"
+            if message.sticker and message.sticker.set_name:
+                result += f"贴纸名称：{code(message.sticker.set_name)}\n"
+                if glovar.compiled["sti"].search(text):
+                    w_list = [w for w in glovar.sti_words if similar("test", w, text)]
+                    result += f"{glovar.names['sti']}：------------------------\n\n"
+                    for w in w_list:
+                        result += f"{code(w)}\n\n"
 
-                if result == "":
-                    result = "并无匹配的各项检测结果"
+            if result == "":
+                result = "并无匹配的各项检测结果"
 
-                thread(send_message, (client, message.chat.id, result, mid))
+            thread(send_message, (client, message.chat.id, result, mid))
     except Exception as e:
         logger.warning(f"Test error: {e}", exc_info=True)
