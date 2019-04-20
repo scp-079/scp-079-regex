@@ -83,11 +83,14 @@ def similar(mode, a, b):
                 return False
 
             i += 1
-    else:
+    elif mode == "loose":
         if not (re.search(a, b, re.I | re.M | re.S)
                 or re.search(b, a, re.I | re.M | re.S)
                 or re.search(a, xg.xeger(b), re.I | re.M | re.S)
                 or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
+            return False
+    else:
+        if not re.search(a, b, re.I | re.M | re.S):
             return False
 
     return True
@@ -143,11 +146,7 @@ def words_add(word_type, word):
             glovar.ask_words[word_key]["old"].append(old)
 
     if glovar.ask_words[word_key]["old"]:
-        text = ""
-        for old in glovar.ask_words[word_key]["old"]:
-            text += f"{code(old)}\n\n"
-
-        text = text[:-2]
+        text = '\n\n'.join(glovar.ask_words[word_key]["old"])
         text = (f"状态：{code('未添加')}\n"
                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
                 f"词组：{code(word)}\n"
@@ -228,11 +227,10 @@ def words_ask(operation: str, word_key):
 
 
 def words_list(word_type, page):
-    text = ""
     markup = None
     words = eval(f"glovar.{word_type}_words")
     if words:
-        word = list(deepcopy(words))
+        w_list = list(deepcopy(words))
         quo = int(len(words) / glovar.per_page)
         if quo != 0:
             page_count = quo + 1
@@ -240,9 +238,9 @@ def words_list(word_type, page):
                 page_count = page_count - 1
 
             if page != page_count:
-                word = word[(page - 1) * glovar.per_page:page * glovar.per_page]
+                w_list = w_list[(page - 1) * glovar.per_page:page * glovar.per_page]
             else:
-                word = word[(page - 1) * glovar.per_page:len(word)]
+                w_list = w_list[(page - 1) * glovar.per_page:len(w_list)]
             if page_count > 1:
                 if page == 1:
                     markup = InlineKeyboardMarkup(
@@ -293,11 +291,8 @@ def words_list(word_type, page):
                             ]
                         ]
                     )
-
-        for w in word:
-            text += f"{code(w)}\n\n"
-
-        text = text[:-2]
+        
+        text = '\n\n'.join(w_list)
         text = (f"类别：{code(glovar.names[word_type])}\n"
                 f"查询：{code('全部')}\n"
                 f"结果：------------------------\n\n{text}")

@@ -35,24 +35,26 @@ def answer(client, callback_query):
     try:
         cid = callback_query.message.chat.id
         if cid == glovar.group_id:
-            aid = callback_query.from_user.id
-            mid = callback_query.message.message_id
-            callback_data = loads(callback_query.data)
-            operation = callback_data["o"]
-            operation_type = callback_data["t"]
-            data = callback_data["d"]
-            if operation == "list":
-                word_type = operation_type
-                page = data
-                text, markup = words_list(word_type, page)
-                text = f"管理：{user_mention(aid)}\n" + text
-                thread(edit_message, (client, cid, mid, text, markup))
-            elif operation == "ask":
-                text = words_ask(operation_type, data)
-                text = f"管理：{user_mention(aid)}\n" + text
-                thread(edit_message, (client, cid, mid, text))
-                if "已添加" in text:
-                    thread(data_exchange, (client,))
+            uid = callback_query.from_user.id
+            aid = int(callback_query.message.text.partition("\n")[0].partition("：")[2])
+            if uid == aid:
+                mid = callback_query.message.message_id
+                callback_data = loads(callback_query.data)
+                operation = callback_data["o"]
+                operation_type = callback_data["t"]
+                data = callback_data["d"]
+                if operation == "list":
+                    word_type = operation_type
+                    page = data
+                    text, markup = words_list(word_type, page)
+                    text = f"管理：{user_mention(aid)}\n" + text
+                    thread(edit_message, (client, cid, mid, text, markup))
+                elif operation == "ask":
+                    text = words_ask(operation_type, data)
+                    text = f"管理：{user_mention(aid)}\n" + text
+                    thread(edit_message, (client, cid, mid, text))
+                    if "已添加" in text:
+                        thread(data_exchange, (client,))
 
             thread(answer_callback, (client, callback_query.id, ""))
     except Exception as e:

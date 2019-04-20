@@ -38,13 +38,18 @@ def add_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
-            word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word = get_text(message)[len(command_list[0]) + 2:]
-                text, markup = words_add(word_type, word)
+                word_type = command_list[1]
+                if len(command_list) > 2 and word_type in glovar.names:
+                    word = get_text(message)[len(command_list[0]) + len(command_list[1]) + 2:].strip()
+                    text, markup = words_add(word_type, word)
+                else:
+                    text = (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
+                            f"状态：{code('未添加')}\n"
+                            f"原因：{code('格式有误')}")
+                    markup = None
             else:
-                text = (f"类别：{code(glovar.names[word_type])}\n"
-                        f"状态：{code('未添加')}\n"
+                text = (f"状态：{code('未添加')}\n"
                         f"原因：{code('格式有误')}")
                 markup = None
 
@@ -77,12 +82,17 @@ def list_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
-            word_type = command_list[0].split("_")[1]
-            if len(command_list) == 1:
-                text, markup = words_list(word_type, 1)
+            if len(command_list) > 1:
+                word_type = command_list[1]
+                if word_type in glovar.names:
+                    text, markup = words_list(word_type, 1)
+                else:
+                    text = (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
+                            f"结果：{code('无法显示')}\n"
+                            f"原因：{code('格式有误')}")
+                    markup = None
             else:
-                text = (f"类别：{code(glovar.names[word_type])}\n"
-                        f"结果：{code('无法显示')}\n"
+                text = (f"结果：{code('无法显示')}\n"
                         f"原因：{code('格式有误')}")
                 markup = None
 
@@ -101,13 +111,17 @@ def remove_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
-            word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word = get_text(message)[len(command_list[0]) + 2:]
-                text = words_remove(word_type, word)
+                word_type = command_list[1]
+                if len(command_list) > 2 and word_type in glovar.names:
+                    word = get_text(message)[len(command_list[0]) + len(command_list[1]) + 2:].strip()
+                    text = words_remove(word_type, word)
+                else:
+                    text = (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
+                            f"状态：{code('未移除')}\n"
+                            f"原因：{code('格式有误')}")
             else:
-                text = (f"类别：{code(glovar.names[word_type])}\n"
-                        f"状态：{code('未添加')}\n"
+                text = (f"状态：{code('未移除')}\n"
                         f"原因：{code('格式有误')}")
 
             text = f"管理：{user_mention(aid)}\n" + text
@@ -128,30 +142,27 @@ def search_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
-            word_type = command_list[0].split("_")[1]
             if len(command_list) > 1:
-                word_query = get_text(message)[len(command_list[0]) + 2:]
-                logger.warning(f"{get_text(message)}")
-                logger.warning(f"{get_text(message)[1:]}")
-                logger.warning(f"{command_list[0]} ")
-                logger.warning(f"{word_query}")
-                include_words = [w for w in eval(f"glovar.{word_type}_words") if similar("loose", w, word_query)]
-                if include_words:
-                    for w in include_words:
-                        text += f"{code(w)}\n\n"
-
-                    text = text[:-2]
-                    text = (f"类别：{code(glovar.names[word_type])}\n"
-                            f"查询：{code(word_query)}\n"
-                            f"结果：------------------------\n\n{text}")
+                word_type = command_list[1]
+                if len(command_list) > 2 and word_type in glovar.names:
+                    word = get_text(message)[len(command_list[0]) + len(command_list[1]) + 2:].strip()
+                    include_words = [w for w in eval(f"glovar.{word_type}_words") if similar("loose", w, word)]
+                    if include_words:
+                        text = '\n\n'.join(include_words)
+                        text = (f"类别：{code(glovar.names[word_type])}\n"
+                                f"查询：{code(word)}\n"
+                                f"结果：------------------------\n\n{text}")
+                    else:
+                        text = (f"类别：{code(glovar.names[word_type])}\n"
+                                f"查询：{code(word)}\n"
+                                f"结果：{code('无法显示')}\n"
+                                f"原因：{code('没有找到')}")
                 else:
-                    text = (f"类别：{code(glovar.names[word_type])}\n"
-                            f"查询：{code(word_query)}\n"
+                    text = (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
                             f"结果：{code('无法显示')}\n"
-                            f"原因：{code('没有找到')}")
+                            f"原因：{code('格式有误')}")
             else:
-                text = (f"类别：{code(glovar.names[word_type])}\n"
-                        f"结果：{code('无法显示')}\n"
+                text = (f"结果：{code('无法显示')}\n"
                         f"原因：{code('格式有误')}")
 
             text = f"管理：{user_mention(aid)}\n" + text

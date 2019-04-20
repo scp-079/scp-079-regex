@@ -33,28 +33,25 @@ logger = logging.getLogger(__name__)
 # Init
 names: dict = {
     "ad": "广告用语",
-    "avatar": "头像分析",
+    "ava": "头像分析",
     "bad": "敏感检测",
     "ban": "自动封禁",
     "bio": "简介封禁",
-    "contact": "联系方式",
-    "delete": "自动删除",
-    "emergency": "应急模式",
-    "nick": "昵称封禁",
-    "watch_bad": "追踪封禁",
-    "watch_delete": "追踪删除",
-    "sticker": "贴纸删除"
+    "con": "联系方式",
+    "del": "自动删除",
+    "eme": "应急模式",
+    "nm": "昵称封禁",
+    "wb": "追踪封禁",
+    "wd": "追踪删除",
+    "sti": "贴纸删除"
 }
 ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
 
 # Generate commands lists
-list_commands: list = []
-search_commands: list = []
-add_commands: list = []
-remove_commands: list = []
-
-for operation in ["list", "search", "add", "remove"]:
-    locals()[f"{operation}_commands"] = [f"{operation}_{word}" for word in names]
+list_commands: list = ["list", "ls"]
+search_commands: list = ["search", "s", "find"]
+add_commands: list = ["add", "ad"]
+remove_commands: list = ["remove", "rm"]
 
 # Load data form pickle
 try:
@@ -67,17 +64,17 @@ for path in ["data", "tmp"]:
         mkdir(path)
 
 ad_words: set = set()
-avatar_words: set = set()
+ava_words: set = set()
 bad_words: set = set()
 ban_words: set = set()
 bio_words: set = set()
-contact_words: set = set()
-delete_words: set = set()
-emergency_words: set = set()
-nick_words: set = set()
-watch_bad_words: set = set()
-watch_delete_words: set = set()
-sticker_words: set = set()
+con_words: set = set()
+del_words: set = set()
+eme_words: set = set()
+nm_words: set = set()
+wb_words: set = set()
+wd_words: set = set()
+sti_words: set = set()
 
 for word_type in names:
     locals()[f"{word_type}_words"] = {f"预留{names[f'{word_type}']}词组 {random_str(16)}"}
