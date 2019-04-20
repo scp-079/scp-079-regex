@@ -75,7 +75,7 @@ def test(client, message):
                         for w in w_list:
                             result += "\t" * 8 + f"{code(w)}\n\n"
 
-            if result == "":
+            if result in {"", f"{bold('文字内容')}\n\n"}:
                 result = "并无匹配的各项检测结果"
 
             thread(send_message, (client, message.chat.id, result, mid))
