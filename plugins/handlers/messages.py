@@ -32,30 +32,31 @@ logger = logging.getLogger(__name__)
 @Client.on_message(Filters.incoming & Filters.channel)
 def test(client, message):
     try:
-        text = get_text(message)
-        if text:
-            result = ""
-            for word_type in glovar.names:
-                if word_type != "sti":
-                    if glovar.compiled[word_type].search(text):
-                        w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                        result += f"{glovar.names[word_type]}：------------------------\n\n"
+        if message.chat.id == glovar.channel_id:
+            text = get_text(message)
+            if text:
+                result = ""
+                for word_type in glovar.names:
+                    if word_type != "sti":
+                        if glovar.compiled[word_type].search(text):
+                            w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
+                            result += f"{glovar.names[word_type]}：------------------------\n\n"
+                            result += '\n\n'.join(w_list)
+                            result += "\n\n"
+
+                if message.sticker and message.sticker.set_name:
+                    result += f"贴纸名称：{code(message.sticker.set_name)}\n"
+                    if glovar.compiled["sti"].search(text):
+                        w_list = [w for w in glovar.sti_words if similar("test", w, text)]
+                        result += f"{glovar.names['sti']}：------------------------\n\n"
                         result += '\n\n'.join(w_list)
                         result += "\n\n"
 
-            if message.sticker and message.sticker.set_name:
-                result += f"贴纸名称：{code(message.sticker.set_name)}\n"
-                if glovar.compiled["sti"].search(text):
-                    w_list = [w for w in glovar.sti_words if similar("test", w, text)]
-                    result += f"{glovar.names['sti']}：------------------------\n\n"
-                    result += '\n\n'.join(w_list)
-                    result += "\n\n"
+                if result != "":
+                    result = result[:-2]
+                else:
+                    result = "并无匹配的各项检测结果"
 
-            if result != "":
-                result = result[:-2]
-            else:
-                result = "并无匹配的各项检测结果"
-
-            thread(send_message, (client, message.chat.id, result))
+                thread(send_message, (client, message.chat.id, result))
     except Exception as e:
         logger.warning(f"Test error: {e}", exc_info=True)
