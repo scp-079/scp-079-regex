@@ -47,30 +47,32 @@ def test(client, message):
             if message.sticker and message.sticker.set_name:
                 text = message.sticker.set_name
                 result += f"贴纸名称：{code(text)}\n"
-                if glovar.compiled["sti"].search(text):
-                    w_list = [w for w in glovar.sti_words if similar("test", w, text)]
-                    result += f"{glovar.names['sti']}：------------------------\n\n"
-                    for w in w_list:
-                        result += f"{code(w)}\n\n"
+                for word_type in ["sti"]:
+                    if glovar.compiled[word_type].search(text):
+                        w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
+                        result += f"{glovar.names[word_type]}：------------------------\n\n"
+                        for w in w_list:
+                            result += f"{code(w)}\n\n"
 
             if message.forward_from or message.forward_from_name or message.forward_from_chat:
                 if message.forward_from:
                     user = message.forward_from
-                    name = user.first_name
+                    text = user.first_name
                     if user.last_name:
-                        name += f" {user.last_name}"
+                        text += f" {user.last_name}"
                 elif message.forward_from_name:
-                    name = message.forward_from_name
+                    text = message.forward_from_name
                 else:
                     chat = message.forward_from_chat
-                    name = chat.title
+                    text = chat.title
 
-                result += f"来源名称：{code(name)}\n"
-                if glovar.compiled["nm"].search(name):
-                    w_list = [w for w in glovar.nm_words if similar("test", w, name)]
-                    result += f"{glovar.names['nm']}：------------------------\n\n"
-                    for w in w_list:
-                        result += f"{code(w)}\n\n"
+                result += f"来源名称：{code(text)}\n"
+                for word_type in ["nm", "wb"]:
+                    if glovar.compiled[word_type].search(text):
+                        w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
+                        result += f"{glovar.names[word_type]}：------------------------\n\n"
+                        for w in w_list:
+                            result += f"{code(w)}\n\n"
 
             if result == "":
                 result = "并无匹配的各项检测结果"
