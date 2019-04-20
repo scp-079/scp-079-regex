@@ -93,6 +93,7 @@ def list_words(client, message):
             aid = message.from_user.id
             mid = message.message_id
             command_list = message.command
+            logger.warning(f"Command list: {command_list}")
             if len(command_list) > 1:
                 word_type = command_list[1]
                 if word_type in glovar.names:
