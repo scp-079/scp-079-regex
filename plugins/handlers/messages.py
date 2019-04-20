@@ -46,7 +46,8 @@ def test(client, message):
                                 result += f"{code(w)}\n\n"
 
             if message.sticker and message.sticker.set_name:
-                result += f"贴纸名称：{code(message.sticker.set_name)}\n"
+                text = message.sticker.set_name
+                result += f"贴纸名称：{code(text)}\n"
                 if glovar.compiled["sti"].search(text):
                     w_list = [w for w in glovar.sti_words if similar("test", w, text)]
                     result += f"{glovar.names['sti']}：------------------------\n\n"
