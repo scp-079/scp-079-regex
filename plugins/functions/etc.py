@@ -61,13 +61,13 @@ def code_block(text) -> str:
 
 def crypt_str(operation, text, key) -> str:
     f = Fernet(key)
+    text = text.encode("utf-8")
     if operation == "decrypt":
-        text = text.encode("utf-8")
         result = f.decrypt(text)
     else:
         result = f.encrypt(text)
-        result = result.decode("utf-8")
 
+    result = result.decode("utf-8")
     return result
 
 
