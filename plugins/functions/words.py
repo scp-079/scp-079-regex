@@ -142,7 +142,6 @@ def words_add(word_type, word):
             return text, markup
 
     # Check similar patterns
-    logger.warning("check similar")
     word_key = random_str(8)
     while word_key in glovar.ask_words:
         word_key = random_str(8)
@@ -162,6 +161,7 @@ def words_add(word_type, word):
             text += f"{code(old)}\n\n"
 
         text = text[:-2]
+        logger.warning(f"{text}")
         text = (f"状态：{code('未添加')}\n"
                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
                 f"词组：{code(word)}\n"
