@@ -78,7 +78,7 @@ def ping(client, message):
     try:
         aid = message.from_user.id
         if aid == glovar.creator_id:
-            text = code("Pong!")
+            text = code(f"{message.command}")
             thread(send_message, (client, message.chat.id, text))
     except Exception as e:
         logger.warning(f"Ping error: {e}", exc_info=True)
