@@ -196,31 +196,33 @@ def words_ask(operation: str, word_key):
         word_type = glovar.ask_words[word_key]["type"]
         new_word = glovar.ask_words[word_key]["new"]
         old_words = glovar.ask_words[word_key]["old"]
+        text = ""
+        for old in glovar.ask_words[word_key]["old"]:
+            text += f"{code(old)}\n\n"
+
+        text = text[:-2]
         if operation == "new":
             eval(f"glovar.{word_type}_words").add(new_word)
             re_compile(word_type)
             text = (f"状态：{code(f'已添加')}\n"
                     f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                    f"词组：{code(new_word)}")
+                    f"词组：{code(new_word)}\n"
+                    f"重复：------------------------\n\n{text}")
         elif operation == "replace":
             eval(f"glovar.{word_type}_words").add(new_word)
             for old in old_words:
                 eval(f"glovar.{word_type}_words").discard(old)
 
             re_compile(word_type)
-            replace_text = ""
-            for old in glovar.ask_words[word_key]["old"]:
-                replace_text += f"{code(old)}，"
-
-            replace_text = replace_text[:-1]
             text = (f"状态：{code(f'已添加')}\n"
                     f"类别：{code(f'{glovar.names[word_type]}')}\n"
                     f"词组：{code(new_word)}\n"
-                    f"替换：{replace_text}")
+                    f"替换：------------------------\n\n{text}")
         else:
             text = (f"状态：{code(f'已取消')}\n"
                     f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                    f"词组：{code(new_word)}")
+                    f"词组：{code(new_word)}\n"
+                    f"重复：------------------------\n\n{text}")
 
         glovar.ask_words.pop(word_key, None)
     else:
