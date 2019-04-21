@@ -23,7 +23,6 @@ from pyrogram import Client, Filters
 from .. import glovar
 from ..functions.etc import code, get_text, thread, user_mention
 from ..functions.telegram import send_message
-from ..functions.timer import backup_files
 from .. functions.words import data_exchange, get_type, similar, words_add, words_list, words_remove
 
 # Enable logging
@@ -62,24 +61,13 @@ def add_words(client, message):
         logger.warning(f"Add words error: {e}", exc_info=True)
 
 
-@Client.on_message(Filters.incoming & Filters.private & Filters.command(commands=["backup"],
-                                                                        prefix=glovar.prefix))
-def backup(client, message):
-    try:
-        aid = message.from_user.id
-        if aid == glovar.creator_id:
-            thread(backup_files, (client,))
-    except Exception as e:
-        logger.warning(f"Manual backup error: {e}", exc_info=True)
-
-
 @Client.on_message(Filters.incoming & Filters.private & Filters.command(commands=["ping"],
                                                                         prefix=glovar.prefix))
 def ping(client, message):
     try:
         aid = message.from_user.id
         if aid == glovar.creator_id:
-            text = code(f"{message.command}")
+            text = code(f"{code('Pong!')}")
             thread(send_message, (client, message.chat.id, text))
     except Exception as e:
         logger.warning(f"Ping error: {e}", exc_info=True)
