@@ -19,7 +19,7 @@
 import logging
 import pickle
 import re
-from configparser import ConfigParser
+from configparser import RawConfigParser
 from os import mkdir
 from os.path import exists
 from shutil import rmtree
@@ -132,7 +132,7 @@ update_to: Union[str, list] = ""
 update_type: str = "reload"
 
 try:
-    config = ConfigParser()
+    config = RawConfigParser()
     config.read("config.ini")
 
     if "custom" in config:

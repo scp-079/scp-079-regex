@@ -58,15 +58,15 @@ def test(client, message):
             if message.forward_from or message.forward_from_name or message.forward_from_chat:
                 if message.forward_from:
                     user = message.forward_from
-                    first_name = ""
-                    if user.first_name:
+                    if user.is_deleted:
+                        text = ""
+                    else:
                         first_name = user.first_name
+                        last_name = ""
+                        if user.last_name:
+                            last_name = message.forward_from.last_name
 
-                    last_name = ""
-                    if user.last_name:
-                        last_name = message.forward_from.last_name
-
-                    text = first_name + last_name
+                        text = first_name + last_name
                 elif message.forward_from_name:
                     text = message.forward_from_name
                 else:
@@ -87,3 +87,15 @@ def test(client, message):
             thread(send_message, (client, message.chat.id, result, mid))
     except Exception as e:
         logger.warning(f"Test error: {e}", exc_info=True)
+
+
+def text_test(client, message):
+    pass
+
+
+def name_test(client, message):
+    pass
+
+
+def sticker_test(client, message):
+    pass
