@@ -76,9 +76,9 @@ def get_type(command_list):
 def re_compile(word_type):
     text = '|'.join(eval(f"glovar.{word_type}_words"))
     if text != "":
-        glovar.compiled[word_type] = re.compile(text, re.I | re.S | re.M)
+        glovar.compiled[word_type] = re.compile(fr"{text}", re.I | re.S | re.M)
     else:
-        glovar.compiled[word_type] = re.compile(f"预留{glovar.names[f'{word_type}']}词组 {random_str(16)}",
+        glovar.compiled[word_type] = re.compile(fr"预留{glovar.names[f'{word_type}']}词组 {random_str(16)}",
                                                 re.I | re.M | re.S)
 
     save("compiled")
