@@ -58,9 +58,15 @@ def test(client, message):
             if message.forward_from or message.forward_from_name or message.forward_from_chat:
                 if message.forward_from:
                     user = message.forward_from
-                    text = user.first_name
+                    first_name = ""
+                    if user.first_name:
+                        first_name = user.first_name
+
+                    last_name = ""
                     if user.last_name:
-                        text += f" {user.last_name}"
+                        last_name = message.forward_from.last_name
+
+                    text = first_name + last_name
                 elif message.forward_from_name:
                     text = message.forward_from_name
                 else:
