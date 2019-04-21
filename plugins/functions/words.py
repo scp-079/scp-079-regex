@@ -337,6 +337,6 @@ def words_remove(word_type, word):
     else:
         text = (f"状态：{code('未移除')}\n"
                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                f"词组：{code(word)}"
+                f"词组：{code(word)}\n"
                 f"原因：{code('不存在')}")
         return text
