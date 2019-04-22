@@ -46,6 +46,7 @@ names: dict = {
     "sti": "贴纸删除"
 }
 ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
+search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 
 # Generate commands lists
 list_commands: list = ["list", "ls"]

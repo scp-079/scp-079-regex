@@ -41,9 +41,9 @@ def test(client, message):
             for word_type in glovar.names:
                 if glovar.compiled[word_type].search(text):
                     w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                    result += "\t" * 4 + f"{glovar.names[word_type]}：----------------\n\n"
+                    result += f"{glovar.names[word_type]}：----------------\n\n"
                     for w in w_list:
-                        result += "\t" * 8 + f"{code(w)}\n\n"
+                        result += "\t" * 4 + f"{code(w)}\n\n"
 
         if message.sticker and message.sticker.set_name:
             text = message.sticker.set_name

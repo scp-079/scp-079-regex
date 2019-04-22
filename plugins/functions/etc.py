@@ -87,6 +87,13 @@ def get_text(message) -> str:
     return text
 
 
+def italic(text) -> str:
+    if text != "":
+        return f"*{text}*"
+
+    return ""
+
+
 def random_str(i):
     return ''.join(choice(ascii_letters + digits) for _ in range(i))
 
