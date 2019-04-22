@@ -59,24 +59,8 @@ def ping(client, message):
 def list_words(client, message):
     try:
         cid = message.chat.id
-        aid = message.from_user.id
         mid = message.message_id
-        command_list = message.command
-        if len(command_list) > 1:
-            i, word_type = get_type(command_list)
-            if word_type in glovar.names:
-                text, markup = words_list(word_type, 1)
-            else:
-                text = (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
-                        f"结果：{code('无法显示')}\n"
-                        f"原因：{code('格式有误')}")
-                markup = None
-        else:
-            text = (f"结果：{code('无法显示')}\n"
-                    f"原因：{code('格式有误')}")
-            markup = None
-
-        text = f"管理：{user_mention(aid)}\n" + text
+        text, markup = words_list(message)
         thread(send_message, (client, cid, text, mid, markup))
     except Exception as e:
         logger.warning(f"List words error: {e}", exc_info=True)

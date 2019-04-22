@@ -23,7 +23,7 @@ from pyrogram import Client
 
 from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group
-from .. functions.words import data_exchange, words_ask, words_list
+from .. functions.words import data_exchange, words_ask, words_list_page
 from ..functions.telegram import answer_callback, edit_message
 
 # Enable logging
@@ -45,8 +45,7 @@ def answer(client, callback_query):
             if action == "list":
                 word_type = action_type
                 page = data
-                text, markup = words_list(word_type, page)
-                text = f"管理：{user_mention(aid)}\n" + text
+                text, markup = words_list_page(aid, word_type, page)
                 thread(edit_message, (client, cid, mid, text, markup))
             elif action == "ask":
                 text = words_ask(action_type, data)

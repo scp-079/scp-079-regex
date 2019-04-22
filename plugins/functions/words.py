@@ -254,85 +254,97 @@ def words_ask(operation: str, word_key):
     return text
 
 
-def words_list(word_type, page):
-    text = ""
+def words_list(message):
+    uid = message.from_user.id
+    text = f"管理：{user_mention(uid)}\n"
+    command_list = list(filter(None, message.command))
+    if len(command_list) > 1:
+        word_type = command_list[1]
+        if word_type in glovar.names:
+            text, markup = words_list_page(uid, word_type, 1)
+        else:
+            text += (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
+                     f"结果：{code('无法显示')}\n"
+                     f"原因：{code('格式有误')}")
+            markup = None
+    else:
+        text += (f"结果：{code('无法显示')}\n"
+                 f"原因：{code('格式有误')}")
+        markup = None
+
+    return text, markup
+
+
+def words_list_page(uid, word_type, page):
+    text = f"管理：{user_mention(uid)}\n"
     markup = None
     words = eval(f"glovar.{word_type}_words")
-    if words:
-        w_list = list(deepcopy(words))
-        quo = int(len(words) / glovar.per_page)
-        if quo != 0:
-            page_count = quo + 1
-            if len(words) % glovar.per_page == 0:
-                page_count = page_count - 1
+    w_list = list(deepcopy(words))
+    quo = int(len(words) / glovar.per_page)
+    if quo != 0:
+        page_count = quo + 1
+        if len(words) % glovar.per_page == 0:
+            page_count = page_count - 1
 
-            if page != page_count:
-                w_list = w_list[(page - 1) * glovar.per_page:page * glovar.per_page]
+        if page != page_count:
+            w_list = w_list[(page - 1) * glovar.per_page:page * glovar.per_page]
+        else:
+            w_list = w_list[(page - 1) * glovar.per_page:len(w_list)]
+        if page_count > 1:
+            if page == 1:
+                markup = InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                f"第 {page} 页",
+                                callback_data=button_data("none")
+                            ),
+                            InlineKeyboardButton(
+                                ">>",
+                                callback_data=button_data("list", word_type, page + 1)
+                            )
+                        ]
+                    ]
+                )
+            elif page == page_count:
+                markup = InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                "<<",
+                                callback_data=button_data("list", word_type, page - 1)
+                            ),
+                            InlineKeyboardButton(
+                                f"第 {page} 页",
+                                callback_data=button_data("none")
+                            )
+                        ]
+                    ]
+                )
             else:
-                w_list = w_list[(page - 1) * glovar.per_page:len(w_list)]
-            if page_count > 1:
-                if page == 1:
-                    markup = InlineKeyboardMarkup(
+                markup = InlineKeyboardMarkup(
+                    [
                         [
-                            [
-                                InlineKeyboardButton(
-                                    f"第 {page} 页",
-                                    callback_data=button_data("none")
-                                ),
-                                InlineKeyboardButton(
-                                    ">>",
-                                    callback_data=button_data("list", word_type, page + 1)
-                                )
-                            ]
+                            InlineKeyboardButton(
+                                "<<",
+                                callback_data=button_data("list", word_type, page - 1)
+                            ),
+                            InlineKeyboardButton(
+                                f"第 {page} 页",
+                                callback_data=button_data("none")
+                            ),
+                            InlineKeyboardButton(
+                                '>>',
+                                callback_data=button_data("list", word_type, page + 1)
+                            )
                         ]
-                    )
-                elif page == page_count:
-                    markup = InlineKeyboardMarkup(
-                        [
-                            [
-                                InlineKeyboardButton(
-                                    "<<",
-                                    callback_data=button_data("list", word_type, page - 1)
-                                ),
-                                InlineKeyboardButton(
-                                    f"第 {page} 页",
-                                    callback_data=button_data("none")
-                                )
-                            ]
-                        ]
-                    )
-                else:
-                    markup = InlineKeyboardMarkup(
-                        [
-                            [
-                                InlineKeyboardButton(
-                                    "<<",
-                                    callback_data=button_data("list", word_type, page - 1)
-                                ),
-                                InlineKeyboardButton(
-                                    f"第 {page} 页",
-                                    callback_data=button_data("none")
-                                ),
-                                InlineKeyboardButton(
-                                    '>>',
-                                    callback_data=button_data("list", word_type, page + 1)
-                                )
-                            ]
-                        ]
-                    )
+                    ]
+                )
 
-        for w in w_list:
-            text += f"{code(w)}\n\n"
-
-        text = text[:-2]
-        text = (f"类别：{code(glovar.names[word_type])}\n"
-                f"查询：{code('全部')}\n"
-                f"结果：------------------------\n\n{text}")
-    else:
-        text = (f"类别：{code(glovar.names[word_type])}\n"
-                f"查询：{code('全部')}\n"
-                f"结果：{code('无法显示')}\n"
-                f"原因：{code('没有找到')}")
+    end_text = "\n\n".join(w_list)
+    text += (f"类别：{code(glovar.names[word_type])}\n"
+             f"查询：{code('全部')}\n"
+             f"结果：------------------------\n\n{end_text}")
 
     return text, markup
 
