@@ -21,10 +21,10 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
-from ..functions.etc import code, get_text, thread, user_mention
+from ..functions.etc import code, thread
 from ..functions.filters import regex_group, test_group
 from ..functions.telegram import send_message
-from .. functions.words import data_exchange, get_type, similar, words_add, words_list, words_remove
+from .. functions.words import data_exchange, words_add, words_list, words_remove, words_search
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -85,37 +85,8 @@ def remove_words(client, message):
 def search_words(client, message):
     try:
         cid = message.chat.id
-        uid = message.from_user.id
         mid = message.message_id
-        text = ""
-        command_list = message.command
-        if len(command_list) > 1:
-            i, word_type = get_type(command_list)
-            if len(command_list) > 2 and word_type in glovar.names:
-                word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
-                include_words = [w for w in eval(f"glovar.{word_type}_words") if similar("loose", w, word)]
-                if include_words:
-                    for w in include_words:
-                        text += f"{code(w)}\n\n"
-
-                    text = text[:-2]
-                    text = (f"类别：{code(glovar.names[word_type])}\n"
-                            f"查询：{code(word)}\n"
-                            f"结果：------------------------\n\n{text}")
-                else:
-                    text = (f"类别：{code(glovar.names[word_type])}\n"
-                            f"查询：{code(word)}\n"
-                            f"结果：{code('无法显示')}\n"
-                            f"原因：{code('没有找到')}")
-            else:
-                text = (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
-                        f"结果：{code('无法显示')}\n"
-                        f"原因：{code('格式有误')}")
-        else:
-            text = (f"结果：{code('无法显示')}\n"
-                    f"原因：{code('格式有误')}")
-
-        text = f"管理：{user_mention(uid)}\n" + text
-        thread(send_message, (client, cid, text, mid))
+        text, markup = words_search(message)
+        thread(send_message, (client, cid, text, mid, markup))
     except Exception as e:
         logger.warning(f"Search words error: {e}", exc_info=True)

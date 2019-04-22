@@ -18,7 +18,6 @@
 
 import logging
 import re
-from copy import deepcopy
 from time import sleep
 
 from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
@@ -279,7 +278,8 @@ def words_list_page(uid, word_type, page):
     text = f"管理：{user_mention(uid)}\n"
     markup = None
     words = eval(f"glovar.{word_type}_words")
-    w_list = list(deepcopy(words))
+    w_list = list(words)
+    w_list.sort()
     quo = int(len(words) / glovar.per_page)
     if quo != 0:
         page_count = quo + 1
@@ -378,3 +378,34 @@ def words_remove(message) -> str:
                  f"原因：{code('格式有误')}")
 
     return text
+
+
+def words_search(message) -> (str, InlineKeyboardMarkup):
+    uid = message.from_user.id
+    text = f"管理：{user_mention(uid)}\n"
+    markup = None
+    command_list = message.command
+    if len(command_list) > 1:
+        i, word_type = get_type(command_list)
+        if len(command_list) > 2 and word_type in glovar.names:
+            word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
+            include_words = [w for w in eval(f"glovar.{word_type}_words") if similar("loose", w, word)]
+            if include_words:
+                end_text = "\n\n".join([code(w) for w in include_words])
+                text += (f"类别：{code(glovar.names[word_type])}\n"
+                         f"查询：{code(word)}\n"
+                         f"结果：------------------------\n\n{end_text}")
+            else:
+                text += (f"类别：{code(glovar.names[word_type])}\n"
+                         f"查询：{code(word)}\n"
+                         f"结果：{code('无法显示')}\n"
+                         f"原因：{code('没有找到')}")
+        else:
+            text += (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
+                     f"结果：{code('无法显示')}\n"
+                     f"原因：{code('格式有误')}")
+    else:
+        text = (f"结果：{code('无法显示')}\n"
+                f"原因：{code('格式有误')}")
+
+    return text, markup
