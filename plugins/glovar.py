@@ -150,9 +150,9 @@ try:
     bot_token = config["basic"].get("token", bot_token)
     prefix = list(config["basic"].get("prefix", prefix_str))
     # [channels]
-    exchange_channel_id = int(config["channels"].get("exchange_id", exchange_channel_id))
-    test_group_id = int(config["channels"].get("channel_id", test_group_id))
-    regex_group_id = int(config["channels"].get("group_id", regex_group_id))
+    exchange_channel_id = int(config["channels"].get("exchange_channel_id", exchange_channel_id))
+    test_group_id = int(config["channels"].get("test_group_id", test_group_id))
+    regex_group_id = int(config["channels"].get("regex_group_id", regex_group_id))
     # [custom]
     per_page = int(config["custom"].get("per_page", per_page))
     reload_path = config["custom"].get("reload_path", reload_path)
