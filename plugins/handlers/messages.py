@@ -30,7 +30,7 @@ from ..functions.words import similar
 logger = logging.getLogger(__name__)
 
 
-@Client.on_message(Filters.incoming & Filters.group & test_group)
+@Client.on_message(Filters.incoming & Filters.group & test_group & ~Filters.service)
 def test(client, message):
     try:
         text = get_text(message)
