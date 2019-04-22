@@ -25,7 +25,7 @@ from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
 from xeger import Xeger
 
 from .. import glovar
-from .etc import code, crypt_str, button_data, delay, get_text, random_str, send_data, thread, user_mention
+from .etc import code, crypt_str, button_data, delay, random_str, send_data, thread, user_mention
 from .files import crypt_file, save
 from .telegram import send_document, send_message
 
@@ -63,7 +63,7 @@ def data_exchange(client):
         logger.warning(f"Data exchange error: {e}")
 
 
-def get_type(command_list):
+def get_type(command_list) -> (int, str):
     i = 1
     word_type = command_list[i]
     while word_type == "" and i < len(command_list):
@@ -85,7 +85,7 @@ def re_compile(word_type):
     save(f"{word_type}_words")
 
 
-def similar(mode, a, b):
+def similar(mode, a, b) -> bool:
     if mode == "strict":
         i = 0
         while i < 3:
@@ -106,14 +106,15 @@ def similar(mode, a, b):
     return True
 
 
-def words_add(message):
+def words_add(message) -> (str, InlineKeyboardMarkup):
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
-    command_list = message.command
+    command_list = list(filter(None, message.command))
+    # Check if the command format is correct
     if len(command_list) > 1:
-        i, word_type = get_type(command_list)
+        word_type = command_list[1]
         if len(command_list) > 2 and word_type in glovar.names:
-            word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
+            word = command_list[2]
             # Check if the word already exits
             if word in eval(f"glovar.{word_type}_words"):
                 text += (f"状态：{code('未添加')}\n"
@@ -121,98 +122,95 @@ def words_add(message):
                          f"词组：{code(word)}\n"
                          f"原因：{code('已存在')}")
                 markup = None
-                return text, markup
-
-            # Check if the pattern is correct
-            try:
-                pattern = re.compile(word, re.I | re.M | re.S)
-            except Exception as e:
-                text += (f"状态：{code('未添加')}\n"
-                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                         f"词组：{code(word)}\n"
-                         f"原因：{code('出现错误')}\n"
-                         f"错误：{code(e)}")
-                markup = None
-                return text, markup
-
-            # Check if the pattern is special
-            for test in ["项脊轩，旧南阁子也。室仅方丈，可容一人居。",
-                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                         "0123456789"
-                         ]:
-                if pattern.search(test):
+            else:
+                # Check if the pattern is correct
+                try:
+                    pattern = re.compile(word, re.I | re.M | re.S)
+                except Exception as e:
                     text += (f"状态：{code('未添加')}\n"
                              f"类别：{code(f'{glovar.names[word_type]}')}\n"
                              f"词组：{code(word)}\n"
-                             f"原因：{code('不具有特殊性')}")
+                             f"原因：{code('出现错误')}\n"
+                             f"错误：{code(e)}")
                     markup = None
                     return text, markup
 
-            # Check similar patterns
-            word_key = random_str(8)
-            while word_key in glovar.ask_words:
+                # Check if the pattern is special
+                for test in ["项脊轩，旧南阁子也。室仅方丈，可容一人居。",
+                             "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                             "0123456789"
+                             ]:
+                    if pattern.search(test):
+                        text += (f"状态：{code('未添加')}\n"
+                                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                                 f"词组：{code(word)}\n"
+                                 f"原因：{code('不具有特殊性')}")
+                        markup = None
+                        return text, markup
+
+                # Check similar patterns
                 word_key = random_str(8)
+                while word_key in glovar.ask_words:
+                    word_key = random_str(8)
 
-            glovar.ask_words[word_key] = {
-                "type": word_type,
-                "new": word,
-                "old": []
-            }
-            for old in eval(f"glovar.{word_type}_words"):
-                if similar("strict", old, word):
-                    glovar.ask_words[word_key]["old"].append(old)
+                glovar.ask_words[word_key] = {
+                    "type": word_type,
+                    "new": word,
+                    "old": []
+                }
+                for old in eval(f"glovar.{word_type}_words"):
+                    if similar("strict", old, word):
+                        glovar.ask_words[word_key]["old"].append(old)
 
-            if glovar.ask_words[word_key]["old"]:
-                end_text = "\n\n".join(glovar.ask_words[word_key]["old"])
-                text += (f"状态：{code('未添加')}\n"
-                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                         f"词组：{code(word)}\n"
-                         f"原因：{code('等待确认')}\n"
-                         f"重复：------------------------\n\n{end_text}")
-                add_new = button_data("ask", "new", word_key)
-                replace_all = button_data("ask", "replace", word_key)
-                cancel = button_data("ask", "cancel", word_key)
-                markup = InlineKeyboardMarkup(
-                    [
+                if glovar.ask_words[word_key]["old"]:
+                    end_text = "\n\n".join(glovar.ask_words[word_key]["old"])
+                    text += (f"状态：{code('未添加')}\n"
+                             f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                             f"词组：{code(word)}\n"
+                             f"原因：{code('等待确认')}\n"
+                             f"重复：------------------------\n\n{end_text}")
+                    add_new = button_data("ask", "new", word_key)
+                    replace_all = button_data("ask", "replace", word_key)
+                    cancel = button_data("ask", "cancel", word_key)
+                    markup = InlineKeyboardMarkup(
                         [
-                            InlineKeyboardButton(
-                                "另增新词",
-                                callback_data=add_new
-                            ),
-                            InlineKeyboardButton(
-                                "替换全部",
-                                callback_data=replace_all
-                            )
-                        ],
-                        [
-                            InlineKeyboardButton(
-                                "取消",
-                                callback_data=cancel
-                            )
+                            [
+                                InlineKeyboardButton(
+                                    "另增新词",
+                                    callback_data=add_new
+                                ),
+                                InlineKeyboardButton(
+                                    "替换全部",
+                                    callback_data=replace_all
+                                )
+                            ],
+                            [
+                                InlineKeyboardButton(
+                                    "取消",
+                                    callback_data=cancel
+                                )
+                            ]
                         ]
-                    ]
-                )
-                return text, markup
-            else:
-                glovar.ask_words.pop(word_key, None)
-                eval(f"glovar.{word_type}_words").add(word)
-                re_compile(word_type)
-                text += (f"状态：{code(f'已添加')}\n"
-                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                         f"词组：{code(word)}")
-                markup = None
-                return text, markup
+                    )
+                else:
+                    glovar.ask_words.pop(word_key, None)
+                    eval(f"glovar.{word_type}_words").add(word)
+                    re_compile(word_type)
+                    text += (f"状态：{code(f'已添加')}\n"
+                             f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                             f"词组：{code(word)}")
+                    markup = None
         else:
             text += (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
                      f"状态：{code('未添加')}\n"
                      f"原因：{code('格式有误')}")
             markup = None
-            return text, markup
     else:
         text += (f"状态：{code('未添加')}\n"
                  f"原因：{code('格式有误')}")
         markup = None
-        return text, markup
+
+    return text, markup
 
 
 def words_ask(operation: str, word_key):
@@ -339,18 +337,32 @@ def words_list(word_type, page):
     return text, markup
 
 
-def words_remove(word_type, word):
-    if word in eval(f"glovar.{word_type}_words"):
-        eval(f"glovar.{word_type}_words").discard(word)
-        re_compile(word_type)
-        text = (f"状态：{code(f'已移除')}\n"
-                f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                f"词组：{code(word)}")
-        return text
-
+def words_remove(message) -> str:
+    uid = message.from_user.id
+    text = f"管理：{user_mention(uid)}\n"
+    command_list = list(filter(None, message.command))
+    # Check if the command format is correct
+    if len(command_list) > 1:
+        word_type = command_list[1]
+        if len(command_list) > 2 and word_type in glovar.names:
+            word = command_list[2]
+            if word in eval(f"glovar.{word_type}_words"):
+                eval(f"glovar.{word_type}_words").discard(word)
+                re_compile(word_type)
+                text += (f"状态：{code(f'已移除')}\n"
+                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                         f"词组：{code(word)}")
+            else:
+                text += (f"状态：{code('未移除')}\n"
+                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                         f"词组：{code(word)}\n"
+                         f"原因：{code('不存在')}")
+        else:
+            text += (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
+                     f"状态：{code('未移除')}\n"
+                     f"原因：{code('格式有误')}")
     else:
-        text = (f"状态：{code('未移除')}\n"
-                f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                f"词组：{code(word)}\n"
-                f"原因：{code('不存在')}")
-        return text
+        text += (f"状态：{code('未移除')}\n"
+                 f"原因：{code('格式有误')}")
+
+    return text
