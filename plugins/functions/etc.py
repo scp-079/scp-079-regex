@@ -89,7 +89,7 @@ def get_text(message) -> str:
 
 def italic(text) -> str:
     if text != "":
-        return f"*{text}*"
+        return f"__{text}__"
 
     return ""
 
