@@ -445,7 +445,8 @@ def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMark
                 for w in w_list:
                     end_text += (f"{code(w)}\n\n"
                                  + "\t" * 4
-                                 + "，".join([f"{italic(t)}" for t in glovar.search_words[key]['result'][w]])
+                                 + "，".join([f"{italic(glovar.names[t])}"
+                                             for t in glovar.search_words[key]['result'][w]])
                                  + "\n\n")
 
                 end_text = end_text[:-2]
