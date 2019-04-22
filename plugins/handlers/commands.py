@@ -35,25 +35,8 @@ logger = logging.getLogger(__name__)
 def add_words(client, message):
     try:
         cid = message.chat.id
-        uid = message.from_user.id
         mid = message.message_id
-        command_list = message.command
-        if len(command_list) > 1:
-            i, word_type = get_type(command_list)
-            if len(command_list) > 2 and word_type in glovar.names:
-                word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
-                text, markup = words_add(word_type, word)
-            else:
-                text = (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
-                        f"状态：{code('未添加')}\n"
-                        f"原因：{code('格式有误')}")
-                markup = None
-        else:
-            text = (f"状态：{code('未添加')}\n"
-                    f"原因：{code('格式有误')}")
-            markup = None
-
-        text = f"管理：{user_mention(uid)}\n" + text
+        text, markup = words_add(message)
         thread(send_message, (client, cid, text, mid, markup))
         if "已添加" in text:
             thread(data_exchange, (client,))

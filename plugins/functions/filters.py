@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from pyrogram import Filters
+from pyrogram import CallbackQuery, Filters
 
 from .. import glovar
 
@@ -38,7 +38,12 @@ def is_test_group(_, message):
     return False
 
 
-def is_regex_group(_, message):
+def is_regex_group(_, update):
+    if isinstance(update, CallbackQuery):
+        message = update.message
+    else:
+        message = update
+
     cid = message.chat.id
     if cid == glovar.regex_group_id:
         return True

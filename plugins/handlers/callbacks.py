@@ -21,8 +21,8 @@ from json import loads
 
 from pyrogram import Client
 
-from .. import glovar
 from ..functions.etc import thread, user_mention
+from ..functions.filters import regex_group
 from .. functions.words import data_exchange, words_ask, words_list
 from ..functions.telegram import answer_callback, edit_message
 
@@ -30,31 +30,30 @@ from ..functions.telegram import answer_callback, edit_message
 logger = logging.getLogger(__name__)
 
 
-@Client.on_callback_query()
+@Client.on_callback_query(regex_group)
 def answer(client, callback_query):
     try:
         cid = callback_query.message.chat.id
-        if cid == glovar.test_group_id:
-            uid = callback_query.from_user.id
-            aid = int(callback_query.message.text.partition("\n")[0].partition("：")[2])
-            if uid == aid:
-                mid = callback_query.message.message_id
-                callback_data = loads(callback_query.data)
-                operation = callback_data["a"]
-                operation_type = callback_data["t"]
-                data = callback_data["d"]
-                if operation == "list":
-                    word_type = operation_type
-                    page = data
-                    text, markup = words_list(word_type, page)
-                    text = f"管理：{user_mention(aid)}\n" + text
-                    thread(edit_message, (client, cid, mid, text, markup))
-                elif operation == "ask":
-                    text = words_ask(operation_type, data)
-                    text = f"管理：{user_mention(aid)}\n" + text
-                    thread(edit_message, (client, cid, mid, text))
-                    if "已添加" in text:
-                        thread(data_exchange, (client,))
+        uid = callback_query.from_user.id
+        aid = int(callback_query.message.text.partition("\n")[0].partition("：")[2])
+        if uid == aid:
+            mid = callback_query.message.message_id
+            callback_data = loads(callback_query.data)
+            action = callback_data["a"]
+            action_type = callback_data["t"]
+            data = callback_data["d"]
+            if action == "list":
+                word_type = action_type
+                page = data
+                text, markup = words_list(word_type, page)
+                text = f"管理：{user_mention(aid)}\n" + text
+                thread(edit_message, (client, cid, mid, text, markup))
+            elif action == "ask":
+                text = words_ask(action_type, data)
+                text = f"管理：{user_mention(aid)}\n" + text
+                thread(edit_message, (client, cid, mid, text))
+                if "已添加" in text:
+                    thread(data_exchange, (client,))
 
             thread(answer_callback, (client, callback_query.id, ""))
     except Exception as e:
