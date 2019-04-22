@@ -430,10 +430,10 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
 
 
 def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMarkup):
+    text = f"管理：{user_mention(uid)}\n"
     if key in glovar.search_words:
         word_type = glovar.search_words[key]["type"]
         word = glovar.search_words[key]["word"]
-        text = f"管理：{user_mention(uid)}\n"
         markup = None
         words = glovar.search_words[key]["result"]
         if words:
@@ -462,8 +462,8 @@ def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMark
                      f"结果：{code('无法显示')}\n"
                      f"原因：{code('没有找到')}")
     else:
-        text = (f"结果：{code('无法显示')}\n"
-                f"原因：{code('会话失效')}")
+        text += (f"结果：{code('无法显示')}\n"
+                 f"原因：{code('会话失效')}")
         markup = None
 
     return text, markup
