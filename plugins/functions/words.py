@@ -25,7 +25,7 @@ from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton
 from xeger import Xeger
 
 from .. import glovar
-from .etc import code, crypt_str, button_data, delay, random_str, send_data, thread, user_mention
+from .etc import code, crypt_str, button_data, get_text, delay, random_str, send_data, thread, user_mention
 from .files import crypt_file, save
 from .telegram import send_document, send_message
 
@@ -109,12 +109,12 @@ def similar(mode, a, b) -> bool:
 def words_add(message) -> (str, InlineKeyboardMarkup):
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
-    command_list = list(filter(None, message.command))
+    command_list = message.command
     # Check if the command format is correct
     if len(command_list) > 1:
-        word_type = command_list[1]
+        i, word_type = get_type(command_list)
         if len(command_list) > 2 and word_type in glovar.names:
-            word = command_list[2]
+            word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
             # Check if the word already exits
             if word in eval(f"glovar.{word_type}_words"):
                 text += (f"状态：{code('未添加')}\n"
@@ -352,12 +352,12 @@ def words_list_page(uid, word_type, page):
 def words_remove(message) -> str:
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
-    command_list = list(filter(None, message.command))
+    command_list = message.command
     # Check if the command format is correct
     if len(command_list) > 1:
-        word_type = command_list[1]
+        i, word_type = get_type(command_list)
         if len(command_list) > 2 and word_type in glovar.names:
-            word = command_list[2]
+            word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
             if word in eval(f"glovar.{word_type}_words"):
                 eval(f"glovar.{word_type}_words").discard(word)
                 re_compile(word_type)
