@@ -400,7 +400,7 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
 
             glovar.search_words[search_key] = {
                 "type": word_type,
-                "query": word,
+                "word": word,
                 "result": {}
             }
             result = {}
