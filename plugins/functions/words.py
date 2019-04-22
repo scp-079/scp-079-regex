@@ -47,7 +47,7 @@ def data_exchange(client):
                 action_type="reload",
                 data=crypt_str("encrypt", glovar.reload_path, glovar.key)
             )
-            delay(5, send_message, [client, glovar.exchange_id, exchange_text])
+            delay(5, send_message, [client, glovar.exchange_channel_id, exchange_text])
         else:
             exchange_text = send_data(
                 sender="REGEX",
@@ -58,7 +58,7 @@ def data_exchange(client):
             )
             sleep(5)
             crypt_file("encrypt", "data/compiled", "tmp/compiled")
-            thread(send_document, (client, glovar.exchange_id, "tmp/compiled", exchange_text))
+            thread(send_document, (client, glovar.exchange_channel_id, "tmp/compiled", exchange_text))
     except Exception as e:
         logger.warning(f"Data exchange error: {e}")
 

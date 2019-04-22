@@ -22,25 +22,41 @@ from pyrogram import Filters
 from .. import glovar
 
 
-def is_creator(_, message):
-    uid = message.from_user.id
-    if uid == glovar.creator_id:
+def is_exchange_channel(_, message):
+    cid = message.chat.id
+    if cid == glovar.exchange_channel_id:
         return True
 
     return False
 
 
-the_creator = Filters.create(
-    name="The Creator",
-    func=is_creator
+def is_test_group(_, message):
+    cid = message.chat.id
+    if cid == glovar.exchange_channel_id:
+        return True
+
+    return False
+
+
+def is_regex_group(_, message):
+    cid = message.chat.id
+    if cid == glovar.regex_group_id:
+        return True
+
+    return False
+
+
+exchange_channel = Filters.create(
+    name="Exchange Channel",
+    func=is_exchange_channel
 )
 
-the_channel = Filters.create(
-    name="The Channel",
-    func=lambda flt, callback_query: callback_query.data == b"Pyrogram"
+test_group = Filters.create(
+    name="Test Group",
+    func=is_test_group
 )
 
-the_group = Filters.create(
-    name="The Group",
-    func=lambda flt, callback_query: callback_query.data == b"Pyrogram"
+regex_group = Filters.create(
+    name="Regex Group",
+    func=is_regex_group
 )

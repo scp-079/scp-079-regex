@@ -2,11 +2,6 @@
 api_id = [DATA EXPUNGED]
 api_hash = [DATA EXPUNGED]
 
-[proxy]
-enabled = False
-hostname = 127.0.0.1
-port = 1080
-
 [plugins]
 root = plugins
 include =
@@ -14,16 +9,26 @@ include =
     handlers.commands
     handlers.messages
 
-[custom]
-channel_id = [DATA EXPUNGED]
-creator_id = [DATA EXPUNGED]
-exchange_id = [DATA EXPUNGED]
-group_id = [DATA EXPUNGED]
-key = [DATA EXPUNGED]
-password = [DATA EXPUNGED]
-per_page = 15
+[proxy]
+enabled = False
+hostname = 127.0.0.1
+port = 1080
+
+[basic]
+bot_token = [DATA EXPUNGED]
 prefix = /!
+
+[channels]
+exchange_channel_id = [DATA EXPUNGED]
+regex_group_id = [DATA EXPUNGED]
+test_group_id = [DATA EXPUNGED]
+
+[custom]
+per_page = 15
 reload_path = [DATA EXPUNGED]
-token = [DATA EXPUNGED]
 update_to = USER WATCHER
 update_type = reload
+
+[encrypt]
+key = [DATA EXPUNGED]
+password = [DATA EXPUNGED]

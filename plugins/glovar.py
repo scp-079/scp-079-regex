@@ -54,6 +54,8 @@ add_commands: list = ["add", "ad"]
 remove_commands: list = ["remove", "rm"]
 
 # Load data form pickle
+
+# Init dir
 try:
     rmtree("tmp")
 except Exception as e:
@@ -63,6 +65,7 @@ for path in ["data", "tmp"]:
     if not exists(path):
         mkdir(path)
 
+# Init words variables
 ad_words: set = set()
 ava_words: set = set()
 bad_words: set = set()
@@ -75,10 +78,10 @@ nm_words: set = set()
 wb_words: set = set()
 wd_words: set = set()
 sti_words: set = set()
-
 for word_type in names:
     locals()[f"{word_type}_words"] = {f"预留{names[f'{word_type}']}词组 {random_str(16)}"}
 
+# Load words data
 for word_type in names:
     try:
         try:
@@ -96,10 +99,12 @@ for word_type in names:
         logger.critical(f"Load data {word_type}_words backup error: {e}", exc_info=True)
         raise SystemExit("[DATA CORRUPTION]")
 
+# Init compiled variable
 compiled: dict = {}
 for word_type in names:
     compiled[word_type] = re.compile(f"预留{names[f'{word_type}']}词组 {random_str(16)}", re.I | re.M | re.S)
 
+# Load compiled data
 try:
     try:
         if exists("data/compiled") or exists("data/.compiled"):
@@ -117,54 +122,63 @@ except Exception as e:
     raise SystemExit("[DATA CORRUPTION]")
 
 # Read data from config.ini
-channel_id: int = 0
-creator_id: int = 0
-exchange_id: int = 0
-group_id: int = 0
-key: Union[str, bytes] = ""
-password: str = ""
-per_page: int = 15
+
+# [basic]
+bot_token: str = ""
 prefix: List[str] = []
 prefix_str: str = "/!！"
+
+# [channels]
+exchange_channel_id: int = 0
+regex_group_id: int = 0
+test_group_id: int = 0
+
+# [custom]
+per_page: int = 15
 reload_path: str = ""
-token: str = ""
 update_to: Union[str, list] = ""
 update_type: str = "reload"
+
+# [encrypt]
+key: Union[str, bytes] = ""
+password: str = ""
 
 try:
     config = RawConfigParser()
     config.read("config.ini")
-
-    if "custom" in config:
-        channel_id = int(config["custom"].get("channel_id", channel_id))
-        creator_id = int(config["custom"].get("creator_id", creator_id))
-        exchange_id = int(config["custom"].get("exchange_id", exchange_id))
-        group_id = int(config["custom"].get("group_id", group_id))
-        key = config["custom"].get("key", key)
-        key = key.encode("utf-8")
-        password = config["custom"].get("password", password)
-        per_page = int(config["custom"].get("per_page", per_page))
-        prefix = list(config["custom"].get("prefix", prefix_str))
-        reload_path = config["custom"].get("reload_path", reload_path)
-        token = config["custom"].get("token", token)
-        update_to = config["custom"].get("update_to", update_to)
-        update_to = update_to.split(" ")
-        update_type = config["custom"].get("update_type", update_type)
+    # [basic]
+    bot_token = config["basic"].get("token", bot_token)
+    prefix = list(config["basic"].get("prefix", prefix_str))
+    # [channels]
+    exchange_channel_id = int(config["channels"].get("exchange_id", exchange_channel_id))
+    test_group_id = int(config["channels"].get("channel_id", test_group_id))
+    regex_group_id = int(config["channels"].get("group_id", regex_group_id))
+    # [custom]
+    per_page = int(config["custom"].get("per_page", per_page))
+    reload_path = config["custom"].get("reload_path", reload_path)
+    update_to = config["custom"].get("update_to", update_to)
+    update_to = update_to.split(" ")
+    update_type = config["custom"].get("update_type", update_type)
+    # [encrypt]
+    key = config["encrypt"].get("key", key)
+    key = key.encode("utf-8")
+    password = config["encrypt"].get("password", password)
 except Exception as e:
-    logger.warning(f"Read data from config.ini error: {e}")
+    logger.warning(f"Read data from config.ini error: {e}", exc_info=True)
 
-if (channel_id == 0
-        or creator_id == 0
-        or exchange_id == 0
-        or group_id == 0
-        or key in {"", b"[DATA EXPUNGED]"}
-        or password in {"", "[DATA EXPUNGED]"}
+# Check
+if (bot_token in {"", "[DATA EXPUNGED]"}
         or prefix == []
-        or token in {"", "[DATA EXPUNGED]"}
-        or (update_type == "reload" and reload_path in {"", "[DATA EXPUNGED]"})):
+        or exchange_channel_id == 0
+        or test_group_id == 0
+        or regex_group_id == 0
+        or (update_type == "reload" and reload_path in {"", "[DATA EXPUNGED]"})
+        or key in {"", b"[DATA EXPUNGED]"}
+        or password in {"", "[DATA EXPUNGED]"}):
     logger.critical("No proper settings")
     raise SystemExit('No proper settings')
 
-copyright_text = ("SCP-079-REGEX v0.1.4, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
+# Start program
+copyright_text = ("SCP-079-REGEX v0.1.5, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
                   "Licensed under the terms of the GNU General Public License v3 or later (GPLv3+)\n")
 print(copyright_text)

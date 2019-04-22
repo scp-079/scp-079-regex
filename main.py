@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 # Start
 app = Client(
     session_name="bot",
-    bot_token=glovar.token
+    bot_token=glovar.bot_token
 )
 app.start()
 

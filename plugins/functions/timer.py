@@ -40,7 +40,7 @@ def backup_files(client):
                     data=file
                 )
                 crypt_file("encrypt", f"data/{file}", f"tmp/{file}")
-                thread(send_document, (client, glovar.exchange_id, f"tmp/{file}", exchange_text))
+                thread(send_document, (client, glovar.exchange_channel_id, f"tmp/{file}", exchange_text))
                 sleep(5)
             except Exception as e:
                 logger.warning(f"Send backup file {file} error: {e}", exc_info=True)
