@@ -163,7 +163,7 @@ def words_add(message) -> (str, InlineKeyboardMarkup):
                         glovar.ask_words[word_key]["old"].append(old)
 
                 if glovar.ask_words[word_key]["old"]:
-                    end_text = "\n\n".join(glovar.ask_words[word_key]["old"])
+                    end_text = "\n\n".join([code(w) for w in glovar.ask_words[word_key]["old"]])
                     text += (f"状态：{code('未添加')}\n"
                              f"类别：{code(f'{glovar.names[word_type]}')}\n"
                              f"词组：{code(word)}\n"
@@ -341,7 +341,7 @@ def words_list_page(uid, word_type, page):
                     ]
                 )
 
-    end_text = "\n\n".join(w_list)
+    end_text = "\n\n".join([code(w) for w in w_list])
     text += (f"类别：{code(glovar.names[word_type])}\n"
              f"查询：{code('全部')}\n"
              f"结果：------------------------\n\n{end_text}")
