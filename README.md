@@ -1,7 +1,6 @@
 # SCP-079-REGEX
 
-This project is used to manage regular expression rules adopted by other bots. 
-Not yet completed.
+This project is used to manage regular expression rules adopted by other bots.
 
 ## How to use
 
