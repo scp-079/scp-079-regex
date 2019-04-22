@@ -147,7 +147,7 @@ try:
     config = RawConfigParser()
     config.read("config.ini")
     # [basic]
-    bot_token = config["basic"].get("token", bot_token)
+    bot_token = config["basic"].get("bot_token", bot_token)
     prefix = list(config["basic"].get("prefix", prefix_str))
     # [channels]
     exchange_channel_id = int(config["channels"].get("exchange_channel_id", exchange_channel_id))
