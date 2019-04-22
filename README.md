@@ -11,6 +11,8 @@ See [this article](https://scp-079.org/regex/).
 
 - Easy to use
 - Can merge similar or mutually contained rules
+- Search patterns
+- Test patterns
 
 ## To Do List
 
@@ -18,8 +20,10 @@ See [this article](https://scp-079.org/regex/).
 - [x] Check the pattern before add
 - [x] Choose the right way to store data
 - [x] Interfacing with the whole project database
+- [x] Search for patterns in more ways
+- [x] Test patterns in a group
 - [ ] Simplified Chinese to Traditional Chinese
-- [ ] More groups
+- [ ] Copy the same pattern to other groups
 
 ## Requirements
 
@@ -32,11 +36,14 @@ See [this article](https://scp-079.org/regex/).
     - functions
         - `etc.py` : Miscellaneous
         - `files.py` : Save files
+        - `filters.py` : Some filters
         - `telegram.py` : Some telegram functions
+        - `timer.py` : Timer functions
         - `words.py` : Manage words
     - handlers
-        - `callback.py` : Handle callback
+        - `callbacks.py` : Handle callbacks
         - `commands` : Handle commands
+        - `messages.py`: Handle messages
     - `glovar.py` : Global variables
 - `.gitignore` : Ignore
 - `config.ini.example` -> `config.ini` : Configures
