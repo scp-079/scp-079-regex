@@ -32,7 +32,7 @@ def is_exchange_channel(_, message):
 
 def is_test_group(_, message):
     cid = message.chat.id
-    if cid == glovar.exchange_channel_id:
+    if cid == glovar.test_group_id:
         return True
 
     return False
