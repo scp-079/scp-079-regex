@@ -73,7 +73,7 @@ def get_messages(client, cid: int, mid: int):
             try:
                 result = client.get_messages(
                     chat_id=cid,
-                    message_id=mid
+                    message_ids=mid
                 )
             except FloodWait as e:
                 sleep(e.x + 1)
