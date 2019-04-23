@@ -24,7 +24,7 @@ from .. import glovar
 from ..functions.etc import code, thread
 from ..functions.filters import regex_group, test_group
 from ..functions.telegram import send_message
-from .. functions.words import data_exchange, words_add, words_list, words_remove, words_search
+from .. functions.words import data_exchange, word_add, words_list, word_remove, words_search
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -32,11 +32,11 @@ logger = logging.getLogger(__name__)
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.add_commands, glovar.prefix))
-def add_words(client, message):
+def add_word(client, message):
     try:
         cid = message.chat.id
         mid = message.message_id
-        text, markup = words_add(message)
+        text, markup = word_add(message)
         thread(send_message, (client, cid, text, mid, markup))
         if "已添加" in text:
             thread(data_exchange, (client,))
@@ -68,11 +68,11 @@ def list_words(client, message):
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(commands=glovar.remove_commands, prefix=glovar.prefix))
-def remove_words(client, message):
+def remove_word(client, message):
     try:
         cid = message.chat.id
         mid = message.message_id
-        text = words_remove(message)
+        text = word_remove(message)
         thread(send_message, (client, cid, text, mid))
         if "已移除" in text:
             thread(data_exchange, (client,))

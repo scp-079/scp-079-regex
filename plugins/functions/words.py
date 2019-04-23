@@ -116,7 +116,7 @@ def similar(mode: str, a: str, b: str) -> bool:
     return True
 
 
-def words_add(message: Message) -> (str, InlineKeyboardMarkup):
+def word_add(message: Message) -> (str, InlineKeyboardMarkup):
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
     command_list = message.command
@@ -221,6 +221,63 @@ def words_add(message: Message) -> (str, InlineKeyboardMarkup):
         markup = None
 
     return text, markup
+
+
+def word_remove(message: Message) -> str:
+    uid = message.from_user.id
+    text = word_remove_try(message)
+    if text:
+        return text
+    elif message.reply_to_message:
+        aid = message.reply_to_message.from_user.id
+        if uid == aid:
+            r_text = word_remove_try(message.reply_to_message)
+            if r_text:
+                return r_text
+        else:
+            text = f"管理：{user_mention(uid)}\n"
+            text += (f"状态：{code('未移除')}\n"
+                     f"原因：{code('权限错误')}")
+            return text
+
+    text = f"管理：{user_mention(uid)}\n"
+    text += (f"状态：{code('未移除')}\n"
+             f"原因：{code('格式有误')}")
+
+    return text
+
+
+def word_remove_try(message: Message) -> Union[str, None]:
+    uid = message.from_user.id
+    text = f"管理：{user_mention(uid)}\n"
+    command_list = message.command
+    if not command_list:
+        command_list = get_text(message).split(" ")
+
+    # Check if the command format is correct
+    if len(command_list) > 1:
+        i, word_type = get_type(command_list)
+        if len(command_list) > 2 and word_type in glovar.names:
+            word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
+            if word in eval(f"glovar.{word_type}_words"):
+                eval(f"glovar.{word_type}_words").discard(word)
+                re_compile(word_type)
+                text += (f"状态：{code(f'已移除')}\n"
+                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                         f"词组：{code(word)}")
+            else:
+                text += (f"状态：{code('未移除')}\n"
+                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                         f"词组：{code(word)}\n"
+                         f"原因：{code('不存在')}")
+        else:
+            text += (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
+                     f"状态：{code('未移除')}\n"
+                     f"原因：{code('格式有误')}")
+    else:
+        text = None
+
+    return text
 
 
 def words_ask(operation: str, key: str) -> str:
@@ -363,63 +420,6 @@ def words_page(w_list: list, action: str, action_type: str, page: int) -> (list,
                 )
 
     return w_list, markup
-
-
-def words_remove(message: Message) -> str:
-    uid = message.from_user.id
-    text = words_remove_word(message)
-    if text:
-        return text
-    elif message.reply_to_message:
-        aid = message.reply_to_message.from_user.id
-        if uid == aid:
-            r_text = words_remove_word(message.reply_to_message)
-            if r_text:
-                return r_text
-        else:
-            text = f"管理：{user_mention(uid)}\n"
-            text += (f"状态：{code('未移除')}\n"
-                     f"原因：{code('权限错误')}")
-            return text
-
-    text = f"管理：{user_mention(uid)}\n"
-    text += (f"状态：{code('未移除')}\n"
-             f"原因：{code('格式有误')}")
-
-    return text
-
-
-def words_remove_word(message: Message) -> Union[str, None]:
-    uid = message.from_user.id
-    text = f"管理：{user_mention(uid)}\n"
-    command_list = message.command
-    if not command_list:
-        command_list = get_text(message).split(" ")
-
-    # Check if the command format is correct
-    if len(command_list) > 1:
-        i, word_type = get_type(command_list)
-        if len(command_list) > 2 and word_type in glovar.names:
-            word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
-            if word in eval(f"glovar.{word_type}_words"):
-                eval(f"glovar.{word_type}_words").discard(word)
-                re_compile(word_type)
-                text += (f"状态：{code(f'已移除')}\n"
-                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                         f"词组：{code(word)}")
-            else:
-                text += (f"状态：{code('未移除')}\n"
-                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                         f"词组：{code(word)}\n"
-                         f"原因：{code('不存在')}")
-        else:
-            text += (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
-                     f"状态：{code('未移除')}\n"
-                     f"原因：{code('格式有误')}")
-    else:
-        text = None
-
-    return text
 
 
 def words_search(message: Message) -> (str, InlineKeyboardMarkup):
