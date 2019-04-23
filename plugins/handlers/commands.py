@@ -139,7 +139,7 @@ def same_word(client, message):
                                 return
                             else:
                                 text += (f"状态：{code('未执行')}\n"
-                                         f"原因：{code('来源有误')}")
+                                         f"原因：{code('二级来源有误')}")
                         else:
                             text += (f"状态：{code('未执行')}\n"
                                      f"原因：{code('权限错误')}")
