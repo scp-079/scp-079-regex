@@ -23,7 +23,7 @@ from pyrogram import Client, Filters
 from .. import glovar
 from ..functions.etc import code, get_text, thread, user_mention
 from ..functions.filters import regex_group, test_group
-from ..functions.telegram import send_message
+from ..functions.telegram import get_messages, send_message
 from .. functions.words import data_exchange, get_type, word_add, words_list, word_remove, words_search
 
 # Enable logging
@@ -117,37 +117,37 @@ def same_word(client, message):
                         return
                     elif (old_command_type in glovar.remove_commands
                           and len(old_command_list) == 1):
-                        logger.warning(client.get_messages(chat_id=glovar.regex_group_id, message_ids=old_message.message_id))
-                        # old_message = old_message.reply_to_message
-                        # aid = old_message.from_user.id
-                        # if uid == aid:
-                        #     old_command_list_raw = get_text(old_message).split(' ')
-                        #     old_command_list = list(filter(None, old_command_list_raw))
-                        #     old_command_type = old_command_list[0][1:]
-                        #     if (len(old_command_list) > 2
-                        #             and old_command_type in glovar.add_commands):
-                        #         i, _ = get_type(old_command_list_raw)
-                        #         old_word = get_text(old_message)[1
-                        #                                          + len(old_command_list_raw[0])
-                        #                                          + i
-                        #                                          + len(old_command_list_raw[1]):].strip()
-                        #         for new_word_type in new_word_type_list:
-                        #             old_message.text = f"{old_command_type} {new_word_type} {old_word}"
-                        #             text = word_remove(old_message)
-                        #             thread(send_message, (client, cid, text, mid))
-                        #
-                        #         return
-                        #     else:
-                        #         text += (f"状态：{code('未执行')}\n"
-                        #                  f"原因：{code('二级来源有误')}")
-                        # else:
-                        #     text += (f"状态：{code('未执行')}\n"
-                        #              f"原因：{code('权限错误')}")
+                        old_message = get_messages(client, cid, old_message.message_id)
+                        if old_message.reply_to_message:
+                            old_message = old_message.reply_to_message
+                            aid = old_message.from_user.id
+                            if uid == aid:
+                                old_command_list_raw = get_text(old_message).split(' ')
+                                old_command_list = list(filter(None, old_command_list_raw))
+                                old_command_type = old_command_list[0][1:]
+                                if (len(old_command_list) > 2
+                                        and old_command_type in glovar.add_commands):
+                                    i, _ = get_type(old_command_list_raw)
+                                    old_word = get_text(old_message)[1
+                                                                     + len(old_command_list_raw[0])
+                                                                     + i
+                                                                     + len(old_command_list_raw[1]):].strip()
+                                    for new_word_type in new_word_type_list:
+                                        old_message.text = f"{old_command_type} {new_word_type} {old_word}"
+                                        text = word_remove(old_message)
+                                        thread(send_message, (client, cid, text, mid))
+
+                                    return
+                                else:
+                                    text += (f"状态：{code('未执行')}\n"
+                                             f"原因：{code('二级来源有误')}")
+                            else:
+                                text += (f"状态：{code('未执行')}\n"
+                                         f"原因：{code('权限错误')}")
+                        else:
+                            text += (f"状态：{code('未执行')}\n"
+                                     f"原因：{code('来源有误')}")
                     else:
-                        logger.warning(old_command_type)
-                        logger.warning(old_command_list)
-                        logger.warning(old_message.reply_to_message)
-                        logger.warning(old_message)
                         text += (f"状态：{code('未执行')}\n"
                                  f"原因：{code('来源有误')}")
                 else:

@@ -61,7 +61,24 @@ def edit_message(client, cid: int, mid: int, text: str, markup=None):
                 except FloodWait as e:
                     sleep(e.x + 1)
     except Exception as e:
-        logger.warning(f"Edit message at {cid} error: {e}", exc_info=True)
+        logger.warning(f"Edit message in {cid} error: {e}", exc_info=True)
+
+    return result
+
+
+def get_messages(client, cid: int, mid: int):
+    result = None
+    try:
+        while not result:
+            try:
+                result = client.get_messages(
+                    chat_id=cid,
+                    message_id=mid
+                )
+            except FloodWait as e:
+                sleep(e.x + 1)
+    except Exception as e:
+        logger.warning(f"Get messages in {cid} error: {e}", exc_info=True)
 
     return result
 
@@ -82,7 +99,7 @@ def send_document(client, cid: int, file: str, text: str = None, mid: int = None
             except FloodWait as e:
                 sleep(e.x + 1)
     except Exception as e:
-        logger.warning(f"Send document at {cid} error: {e}", exec_info=True)
+        logger.warning(f"Send document to {cid} error: {e}", exec_info=True)
 
     return result
 
