@@ -22,7 +22,7 @@ See [this article](https://scp-079.org/regex/).
 - [x] Search for patterns in more ways
 - [x] Test patterns in a group
 - [ ] Simplified Chinese to Traditional Chinese
-- [ ] Copy the same pattern to other groups
+- [x] Copy the same pattern to other groups
 
 ## Requirements
 
