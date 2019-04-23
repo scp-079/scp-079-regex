@@ -21,10 +21,11 @@ from json import dumps, loads
 from random import choice
 from string import ascii_letters, digits
 from threading import Thread, Timer
-from typing import Callable, List, Union
+from typing import Callable, List, Optional, Union
 
 from cryptography.fernet import Fernet
 from opencc import convert
+from pyrogram import Message
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -60,7 +61,7 @@ def code_block(text) -> str:
     return ""
 
 
-def crypt_str(operation, text, key) -> str:
+def crypt_str(operation: str, text: str, key: str) -> str:
     f = Fernet(key)
     text = text.encode("utf-8")
     if operation == "decrypt":
@@ -72,13 +73,14 @@ def crypt_str(operation, text, key) -> str:
     return result
 
 
-def delay(secs, target: Callable, args: list):
+def delay(secs: int, target: Callable, args: list) -> bool:
     t = Timer(secs, target, args)
     t.daemon = True
     t.start()
+    return True
 
 
-def get_text(message) -> str:
+def get_text(message: Message) -> Optional[str]:
     text = None
     if message.text:
         text = message.text
@@ -98,11 +100,11 @@ def italic(text) -> str:
     return ""
 
 
-def random_str(i):
+def random_str(i: int) -> str:
     return ''.join(choice(ascii_letters + digits) for _ in range(i))
 
 
-def receive_data(message) -> dict:
+def receive_data(message: Message) -> dict:
     text = get_text(message)
     try:
         assert text is not None, f"Can't get text from message: {message}"
@@ -123,7 +125,7 @@ def send_data(sender: str, receivers: List[str], action: str, action_type: str, 
                 USER - Stands for SCP-079-USER
                 WATCH - Stands for SCP-079-WATCHER
 
-        receivers (set of str):
+        receivers (list of str):
             The receivers' names. It can be any of the followings:
                 USER - Stands for SCP-079-USER
                 WATCH - Stands for SCP-079-WATCHER
@@ -176,11 +178,13 @@ def t2s(text: str) -> str:
     return convert(text, config="t2s.json")
 
 
-def thread(target: Callable, args: tuple):
+def thread(target: Callable, args: tuple) -> bool:
     t = Thread(target=target, args=args)
     t.daemon = True
     t.start()
 
+    return True
 
-def user_mention(uid: int):
+
+def user_mention(uid: int) -> str:
     return f"[{uid}](tg://user?id={uid})"

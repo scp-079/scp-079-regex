@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 xg = Xeger(limit=32)
 
 
-def data_exchange(client: Client):
+def data_exchange(client: Client) -> bool:
     try:
         receivers = glovar.update_to
         if glovar.update_type == "reload":
@@ -59,8 +59,12 @@ def data_exchange(client: Client):
             sleep(5)
             crypt_file("encrypt", "data/compiled", "tmp/compiled")
             thread(send_document, (client, glovar.exchange_channel_id, "tmp/compiled", exchange_text))
+
+        return True
     except Exception as e:
         logger.warning(f"Data exchange error: {e}", exc_info=True)
+
+    return False
 
 
 def get_admin(message: Message) -> Optional[int]:
@@ -83,7 +87,7 @@ def get_type(command_list: list) -> (int, str):
     return i, word_type
 
 
-def re_compile(word_type: str):
+def re_compile(word_type: str) -> bool:
     text = '|'.join(eval(f"glovar.{word_type}_words"))
     if text != "":
         glovar.compiled[word_type] = re.compile(fr"{text}", re.I | re.S | re.M)
@@ -93,6 +97,8 @@ def re_compile(word_type: str):
 
     save("compiled")
     save(f"{word_type}_words")
+
+    return True
 
 
 def similar(mode: str, a: str, b: str) -> bool:

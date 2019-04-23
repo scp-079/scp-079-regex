@@ -16,13 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pyrogram import Client, Message
+
 from .. import glovar
 from .etc import code, get_text, t2s, thread
 from .telegram import send_message
 from .words import similar
 
 
-def name_test(client, message):
+def name_test(client: Client, message: Message) -> bool:
     if message.forward_from or message.forward_from_name or message.forward_from_chat:
         cid = message.chat.id
         result = ""
@@ -55,9 +57,12 @@ def name_test(client, message):
                     result += "\t" * 8 + f"{code(w)}\n\n"
 
         thread(send_message, (client, cid, result, mid))
+        return True
+
+    return False
 
 
-def sticker_test(client, message):
+def sticker_test(client: Client, message: Message) -> bool:
     if message.sticker and message.sticker.set_name:
         cid = message.chat.id
         result = ""
@@ -74,9 +79,12 @@ def sticker_test(client, message):
                     result += "\t" * 8 + f"{code(w)}\n\n"
 
         thread(send_message, (client, cid, result, mid))
+        return True
+
+    return False
 
 
-def text_test(client, message):
+def text_test(client: Client, message: Message) -> bool:
     text = get_text(message)
     if text:
         cid = message.chat.id
@@ -94,3 +102,6 @@ def text_test(client, message):
             result = "并无匹配的各项检测结果"
 
         thread(send_message, (client, cid, result, mid))
+        return True
+
+    return False

@@ -16,13 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Union
 
-from pyrogram import CallbackQuery, Filters
+from pyrogram import CallbackQuery, Filters, Message
 
 from .. import glovar
 
 
-def is_exchange_channel(_, message):
+def is_exchange_channel(_, message: Message) -> bool:
     cid = message.chat.id
     if cid == glovar.exchange_channel_id:
         return True
@@ -30,7 +31,7 @@ def is_exchange_channel(_, message):
     return False
 
 
-def is_test_group(_, message):
+def is_test_group(_, message: Message) -> bool:
     cid = message.chat.id
     if cid == glovar.test_group_id:
         return True
@@ -38,7 +39,7 @@ def is_test_group(_, message):
     return False
 
 
-def is_regex_group(_, update):
+def is_regex_group(_, update: Union[CallbackQuery, Message]) -> bool:
     if isinstance(update, CallbackQuery):
         message = update.message
     else:

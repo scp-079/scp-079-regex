@@ -29,28 +29,38 @@ from .. import glovar
 logger = logging.getLogger(__name__)
 
 
-def crypt_file(operation, file_in, file_out):
+def crypt_file(operation: str, file_in: str, file_out: str) -> bool:
     try:
         buffer = 64 * 1024
         if operation == "decrypt":
             decryptFile(file_in, file_out, glovar.password, buffer)
         else:
             encryptFile(file_in, file_out, glovar.password, buffer)
+
+        return True
     except Exception as e:
         logger.warning(f"Crypt file error: {e}", exc_info=True)
 
+    return False
 
-def save(file):
+
+def save(file: str) -> bool:
     t = Thread(target=save_thread, args=(file,))
     t.start()
 
+    return True
 
-def save_thread(file):
+
+def save_thread(file: str) -> bool:
     try:
         if glovar:
             with open(f"data/.{file}", "wb") as f:
                 dump(eval(f"glovar.{file}"), f)
 
             copyfile(f"data/.{file}", f"data/{file}")
+
+        return True
     except Exception as e:
         logger.error(f"Save data error: {e}", exc_info=True)
+
+    return False

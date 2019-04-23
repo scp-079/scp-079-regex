@@ -19,6 +19,8 @@
 import logging
 from time import sleep
 
+from pyrogram import Client
+
 from .. import glovar
 from .etc import send_data, thread
 from .files import crypt_file
@@ -28,7 +30,7 @@ from .telegram import send_document
 logger = logging.getLogger(__name__)
 
 
-def backup_files(client):
+def backup_files(client: Client) -> bool:
     try:
         for file in [f"{f}_words" for f in glovar.names] + ["compiled"]:
             try:
@@ -44,5 +46,9 @@ def backup_files(client):
                 sleep(5)
             except Exception as e:
                 logger.warning(f"Send backup file {file} error: {e}", exc_info=True)
+
+        return True
     except Exception as e:
         logger.warning(f"Backup error: {e}", exc_info=True)
+
+    return False
