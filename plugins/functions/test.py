@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .. import glovar
-from .etc import code, get_text, thread
+from .etc import code, get_text, t2s, thread
 from .telegram import send_message
 from .words import similar
 
@@ -45,6 +45,7 @@ def name_test(client, message):
             chat = message.forward_from_chat
             text = chat.title
 
+        text = t2s(text)
         result += f"来源名称：{code(text)}\n\n"
         for word_type in ["nm", "wb"]:
             if glovar.compiled[word_type].search(text):
@@ -63,6 +64,7 @@ def sticker_test(client, message):
         mid = message.message_id
 
         text = message.sticker.set_name
+        text = t2s(text)
         result += f"贴纸名称：{code(text)}\n\n"
         for word_type in ["sti"]:
             if glovar.compiled[word_type].search(text):
