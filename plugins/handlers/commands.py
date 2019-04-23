@@ -81,7 +81,7 @@ def remove_word(client, message):
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
-                   & Filters.command(glovar.remove_commands, glovar.prefix))
+                   & Filters.command(["same"], glovar.prefix))
 def same_word(client, message):
     try:
         cid = message.chat.id
