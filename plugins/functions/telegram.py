@@ -18,15 +18,16 @@
 
 import logging
 from time import sleep
+from typing import List, Optional, Union
 
-from pyrogram import ParseMode
+from pyrogram import Client, InlineKeyboardMarkup, Message, Messages, ParseMode
 from pyrogram.errors import FloodWait
 
 # Enable logging
 logger = logging.getLogger(__name__)
 
 
-def answer_callback(client, query_id: int, text: str):
+def answer_callback(client: Client, query_id: str, text: str) -> Optional[bool]:
     result = None
     try:
         while not result:
@@ -44,7 +45,8 @@ def answer_callback(client, query_id: int, text: str):
     return result
 
 
-def edit_message(client, cid: int, mid: int, text: str, markup=None):
+def edit_message_text(client: Client, cid: int, mid: int, text: str,
+                      markup: InlineKeyboardMarkup = None) -> Optional[Message]:
     result = None
     try:
         if text.strip() != "":
@@ -66,7 +68,7 @@ def edit_message(client, cid: int, mid: int, text: str, markup=None):
     return result
 
 
-def get_messages(client, cid: int, mid: int):
+def get_messages(client: Client, cid: int, mid: Union[int, List[int]]) -> Optional[Message, Messages]:
     result = None
     try:
         while not result:
@@ -83,7 +85,8 @@ def get_messages(client, cid: int, mid: int):
     return result
 
 
-def send_document(client, cid: int, file: str, text: str = None, mid: int = None, markup=None):
+def send_document(client: Client, cid: int, file: str, text: str = None, mid: int = None,
+                  markup: InlineKeyboardMarkup = None) -> Optional[Message]:
     result = None
     try:
         while not result:
@@ -104,7 +107,8 @@ def send_document(client, cid: int, file: str, text: str = None, mid: int = None
     return result
 
 
-def send_message(client, cid: int, text: str, mid: int = None, markup=None):
+def send_message(client: Client, cid: int, text: str, mid: int = None,
+                 markup: InlineKeyboardMarkup = None) -> Optional[Message]:
     result = None
     try:
         if text.strip() != "":
