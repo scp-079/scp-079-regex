@@ -370,14 +370,20 @@ def words_remove(message: Message) -> str:
     text = words_remove_word(message)
     if text:
         return text
-    elif (message.reply_to_message
-          and uid == message.reply_to_message.from_user.id
-          and words_remove_word(message.reply_to_message)):
-        return text
-    else:
-        text = f"管理：{user_mention(uid)}\n"
-        text += (f"状态：{code('未移除')}\n"
-                 f"原因：{code('格式有误')}")
+    elif message.reply_to_message:
+        aid = message.reply_to_message.from_user.id
+        if uid == aid:
+            r_text = words_remove_word(message.reply_to_message)
+            if r_text:
+                return r_text
+        else:
+            text = f"管理：{user_mention(uid)}\n"
+            text += (f"状态：{code('未移除')}\n"
+                     f"原因：{code('权限错误')}")
+
+    text = f"管理：{user_mention(uid)}\n"
+    text += (f"状态：{code('未移除')}\n"
+             f"原因：{code('格式有误')}")
 
     return text
 
