@@ -115,6 +115,34 @@ def same_word(client, message):
                                 thread(send_message, (client, cid, text, mid))
 
                         return
+                    elif (old_command_type in glovar.remove_commands
+                          and len(old_command_list) == 1
+                          and old_message.reply_to_message):
+                        old_message = old_message.reply_to_message
+                        aid = old_message.from_user.id
+                        if uid == aid:
+                            old_command_list_raw = get_text(old_message).split(' ')
+                            old_command_list = list(filter(None, old_command_list_raw))
+                            old_command_type = old_command_list[0][1:]
+                            if (len(old_command_list) > 2
+                                    and old_command_type in glovar.remove_commands):
+                                i, _ = get_type(old_command_list_raw)
+                                old_word = get_text(old_message)[1
+                                                                 + len(old_command_list_raw[0])
+                                                                 + i
+                                                                 + len(old_command_list_raw[1]):].strip()
+                                for new_word_type in new_word_type_list:
+                                    old_message.text = f"{old_command_type} {new_word_type} {old_word}"
+                                    text = word_remove(old_message)
+                                    thread(send_message, (client, cid, text, mid))
+
+                                return
+                            else:
+                                text += (f"状态：{code('未执行')}\n"
+                                         f"原因：{code('来源有误')}")
+                        else:
+                            text += (f"状态：{code('未执行')}\n"
+                                     f"原因：{code('权限错误')}")
                     else:
                         text += (f"状态：{code('未执行')}\n"
                                  f"原因：{code('来源有误')}")
