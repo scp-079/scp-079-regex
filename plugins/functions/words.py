@@ -19,7 +19,7 @@
 import logging
 import re
 from time import sleep
-from typing import Union
+from typing import Optional
 
 from pyrogram import Client, InlineKeyboardMarkup, InlineKeyboardButton, Message
 from xeger import Xeger
@@ -63,7 +63,7 @@ def data_exchange(client: Client):
         logger.warning(f"Data exchange error: {e}", exc_info=True)
 
 
-def get_admin(message: Message) -> Union[int, None]:
+def get_admin(message: Message) -> Optional[int]:
     try:
         aid = int(message.text.partition("\n")[0].partition("：")[2])
         return aid
@@ -247,7 +247,7 @@ def word_remove(message: Message) -> str:
     return text
 
 
-def word_remove_try(message: Message) -> Union[str, None]:
+def word_remove_try(message: Message) -> Optional[str]:
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
     command_list = get_text(message).split(" ")

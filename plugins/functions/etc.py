@@ -86,7 +86,7 @@ def get_text(message) -> str:
         text = message.caption
 
     if text:
-        text = convert(text, config="t2s.json")
+        text = t2s(text)
 
     return text
 
@@ -170,6 +170,10 @@ def send_data(sender: str, receivers: List[str], action: str, action_type: str, 
     }
 
     return code_block(dumps(data, indent=4))
+
+
+def t2s(text: str) -> str:
+    return convert(text, config="t2s.json")
 
 
 def thread(target: Callable, args: tuple):
