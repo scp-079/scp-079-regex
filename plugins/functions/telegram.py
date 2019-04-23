@@ -68,7 +68,7 @@ def edit_message_text(client: Client, cid: int, mid: int, text: str,
     return result
 
 
-def get_messages(client: Client, cid: int, mid: Union[int, List[int]]) -> Optional[Message, Messages]:
+def get_messages(client: Client, cid: int, mid: Union[int, List[int]]) -> Optional[Union[Message, Messages]]:
     result = None
     try:
         while not result:
