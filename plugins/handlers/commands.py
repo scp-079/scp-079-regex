@@ -144,6 +144,9 @@ def same_word(client, message):
                             text += (f"状态：{code('未执行')}\n"
                                      f"原因：{code('权限错误')}")
                     else:
+                        logger.warning(old_command_type)
+                        logger.warning(old_command_list)
+                        logger.warning(old_message.reply_to_message)
                         text += (f"状态：{code('未执行')}\n"
                                  f"原因：{code('来源有误')}")
                 else:
