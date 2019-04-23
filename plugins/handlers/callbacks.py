@@ -24,7 +24,7 @@ from pyrogram import Client
 from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group
 from .. functions.words import data_exchange, get_admin, words_ask, words_list_page, words_search_page
-from ..functions.telegram import answer_callback, edit_message
+from ..functions.telegram import answer_callback, edit_message_text
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -45,19 +45,19 @@ def answer(client, callback_query):
             if action == "ask":
                 text = words_ask(action_type, data)
                 text = f"管理：{user_mention(aid)}\n" + text
-                thread(edit_message, (client, cid, mid, text))
+                thread(edit_message_text, (client, cid, mid, text))
                 if "已添加" in text:
                     thread(data_exchange, (client,))
             elif action == "list":
                 word_type = action_type
                 page = data
                 text, markup = words_list_page(aid, word_type, page)
-                thread(edit_message, (client, cid, mid, text, markup))
+                thread(edit_message_text, (client, cid, mid, text, markup))
             elif action == "search":
                 key = action_type
                 page = data
                 text, markup = words_search_page(uid, key, page)
-                thread(edit_message, (client, cid, mid, text, markup))
+                thread(edit_message_text, (client, cid, mid, text, markup))
 
             thread(answer_callback, (client, callback_query.id, ""))
     except Exception as e:
