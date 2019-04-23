@@ -125,7 +125,7 @@ def same_word(client, message):
                             old_command_list = list(filter(None, old_command_list_raw))
                             old_command_type = old_command_list[0][1:]
                             if (len(old_command_list) > 2
-                                    and old_command_type in glovar.remove_commands):
+                                    and old_command_type in glovar.add_commands):
                                 i, _ = get_type(old_command_list_raw)
                                 old_word = get_text(old_message)[1
                                                                  + len(old_command_list_raw[0])
