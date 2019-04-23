@@ -355,6 +355,21 @@ def words_page(w_list: list, action: str, action_type: str, page: int) -> (list,
 
 
 def words_remove(message: Message) -> str:
+    text = words_remove_word(message)
+    if text:
+        return text
+    elif message.reply_to_message and words_remove_word(message.reply_to_message):
+        return text
+    else:
+        uid = message.from_user.id
+        text = f"管理：{user_mention(uid)}\n"
+        text += (f"状态：{code('未移除')}\n"
+                 f"原因：{code('格式有误')}")
+
+    return text
+
+
+def words_remove_word(message: Message) -> str:
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
     command_list = message.command
