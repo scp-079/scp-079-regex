@@ -21,13 +21,14 @@ See [this article](https://scp-079.org/regex/).
 - [x] Interfacing with the whole project database
 - [x] Search for patterns in more ways
 - [x] Test patterns in a group
-- [ ] Simplified Chinese to Traditional Chinese
+- [x] Simplified Chinese to Traditional Chinese
 - [x] Copy the same pattern to other groups
 
 ## Requirements
 
 - Python 3.6 or higher.
 - requirements.txt
+- Ubuntu: `sudo apt update && sudo apt install opencc`
 
 ## Files
 

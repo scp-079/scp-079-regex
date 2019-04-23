@@ -24,6 +24,7 @@ from threading import Thread, Timer
 from typing import Callable, List, Union
 
 from cryptography.fernet import Fernet
+from opencc import convert
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -83,6 +84,9 @@ def get_text(message) -> str:
         text = message.text
     elif message.caption:
         text = message.caption
+
+    if text:
+        text = convert(text, config="t2s.json")
 
     return text
 
