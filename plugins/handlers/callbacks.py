@@ -23,7 +23,7 @@ from pyrogram import Client
 
 from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group
-from .. functions.words import data_exchange, words_ask, words_list_page, words_search_page
+from .. functions.words import data_exchange, get_admin, words_ask, words_list_page, words_search_page
 from ..functions.telegram import answer_callback, edit_message
 
 # Enable logging
@@ -35,7 +35,7 @@ def answer(client, callback_query):
     try:
         cid = callback_query.message.chat.id
         uid = callback_query.from_user.id
-        aid = int(callback_query.message.text.partition("\n")[0].partition("：")[2])
+        aid = get_admin(callback_query.message)
         if uid == aid:
             mid = callback_query.message.message_id
             callback_data = loads(callback_query.data)

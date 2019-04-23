@@ -60,7 +60,17 @@ def data_exchange(client: Client):
             crypt_file("encrypt", "data/compiled", "tmp/compiled")
             thread(send_document, (client, glovar.exchange_channel_id, "tmp/compiled", exchange_text))
     except Exception as e:
-        logger.warning(f"Data exchange error: {e}")
+        logger.warning(f"Data exchange error: {e}", exc_info=True)
+
+
+def get_admin(message: Message) -> Union[int, None]:
+    try:
+        aid = int(message.text.partition("\n")[0].partition("：")[2])
+        return aid
+    except Exception as e:
+        logger.warning(f"Get admin error: {e}", exc_info=True)
+
+    return None
 
 
 def get_type(command_list: list) -> (int, str):
@@ -356,13 +366,15 @@ def words_page(w_list: list, action: str, action_type: str, page: int) -> (list,
 
 
 def words_remove(message: Message) -> str:
+    uid = message.from_user.id
     text = words_remove_word(message)
     if text:
         return text
-    elif message.reply_to_message and words_remove_word(message.reply_to_message):
+    elif (message.reply_to_message
+          and uid == message.reply_to_message.from_user.id
+          and words_remove_word(message.reply_to_message)):
         return text
     else:
-        uid = message.from_user.id
         text = f"管理：{user_mention(uid)}\n"
         text += (f"状态：{code('未移除')}\n"
                  f"原因：{code('格式有误')}")
