@@ -117,7 +117,7 @@ def same_word(client, message):
                         return
                     elif (old_command_type in glovar.remove_commands
                           and len(old_command_list) == 1):
-                        logger.warning(client.get_messsages(chat_id=glovar.regex_group_id, message_ids=old_message.message_id))
+                        logger.warning(client.get_messages(chat_id=glovar.regex_group_id, message_ids=old_message.message_id))
                         # old_message = old_message.reply_to_message
                         # aid = old_message.from_user.id
                         # if uid == aid:
