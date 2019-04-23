@@ -182,6 +182,6 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
     raise SystemExit('No proper settings')
 
 # Start program
-copyright_text = ("SCP-079-REGEX v0.1.5, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
+copyright_text = ("SCP-079-REGEX v0.2.0, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
                   "Licensed under the terms of the GNU General Public License v3 or later (GPLv3+)\n")
 print(copyright_text)

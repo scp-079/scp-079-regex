@@ -119,7 +119,7 @@ def similar(mode: str, a: str, b: str) -> bool:
 def word_add(message: Message) -> (str, InlineKeyboardMarkup):
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
-    command_list = message.command
+    command_list = get_text(message).split(" ")
     # Check if the command format is correct
     if len(command_list) > 1:
         i, word_type = get_type(command_list)
@@ -250,10 +250,7 @@ def word_remove(message: Message) -> str:
 def word_remove_try(message: Message) -> Union[str, None]:
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
-    command_list = message.command
-    if not command_list:
-        command_list = get_text(message).split(" ")
-
+    command_list = get_text(message).split(" ")
     # Check if the command format is correct
     if len(command_list) > 1:
         i, word_type = get_type(command_list)
