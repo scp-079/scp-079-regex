@@ -380,6 +380,7 @@ def words_remove(message: Message) -> str:
             text = f"管理：{user_mention(uid)}\n"
             text += (f"状态：{code('未移除')}\n"
                      f"原因：{code('权限错误')}")
+            return text
 
     text = f"管理：{user_mention(uid)}\n"
     text += (f"状态：{code('未移除')}\n"
