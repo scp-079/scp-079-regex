@@ -47,17 +47,18 @@ def name_test(client: Client, message: Message) -> bool:
             chat = message.forward_from_chat
             text = chat.title
 
-        text = t2s(text)
-        result += f"来源名称：{code(text)}\n\n"
-        for word_type in ["nm", "wb"]:
-            if glovar.compiled[word_type].search(text):
-                w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                result += "\t" * 4 + f"{glovar.names[word_type]}：----------------\n\n"
-                for w in w_list:
-                    result += "\t" * 8 + f"{code(w)}\n\n"
+        if text != "":
+            text = t2s(text)
+            result += f"来源名称：{code(text)}\n\n"
+            for word_type in ["nm", "wb"]:
+                if glovar.compiled[word_type].search(text):
+                    w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
+                    result += "\t" * 4 + f"{glovar.names[word_type]}：----------------\n\n"
+                    for w in w_list:
+                        result += "\t" * 8 + f"{code(w)}\n\n"
 
-        thread(send_message, (client, cid, result, mid))
-        return True
+            thread(send_message, (client, cid, result, mid))
+            return True
 
     return False
 
