@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .. import glovar
-from .etc import bold, code, get_text, thread
+from .etc import code, get_text, thread
 from .telegram import send_message
 from .words import similar
 
@@ -45,7 +45,7 @@ def name_test(client, message):
             chat = message.forward_from_chat
             text = chat.title
 
-        result += f"{bold('来源名称：')}{code(text)}\n\n"
+        result += f"来源名称：{code(text)}\n\n"
         for word_type in ["nm", "wb"]:
             if glovar.compiled[word_type].search(text):
                 w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
