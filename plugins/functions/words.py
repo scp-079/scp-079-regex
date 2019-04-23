@@ -19,6 +19,7 @@
 import logging
 import re
 from time import sleep
+from typing import Union
 
 from pyrogram import Client, InlineKeyboardMarkup, InlineKeyboardButton, Message
 from xeger import Xeger
@@ -369,7 +370,7 @@ def words_remove(message: Message) -> str:
     return text
 
 
-def words_remove_word(message: Message) -> str:
+def words_remove_word(message: Message) -> Union[str, None]:
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
     command_list = message.command
@@ -394,8 +395,7 @@ def words_remove_word(message: Message) -> str:
                      f"状态：{code('未移除')}\n"
                      f"原因：{code('格式有误')}")
     else:
-        text += (f"状态：{code('未移除')}\n"
-                 f"原因：{code('格式有误')}")
+        text = None
 
     return text
 
