@@ -70,6 +70,7 @@ def crypt_str(operation: str, text: str, key: str) -> str:
         result = f.encrypt(text)
 
     result = result.decode("utf-8")
+
     return result
 
 
@@ -77,6 +78,7 @@ def delay(secs: int, target: Callable, args: list) -> bool:
     t = Timer(secs, target, args)
     t.daemon = True
     t.start()
+
     return True
 
 
@@ -112,7 +114,8 @@ def receive_data(message: Message) -> dict:
         return data
     except Exception as e:
         logger.warning(f"Receive data error: {e}")
-        return {}
+
+    return {}
 
 
 def send_data(sender: str, receivers: List[str], action: str, action_type: str, data=None) -> str:

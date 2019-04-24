@@ -88,17 +88,21 @@ def get_type(command_list: list) -> (int, str):
 
 
 def re_compile(word_type: str) -> bool:
-    text = '|'.join(eval(f"glovar.{word_type}_words"))
-    if text != "":
-        glovar.compiled[word_type] = re.compile(fr"{text}", re.I | re.S | re.M)
-    else:
-        glovar.compiled[word_type] = re.compile(fr"预留{glovar.names[f'{word_type}']}词组 {random_str(16)}",
-                                                re.I | re.M | re.S)
+    try:
+        text = '|'.join(eval(f"glovar.{word_type}_words"))
+        if text != "":
+            glovar.compiled[word_type] = re.compile(fr"{text}", re.I | re.S | re.M)
+        else:
+            glovar.compiled[word_type] = re.compile(fr"预留{glovar.names[f'{word_type}']}词组 {random_str(16)}",
+                                                    re.I | re.M | re.S)
 
-    save("compiled")
-    save(f"{word_type}_words")
+        save("compiled")
+        save(f"{word_type}_words")
+        return True
+    except Exception as e:
+        logger.warning(f"Re compile error: {e}")
 
-    return True
+    return False
 
 
 def similar(mode: str, a: str, b: str) -> bool:
