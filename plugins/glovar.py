@@ -108,7 +108,7 @@ for word_type in names:
 # Init compiled variable
 compiled: dict = {}
 for word_type in names:
-    compiled[word_type] = re.compile(f"预留{names[f'{word_type}']}词组 {random_str(16)}", re.I | re.M | re.S)
+    compiled[word_type] = re.compile(fr"预留{names[f'{word_type}']}词组 {random_str(16)}", re.I | re.M | re.S)
 
 # Load compiled data
 try:
