@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import re
-
 from pyrogram import Client, Message
 
 from .. import glovar
@@ -95,7 +93,7 @@ def text_test(client: Client, message: Message) -> bool:
         mid = message.message_id
 
         for word_type in glovar.names:
-            if glovar.compiled[word_type].search(text, re.I | re.M | re.S):
+            if glovar.compiled[word_type].search(text):
                 w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
                 result += f"{glovar.names[word_type]}：------------------------\n\n"
                 for w in w_list:
