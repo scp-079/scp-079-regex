@@ -18,7 +18,7 @@
 
 import logging
 from time import sleep
-from typing import List, Optional, Union
+from typing import Iterable, Optional
 
 from pyrogram import Client, InlineKeyboardMarkup, Message, Messages, ParseMode
 from pyrogram.errors import FloodWait
@@ -68,14 +68,14 @@ def edit_message_text(client: Client, cid: int, mid: int, text: str,
     return result
 
 
-def get_messages(client: Client, cid: int, mid: Union[int, List[int]]) -> Optional[Union[Message, Messages]]:
+def get_messages(client: Client, cid: int, mids: Iterable[int]) -> Optional[Messages]:
     result = None
     try:
         while not result:
             try:
                 result = client.get_messages(
                     chat_id=cid,
-                    message_ids=mid
+                    message_ids=mids
                 )
             except FloodWait as e:
                 sleep(e.x + 1)
