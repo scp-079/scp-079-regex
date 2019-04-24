@@ -41,7 +41,7 @@ def add_word(client, message):
         if "已添加" in text:
             thread(data_exchange, (client,))
     except Exception as e:
-        logger.warning(f"Add words error: {e}", exc_info=True)
+        logger.warning(f"Add word error: {e}", exc_info=True)
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
@@ -67,12 +67,12 @@ def remove_word(client, message):
         if "已移除" in text:
             thread(data_exchange, (client,))
     except Exception as e:
-        logger.warning(f"Remove words error: {e}", exc_info=True)
+        logger.warning(f"Remove word error: {e}", exc_info=True)
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.same_commands, glovar.prefix))
-def same_word(client, message):
+def same_words(client, message):
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -154,7 +154,7 @@ def same_word(client, message):
         if "已移除" in text:
             thread(data_exchange, (client,))
     except Exception as e:
-        logger.warning(f"Remove words error: {e}", exc_info=True)
+        logger.warning(f"Same words error: {e}", exc_info=True)
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
