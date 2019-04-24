@@ -23,11 +23,14 @@ from pyrogram import Client, Filters
 from ..functions.filters import test_group
 from ..functions.test import name_test, sticker_test, text_test
 
+from .. import glovar
+
 # Enable logging
 logger = logging.getLogger(__name__)
 
 
-@Client.on_message(Filters.incoming & Filters.group & test_group & ~Filters.service)
+@Client.on_message(Filters.incoming & Filters.group & test_group & ~Filters.service
+                   & ~Filters.command(glovar.all_commands, glovar.prefix))
 def test(client, message):
     try:
         name_test(client, message)

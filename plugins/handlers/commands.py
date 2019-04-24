@@ -21,7 +21,7 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
-from ..functions.etc import code, get_text, thread, user_mention
+from ..functions.etc import bold, code, get_text, thread, user_mention
 from ..functions.filters import regex_group, test_group
 from ..functions.telegram import get_messages, send_message
 from .. functions.words import data_exchange, get_type, word_add, words_list, word_remove, words_search
@@ -42,16 +42,6 @@ def add_word(client, message):
             thread(data_exchange, (client,))
     except Exception as e:
         logger.warning(f"Add words error: {e}", exc_info=True)
-
-
-@Client.on_message(Filters.incoming & Filters.group & test_group
-                   & Filters.command(["ping"], glovar.prefix))
-def ping(client, message):
-    try:
-        text = code(f"{code('Pong!')}")
-        thread(send_message, (client, message.chat.id, text))
-    except Exception as e:
-        logger.warning(f"Ping error: {e}", exc_info=True)
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
@@ -81,7 +71,7 @@ def remove_word(client, message):
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
-                   & Filters.command(["same"], glovar.prefix))
+                   & Filters.command(glovar.same_commands, glovar.prefix))
 def same_word(client, message):
     try:
         cid = message.chat.id
@@ -177,3 +167,15 @@ def search_words(client, message):
         thread(send_message, (client, cid, text, mid, markup))
     except Exception as e:
         logger.warning(f"Search words error: {e}", exc_info=True)
+
+
+@Client.on_message(Filters.incoming & Filters.group & test_group
+                   & Filters.command(["version"], glovar.prefix))
+def version(client, message):
+    try:
+        cid = message.chat.id
+        mid = message.message_id
+        text = code(f"{bold(glovar.version)}")
+        thread(send_message, (client, cid, text, mid))
+    except Exception as e:
+        logger.warning(f"Ping error: {e}", exc_info=True)

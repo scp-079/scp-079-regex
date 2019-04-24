@@ -31,6 +31,7 @@ from .functions.etc import random_str
 logger = logging.getLogger(__name__)
 
 # Init
+ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
 names: dict = {
     "ad": "广告用语",
     "ava": "头像分析",
@@ -46,14 +47,16 @@ names: dict = {
     "sti": "贴纸删除",
     "test": "测试用例"
 }
-ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
+version = "0.2.1"
 search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 
 # Generate commands lists
-list_commands: list = ["list", "ls"]
-search_commands: list = ["search", "s", "find"]
 add_commands: list = ["add", "ad"]
+list_commands: list = ["list", "ls"]
 remove_commands: list = ["remove", "rm"]
+same_commands: list = ["same", "copy", "c"]
+search_commands: list = ["search", "s", "find"]
+all_commands: list = add_commands + list_commands + remove_commands + same_commands + search_commands + ["version"]
 
 # Load data form pickle
 
@@ -182,6 +185,6 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
     raise SystemExit('No proper settings')
 
 # Start program
-copyright_text = ("SCP-079-REGEX v0.2.0, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
+copyright_text = (f"SCP-079-REGEX v{version}, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
                   "Licensed under the terms of the GNU General Public License v3 or later (GPLv3+)\n")
 print(copyright_text)
