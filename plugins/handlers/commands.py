@@ -178,4 +178,4 @@ def version(client, message):
         text = code(f"{bold(glovar.version)}")
         thread(send_message, (client, cid, text, mid))
     except Exception as e:
-        logger.warning(f"Ping error: {e}", exc_info=True)
+        logger.warning(f"Version error: {e}", exc_info=True)
