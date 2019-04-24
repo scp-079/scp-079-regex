@@ -109,19 +109,19 @@ def similar(mode: str, a: str, b: str) -> bool:
     if mode == "strict":
         i = 0
         while i < 3:
-            if not (re.search(fr"{a}", xg.xeger(b), re.I | re.M | re.S)
-                    or re.search(fr"{b}", xg.xeger(a), re.I | re.M | re.S)):
+            if not (re.search(a, xg.xeger(b), re.I | re.M | re.S)
+                    or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
                 return False
 
             i += 1
     elif mode == "loose":
-        if not (re.search(fr"{a}", b, re.I | re.M | re.S)
-                or re.search(fr"{b}", a, re.I | re.M | re.S)
-                or re.search(fr"{a}", xg.xeger(b), re.I | re.M | re.S)
-                or re.search(fr"{b}", xg.xeger(a), re.I | re.M | re.S)):
+        if not (re.search(a, b, re.I | re.M | re.S)
+                or re.search(b, a, re.I | re.M | re.S)
+                or re.search(a, xg.xeger(b), re.I | re.M | re.S)
+                or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
             return False
     else:
-        if not re.search(fr"{a}", b, re.I | re.M | re.S):
+        if not re.search(a, b, re.I | re.M | re.S):
             return False
 
     return True
@@ -146,7 +146,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
             else:
                 # Check if the pattern is correct
                 try:
-                    pattern = re.compile(fr"{word}", re.I | re.M | re.S)
+                    pattern = re.compile(word, re.I | re.M | re.S)
                 except Exception as e:
                     text += (f"状态：{code('未添加')}\n"
                              f"类别：{code(f'{glovar.names[word_type]}')}\n"
