@@ -89,7 +89,7 @@ def sticker_test(client: Client, message: Message) -> bool:
 
 def text_test(client: Client, message: Message) -> bool:
     text = get_text(message)
-    if text and not re.search("^版本：", text):
+    if text and not re.search("^版本：|^#(bug|done|fixed|todo)", text):
         cid = message.chat.id
         result = ""
         mid = message.message_id
