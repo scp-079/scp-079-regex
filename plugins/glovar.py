@@ -159,7 +159,7 @@ except Exception as e:
 # [basic]
 bot_token: str = ""
 prefix: List[str] = []
-prefix_str: str = "/!！"
+prefix_str: str = "/!"
 
 # [channels]
 exchange_channel_id: int = 0
