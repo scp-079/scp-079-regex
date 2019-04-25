@@ -84,6 +84,8 @@ wb_words: set = set()
 wd_words: set = set()
 sti_words: set = set()
 test_words: set = set()
+# type_words = {regex1, regex2}
+
 for word_type in names:
     locals()[f"{word_type}_words"] = {f"预留{names[f'{word_type}']}词组 {random_str(16)}"}
 
@@ -107,6 +109,11 @@ for word_type in names:
 
 # Init compiled variable
 compiled: dict = {}
+# pattern = "|".join(type_words)
+# compiled = {
+#     "type": re.compile(pattern, re.I | re.M | re.S)
+# }
+
 for word_type in names:
     compiled[word_type] = re.compile(fr"预留{names[f'{word_type}']}词组 {random_str(16)}", re.I | re.M | re.S)
 
