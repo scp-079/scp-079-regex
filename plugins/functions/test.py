@@ -40,7 +40,7 @@ def name_test(client: Client, message: Message) -> bool:
                 if user.last_name:
                     last_name = message.forward_from.last_name
 
-                text = first_name + last_name
+                text = f"{first_name} {last_name}"
         elif message.forward_from_name:
             text = message.forward_from_name
         else:
