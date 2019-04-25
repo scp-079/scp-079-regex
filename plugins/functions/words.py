@@ -175,9 +175,9 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
                     ask_key = random_str(8)
 
                 glovar.ask_words[ask_key] = {
-                    "type": word_type,
                     "new": word,
-                    "old": []
+                    "old": [],
+                    "type": word_type
                 }
                 for old in eval(f"glovar.{word_type}_words"):
                     if similar("strict", old, word):
@@ -444,9 +444,9 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
                 search_key = random_str(8)
 
             glovar.search_words[search_key] = {
+                "result": {},
                 "type": word_type,
-                "word": word,
-                "result": {}
+                "word": word
             }
             result = {}
             if word_type != "all":

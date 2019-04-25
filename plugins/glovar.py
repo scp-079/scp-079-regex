@@ -31,7 +31,16 @@ from .functions.etc import random_str
 logger = logging.getLogger(__name__)
 
 # Init
+
 ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
+# ask_words = {
+#     "random": {
+#         "new": "regex",
+#         "old": ["regex1", "regex2"],
+#         "type": "type"
+#     }
+# }
+
 names: dict = {
     "ad": "广告用语",
     "ava": "头像分析",
@@ -47,8 +56,19 @@ names: dict = {
     "sti": "贴纸删除",
     "test": "测试用例"
 }
+
 version = "0.2.1"
+
 search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
+# search_words = {
+#     "random": {
+#         "result": {
+#             "regex1": ["type1", "type2"]
+#         },
+#         "type": "type",
+#         "word": "regex"
+#     }
+# }
 
 # Generate commands lists
 add_commands: list = ["add", "ad"]
@@ -84,7 +104,7 @@ wb_words: set = set()
 wd_words: set = set()
 sti_words: set = set()
 test_words: set = set()
-# type_words = {regex1, regex2}
+# type_words = {"regex1", "regex2"}
 
 for word_type in names:
     locals()[f"{word_type}_words"] = {f"预留{names[f'{word_type}']}词组 {random_str(16)}"}
