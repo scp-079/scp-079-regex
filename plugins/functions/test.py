@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
+
 from pyrogram import Client, Message
 
 from .. import glovar
@@ -87,7 +89,7 @@ def sticker_test(client: Client, message: Message) -> bool:
 
 def text_test(client: Client, message: Message) -> bool:
     text = get_text(message)
-    if text:
+    if text and not re.search("^版本：", text):
         cid = message.chat.id
         result = ""
         mid = message.message_id
