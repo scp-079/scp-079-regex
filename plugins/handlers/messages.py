@@ -20,10 +20,9 @@ import logging
 
 from pyrogram import Client, Filters
 
+from .. import glovar
 from ..functions.filters import test_group
 from ..functions.test import name_test, sticker_test, text_test
-
-from .. import glovar
 
 # Enable logging
 logger = logging.getLogger(__name__)
