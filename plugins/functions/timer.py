@@ -23,7 +23,7 @@ from pyrogram import Client
 
 from .. import glovar
 from .etc import send_data, thread
-from .files import crypt_file
+from .file import crypt_file
 from .telegram import send_document
 
 # Enable logging

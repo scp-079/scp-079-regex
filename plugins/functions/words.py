@@ -26,7 +26,7 @@ from xeger import Xeger
 
 from .. import glovar
 from .etc import code, crypt_str, button_data, get_text, delay, italic, random_str, send_data, thread, user_mention
-from .files import crypt_file, save
+from .file import crypt_file, save
 from .telegram import send_document, send_message
 
 # Enable logging
