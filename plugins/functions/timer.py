@@ -36,7 +36,7 @@ def backup_files(client: Client) -> bool:
             try:
                 exchange_text = send_data(
                     sender="REGEX",
-                    receivers=["ALL"],
+                    receivers=["BACKUP"],
                     action="backup",
                     action_type="pickle",
                     data=file
