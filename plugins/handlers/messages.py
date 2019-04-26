@@ -22,7 +22,7 @@ from pyrogram import Client, Filters
 
 from .. import glovar
 from ..functions.filters import test_group
-from ..functions.test import name_test, sticker_test, text_test
+from ..functions.tests import name_test, sticker_test, text_test
 
 # Enable logging
 logger = logging.getLogger(__name__)
