@@ -171,7 +171,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
 
                 # Check similar patterns
                 ask_key = random_str(8)
-                while ask_key in glovar.ask_words:
+                while glovar.ask_words.get(ask_key):
                     ask_key = random_str(8)
 
                 glovar.ask_words[ask_key] = {
