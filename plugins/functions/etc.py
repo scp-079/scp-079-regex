@@ -283,6 +283,11 @@ def send_data(sender: str, receivers: List[str], action: str, action_type: str, 
                     status:
                         "awake"
 
+                        {
+                            status: "up / down",
+                            list: List[str]
+                        }
+
     Returns:
         A formatted string.
     """
