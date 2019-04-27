@@ -58,7 +58,7 @@ def update_status(client: Client) -> bool:
     try:
         exchange_text = send_data(
             sender="REGEX",
-            receivers=["BACKUP"],
+            receivers=["MANAGE"],
             action="update",
             action_type="status",
             data="awake"
