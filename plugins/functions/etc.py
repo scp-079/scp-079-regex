@@ -82,6 +82,16 @@ def delay(secs: int, target: Callable, args: list) -> bool:
     return True
 
 
+def get_command_type(command_list: list) -> (int, str):
+    i = 1
+    command_type = command_list[i]
+    while command_type == "" and i < len(command_list):
+        i += 1
+        command_type = command_list[i]
+
+    return i, command_type
+
+
 def get_text(message: Message) -> Optional[str]:
     text = None
     if message.text:

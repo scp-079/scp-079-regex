@@ -27,7 +27,7 @@ See [this article](https://scp-079.org/regex/).
 ## Requirements
 
 - Python 3.6 or higher.
-- `requirements.txt` ： APScheduler OpenCC pyAesCrypt pyrogram[fast]
+- `requirements.txt` ： APScheduler OpenCC pyAesCrypt pyrogram[fast] xeger
 - Ubuntu: `sudo apt update && sudo apt install opencc`
 
 ## Files

@@ -25,7 +25,8 @@ from pyrogram import Client, InlineKeyboardMarkup, InlineKeyboardButton, Message
 from xeger import Xeger
 
 from .. import glovar
-from .etc import code, crypt_str, button_data, get_text, delay, italic, random_str, send_data, thread, user_mention
+from .etc import code, crypt_str, button_data, get_command_type, get_text, delay, italic, random_str, send_data
+from .etc import thread, user_mention
 from .file import crypt_file, save
 from .telegram import send_document, send_message
 
@@ -77,16 +78,6 @@ def get_admin(message: Message) -> Optional[int]:
     return None
 
 
-def get_type(command_list: list) -> (int, str):
-    i = 1
-    word_type = command_list[i]
-    while word_type == "" and i < len(command_list):
-        i += 1
-        word_type = command_list[i]
-
-    return i, word_type
-
-
 def re_compile(word_type: str) -> bool:
     try:
         text = '|'.join(eval(f"glovar.{word_type}_words"))
@@ -133,7 +124,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
     command_list = get_text(message).split(" ")
     # Check if the command format is correct
     if len(command_list) > 1:
-        i, word_type = get_type(command_list)
+        i, word_type = get_command_type(command_list)
         if len(command_list) > 2 and word_type in glovar.names:
             word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
             # Check if the word already exits
@@ -264,7 +255,7 @@ def word_remove_try(message: Message) -> Optional[str]:
     command_list = get_text(message).split(" ")
     # Check if the command format is correct
     if len(command_list) > 1:
-        i, word_type = get_type(command_list)
+        i, word_type = get_command_type(command_list)
         if len(command_list) > 2 and word_type in glovar.names:
             word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
             if word in eval(f"glovar.{word_type}_words"):
@@ -436,7 +427,7 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
     markup = None
     command_list = message.command
     if len(command_list) > 1:
-        i, word_type = get_type(command_list)
+        i, word_type = get_command_type(command_list)
         if len(command_list) > 2 and (word_type in glovar.names or word_type == "all"):
             word = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
             search_key = random_str(8)

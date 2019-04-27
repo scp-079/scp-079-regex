@@ -12,3 +12,4 @@ pytz==2019.1
 six==1.12.0
 TgCrypto==1.1.1
 tzlocal==1.5.1
+xeger==0.3.4
