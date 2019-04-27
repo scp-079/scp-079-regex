@@ -35,15 +35,16 @@ See [this article](https://scp-079.org/regex/).
 - plugins
     - functions
         - `etc.py` : Miscellaneous
-        - `files.py` : Save files
+        - `file.py` : Save files
         - `filters.py` : Some filters
         - `telegram.py` : Some telegram functions
-        - `timer.py` : Timer functions
+        - `tests.py` : Test functions
+        - `timers.py` : Timer functions
         - `words.py` : Manage words
     - handlers
-        - `callbacks.py` : Handle callbacks
-        - `commands` : Handle commands
-        - `messages.py`: Handle messages
+        - `callback.py` : Handle callbacks
+        - `command.py` : Handle commands
+        - `message.py`: Handle messages
     - `glovar.py` : Global variables
 - `.gitignore` : Ignore
 - `config.ini.example` -> `config.ini` : Configures
