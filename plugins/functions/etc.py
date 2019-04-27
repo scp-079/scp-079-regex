@@ -123,45 +123,149 @@ def send_data(sender: str, receivers: List[str], action: str, action_type: str, 
 
     Args:
         sender (str):
-            The sender's name. It can be any of the followings:
-                REGEX - Stands for SCP-079-REGEX
-                USER - Stands for SCP-079-USER
-                WATCH - Stands for SCP-079-WATCHER
+            The sender's name.
 
         receivers (list of str):
-            The receivers' names. It can be any of the followings:
-                USER - Stands for SCP-079-USER
-                WATCH - Stands for SCP-079-WATCHER
+            The receivers' names.
 
         action (str):
-            The operation that the data receivers need to perform. It can be any of the followings:
+            The action that the data receivers need to take. It can be any of the followings:
                 add - Add id to some list
-                backup - Announce backup data
+                backup - Send backup data
+                config - Update bot config
+                declare - Declare a message
+                help - Let others bot do something
+                leave - Let bots leave some group or channel
                 remove - Remove id in some list
+                request - Send a request to manage bot
                 update - Update some data
 
         action_type (str):
-            Type of operation. It can be any of the followings:
-                When operation is add or remove:
-                    bad channel - Spam channel
-                    bad user - Spam user
-                    except channel - Exception channel
-                    except user - Exception user
-                    watch bad - Suspicious user.
-                                Recommended to ban the user when meets certain conditions
-                    watch delete - Suspicious user.
-                                   Recommended to delete messages from the user when meets certain conditions
+            Type of action. It can be any of the followings:
+                When action is add or remove:
+                    bad - Spam channel or user
+                    except - Exception channel or user
+                    watch - Suspicious user.
+                            Recommended to ban user or delete user's messages when meets certain conditions
 
-                When operation is backup:
+                When action is backup:
                     pickle - Pickle file
 
-                When operation is update:
+                When action is config:
+                    ask - Let CONFIG provide config options in CONFIG Group
+                    update - Update some group's configurations
+
+                When action is declare:
+                    ban - The bot has banned the user who sent the message
+                    delete - The message has been deleted
+
+                When action is help:
+                    ban - Let USER ban a user globally
+                    delete - Let USER delete a user's all messages in some group
+                    report - Let WARN alert admins
+
+                When action is leave:
+                    group - Leave the group
+                    channel - Leave the channel
+
+                When action is request:
+                    leave - Leave the group
+                    join - Join the group
+
+                When action is update:
                     download - Download the data, then update
+                    preview - Update a message's preview
                     reload - Update the data from local machines
+                    score - Update user's score
+                    status - Update bot's status
 
 
         data (optional):
             Additional data required for operation.
+                Add / Remove:
+                    bad / except
+                        {
+                            "id":  12345678,
+                            "type": "user / channel"
+                        }
+
+                    watch:
+                        {
+                            "id": 12345678,
+                            "type": "all / bad / delete"
+                        }
+
+                Backup:
+                    "filename"
+
+                Config:
+                    {
+                        "mode": bool / int / List[Union[bool, int, str]] /
+                                Dict[str, Union[bool, int, List[Union[bool, int, str]]]]
+                    }
+
+                Declare:
+                    {
+                        "group_id": -10012345678,
+                        "message_id": 123
+                    }
+
+                Help:
+                    ban / delete:
+                        {
+                            "group_id": -10012345678,
+                            "user_id": 12345678
+                        }
+
+                    report:
+                        {
+                            "group_id": -10012345678,
+                            "user_id": 12345678,
+                            "message_id": 123
+                        }
+
+                Leave:
+                    -10012345678
+
+                Request:
+                    leave:
+                        {
+                            "group_id": -10012345678,
+                            "reason": "user / permissions"
+                        }
+
+                    join:
+                        {
+                            "group_id": -10012345678,
+                            "bots": List[str]
+                        }
+
+                Score:
+                    3.2
+
+                Update
+                    download:
+                        "filename"
+
+                    preview: {
+                        "group_id": -10012345678,
+                        "user_id": 12345678,
+                        "message_id": 123,
+                        "text": "some text",
+                        "image": "file_id"
+                    }
+
+                    reload:
+                        "path"
+
+                    score:
+                        {
+                            "id": 12345678,
+                            "score": 3.2
+                        }
+
+                    status:
+                        "awake"
 
     Returns:
         A formatted string.
