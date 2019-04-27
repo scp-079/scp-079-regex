@@ -46,8 +46,8 @@ app.start()
 
 # Timer
 scheduler = BackgroundScheduler()
-scheduler.add_job(backup_files, "cron", [app], hour=0)
-scheduler.add_job(update_status, "cron", [app], hour=22)
+scheduler.add_job(backup_files, "cron", [app], hour=18)
+scheduler.add_job(update_status, "cron", [app], hour=18, minute=30)
 scheduler.start()
 
 # Hold
