@@ -83,7 +83,8 @@ other_commands: list = ["admin",
                         "forgive",
                         "report",
                         "version",
-                        "warn"]
+                        "warn",
+                        "warn_config"]
 all_commands += other_commands
 
 # Load data from pickle
