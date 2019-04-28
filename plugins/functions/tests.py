@@ -107,10 +107,9 @@ def text_test(client: Client, message: Message) -> bool:
                 for w in w_list:
                     result += "\t" * 4 + f"{code(w)}\n\n"
 
-        if result == "":
-            result = "并无匹配的各项检测结果"
+        if result != "":
+            thread(send_message, (client, cid, result, mid))
 
-        thread(send_message, (client, cid, result, mid))
         return True
 
     return False
