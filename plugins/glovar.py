@@ -80,6 +80,7 @@ all_commands: list = add_commands + list_commands + remove_commands + same_comma
 other_commands: list = ["admin",
                         "admins",
                         "ban",
+                        "chat",
                         "forgive",
                         "report",
                         "version",
