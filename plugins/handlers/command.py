@@ -21,7 +21,7 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
-from ..functions.etc import bold, code, get_command_type, get_text, thread, user_mention
+from ..functions.etc import bold, code, get_command_context, get_text, thread, user_mention
 from ..functions.filters import regex_group, test_group
 from ..functions.telegram import get_messages, send_message
 from .. functions.words import data_exchange, word_add, words_list, word_remove, words_search
@@ -90,11 +90,7 @@ def same_words(client, message):
                     old_command_type = old_command_list[0][1:]
                     if (len(old_command_list) > 2
                             and old_command_type in glovar.add_commands + glovar.remove_commands):
-                        i, _ = get_command_type(old_command_list_raw)
-                        old_word = get_text(old_message)[1
-                                                         + len(old_command_list_raw[0])
-                                                         + i
-                                                         + len(old_command_list_raw[1]):].strip()
+                        old_word = get_command_context(old_message)
                         for new_word_type in new_word_type_list:
                             old_message.text = f"{old_command_type} {new_word_type} {old_word}"
                             if old_command_type in glovar.add_commands:
@@ -117,11 +113,7 @@ def same_words(client, message):
                                 old_command_type = old_command_list[0][1:]
                                 if (len(old_command_list) > 2
                                         and old_command_type in glovar.add_commands):
-                                    i, _ = get_command_type(old_command_list_raw)
-                                    old_word = get_text(old_message)[1
-                                                                     + len(old_command_list_raw[0])
-                                                                     + i
-                                                                     + len(old_command_list_raw[1]):].strip()
+                                    old_word = get_command_context(old_message)
                                     for new_word_type in new_word_type_list:
                                         old_message.text = f"{old_command_type} {new_word_type} {old_word}"
                                         text = word_remove(old_message)
