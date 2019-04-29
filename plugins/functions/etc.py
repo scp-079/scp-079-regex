@@ -95,6 +95,7 @@ def get_command_context(message: Message) -> str:
     else:
         command_context = ""
 
+    logger.warning(command_context)
     return command_context
 
 
