@@ -427,7 +427,7 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
     markup = None
     command_list = message.command
     if len(command_list) > 1:
-        word_type = list(filter(None, command_list))
+        word_type = list(filter(None, command_list))[1]
         if len(command_list) > 2 and (word_type in glovar.names or word_type == "all"):
             word = get_command_context(message)
             search_key = random_str(8)
