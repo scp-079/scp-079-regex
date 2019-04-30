@@ -21,9 +21,10 @@ from json import loads
 
 from pyrogram import Client
 
+from ..functions.channel import share_regex_update
 from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group
-from .. functions.words import data_exchange, get_admin, words_ask, words_list_page, words_search_page
+from .. functions.words import get_admin, words_ask, words_list_page, words_search_page
 from ..functions.telegram import answer_callback, edit_message_text
 
 # Enable logging
@@ -36,18 +37,20 @@ def answer(client, callback_query):
         cid = callback_query.message.chat.id
         uid = callback_query.from_user.id
         aid = get_admin(callback_query.message)
+        # Check permission
         if uid == aid:
+            # Basic callback data
             mid = callback_query.message.message_id
             callback_data = loads(callback_query.data)
             action = callback_data["a"]
             action_type = callback_data["t"]
             data = callback_data["d"]
             if action == "ask":
-                text = words_ask(action_type, data)
-                text = f"管理：{user_mention(aid)}\n" + text
+                text = (f"管理：{user_mention(aid)}\n"
+                        f"{words_ask(action_type, data)}")
                 thread(edit_message_text, (client, cid, mid, text))
                 if "已添加" in text:
-                    thread(data_exchange, (client,))
+                    thread(share_regex_update, (client,))
             elif action == "list":
                 word_type = action_type
                 page = data

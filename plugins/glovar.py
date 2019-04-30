@@ -57,7 +57,7 @@ names: dict = {
     "test": "测试用例"
 }
 
-version = "0.2.3"
+version = "0.2.4"
 
 search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 # search_words = {

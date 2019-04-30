@@ -21,10 +21,11 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
+from ..functions.channel import share_regex_update
 from ..functions.etc import bold, code, get_command_context, get_text, thread, user_mention
 from ..functions.filters import regex_group, test_group
 from ..functions.telegram import get_messages, send_message
-from .. functions.words import data_exchange, word_add, words_list, word_remove, words_search
+from .. functions.words import word_add, words_list, word_remove, words_search
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ def add_word(client, message):
         text, markup = word_add(message)
         thread(send_message, (client, cid, text, mid, markup))
         if "已添加" in text:
-            thread(data_exchange, (client,))
+            thread(share_regex_update, (client,))
     except Exception as e:
         logger.warning(f"Add word error: {e}", exc_info=True)
 
@@ -65,7 +66,7 @@ def remove_word(client, message):
         text = word_remove(message)
         thread(send_message, (client, cid, text, mid))
         if "已移除" in text:
-            thread(data_exchange, (client,))
+            thread(share_regex_update, (client,))
     except Exception as e:
         logger.warning(f"Remove word error: {e}", exc_info=True)
 
@@ -78,16 +79,19 @@ def same_words(client, message):
         mid = message.message_id
         uid = message.from_user.id
         text = f"管理：{user_mention(uid)}\n"
+        # Get this new command's list
         new_command_list = list(filter(None, message.command))
         new_word_type_list = new_command_list[1:]
+        # Check new command's format
         if len(new_command_list) > 1 and all([new_word_type in glovar.names for new_word_type in new_word_type_list]):
             if message.reply_to_message:
                 old_message = message.reply_to_message
                 aid = old_message.from_user.id
+                # Check permission
                 if uid == aid:
-                    old_command_list_raw = get_text(old_message).split(' ')
-                    old_command_list = list(filter(None, old_command_list_raw))
+                    old_command_list = list(filter(None, get_text(old_message).split(" ")))
                     old_command_type = old_command_list[0][1:]
+                    # Check old command's format
                     if (len(old_command_list) > 2
                             and old_command_type in glovar.add_commands + glovar.remove_commands):
                         old_word = get_command_context(old_message)
@@ -101,15 +105,17 @@ def same_words(client, message):
                                 thread(send_message, (client, cid, text, mid))
 
                         return
+                    # If origin old message just simply "/rm", bot should check which message it replied to
                     elif (old_command_type in glovar.remove_commands
                           and len(old_command_list) == 1):
+                        # Get the message replied by old message
                         old_message = get_messages(client, cid, [old_message.message_id]).messages[0]
                         if old_message.reply_to_message:
                             old_message = old_message.reply_to_message
                             aid = old_message.from_user.id
+                            # Check permission
                             if uid == aid:
-                                old_command_list_raw = get_text(old_message).split(' ')
-                                old_command_list = list(filter(None, old_command_list_raw))
+                                old_command_list = list(filter(None, get_text(old_message).split(" ")))
                                 old_command_type = old_command_list[0][1:]
                                 if (len(old_command_list) > 2
                                         and old_command_type in glovar.add_commands):
@@ -144,7 +150,7 @@ def same_words(client, message):
 
         thread(send_message, (client, cid, text, mid))
         if "已移除" in text:
-            thread(data_exchange, (client,))
+            thread(share_regex_update, (client,))
     except Exception as e:
         logger.warning(f"Same words error: {e}", exc_info=True)
 

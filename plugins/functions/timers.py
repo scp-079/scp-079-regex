@@ -22,7 +22,8 @@ from time import sleep
 from pyrogram import Client
 
 from .. import glovar
-from .etc import send_data, thread
+from .channel import share_data
+from .etc import thread
 from .file import crypt_file
 from .telegram import send_document, send_message
 
@@ -31,10 +32,12 @@ logger = logging.getLogger(__name__)
 
 
 def backup_files(client: Client) -> bool:
+    # Backup data files to BACKUP
     try:
         for file in [f"{f}_words" for f in glovar.names] + ["compiled"]:
             try:
-                exchange_text = send_data(
+                exchange_text = share_data(
+                    client=client,
                     sender="REGEX",
                     receivers=["BACKUP"],
                     action="backup",
@@ -55,10 +58,12 @@ def backup_files(client: Client) -> bool:
 
 
 def update_status(client: Client) -> bool:
+    # Update running status to BACKUP
     try:
-        exchange_text = send_data(
+        exchange_text = share_data(
+            client=client,
             sender="REGEX",
-            receivers=["MANAGE"],
+            receivers=["BACKUP"],
             action="update",
             action_type="status",
             data="awake"

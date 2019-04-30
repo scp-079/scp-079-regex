@@ -18,17 +18,15 @@
 
 import logging
 import re
-from time import sleep
 from typing import Optional
 
-from pyrogram import Client, InlineKeyboardMarkup, InlineKeyboardButton, Message
+from pyrogram import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from xeger import Xeger
 
 from .. import glovar
-from .etc import code, crypt_str, button_data, get_command_context, get_text, delay, italic, random_str, send_data
-from .etc import thread, user_mention
-from .file import crypt_file, save
-from .telegram import send_document, send_message
+from .etc import code, button_data, get_command_context, get_text, italic, random_str
+from .etc import user_mention
+from .file import save
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -37,38 +35,8 @@ logger = logging.getLogger(__name__)
 xg = Xeger(limit=32)
 
 
-def data_exchange(client: Client) -> bool:
-    try:
-        receivers = glovar.update_to
-        if glovar.update_type == "reload":
-            exchange_text = send_data(
-                sender="REGEX",
-                receivers=receivers,
-                action="update",
-                action_type="reload",
-                data=crypt_str("encrypt", glovar.reload_path, glovar.key)
-            )
-            delay(5, send_message, [client, glovar.exchange_channel_id, exchange_text])
-        else:
-            exchange_text = send_data(
-                sender="REGEX",
-                receivers=receivers,
-                action="update",
-                action_type="download",
-                data=crypt_str("encrypt", glovar.reload_path, glovar.key)
-            )
-            sleep(5)
-            crypt_file("encrypt", "data/compiled", "tmp/compiled")
-            thread(send_document, (client, glovar.exchange_channel_id, "tmp/compiled", exchange_text))
-
-        return True
-    except Exception as e:
-        logger.warning(f"Data exchange error: {e}", exc_info=True)
-
-    return False
-
-
 def get_admin(message: Message) -> Optional[int]:
+    # Get message's origin commander
     try:
         aid = int(message.text.partition("\n")[0].partition("：")[2])
         return aid
@@ -79,6 +47,7 @@ def get_admin(message: Message) -> Optional[int]:
 
 
 def re_compile(word_type: str) -> bool:
+    # Re compile the regex
     try:
         text = '|'.join(eval(f"glovar.{word_type}_words"))
         if text != "":
@@ -97,6 +66,7 @@ def re_compile(word_type: str) -> bool:
 
 
 def similar(mode: str, a: str, b: str) -> bool:
+    # Check similar pattern, use strict mode to get more accurate
     if mode == "strict":
         i = 0
         while i < 3:
@@ -119,6 +89,7 @@ def similar(mode: str, a: str, b: str) -> bool:
 
 
 def word_add(message: Message) -> (str, InlineKeyboardMarkup):
+    # Add a word
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
     command_list = get_text(message).split(" ")
@@ -130,7 +101,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
             # Check if the word already exits
             if word in eval(f"glovar.{word_type}_words"):
                 text += (f"状态：{code('未添加')}\n"
-                         f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                         f"类别：{code(glovar.names[word_type])}\n"
                          f"词组：{code(word)}\n"
                          f"原因：{code('已存在')}")
                 markup = None
@@ -140,7 +111,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
                     pattern = re.compile(word, re.I | re.M | re.S)
                 except Exception as e:
                     text += (f"状态：{code('未添加')}\n"
-                             f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                             f"类别：{code(glovar.names[word_type])}\n"
                              f"词组：{code(word)}\n"
                              f"原因：{code('出现错误')}\n"
                              f"错误：{code(e)}")
@@ -152,9 +123,9 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
                              "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                              "0123456789"
                              ]:
-                    if pattern.search(test):
+                    if pattern.search(test, re.I | re.M | re.S):
                         text += (f"状态：{code('未添加')}\n"
-                                 f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                                 f"类别：{code(glovar.names[word_type])}\n"
                                  f"词组：{code(word)}\n"
                                  f"原因：{code('不具有特殊性')}")
                         markup = None
@@ -177,7 +148,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
                 if glovar.ask_words[ask_key]["old"]:
                     end_text = "\n\n".join([code(w) for w in glovar.ask_words[ask_key]["old"]])
                     text += (f"状态：{code('未添加')}\n"
-                             f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                             f"类别：{code(glovar.names[word_type])}\n"
                              f"词组：{code(word)}\n"
                              f"原因：{code('等待确认')}\n"
                              f"重复：------------------------\n\n{end_text}")
@@ -209,7 +180,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
                     eval(f"glovar.{word_type}_words").add(word)
                     re_compile(word_type)
                     text += (f"状态：{code(f'已添加')}\n"
-                             f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                             f"类别：{code(glovar.names[word_type])}\n"
                              f"词组：{code(word)}")
                     markup = None
         else:
@@ -226,6 +197,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
 
 
 def word_remove(message: Message) -> str:
+    # Remove a word
     uid = message.from_user.id
     text = word_remove_try(message)
     if text:
@@ -237,19 +209,20 @@ def word_remove(message: Message) -> str:
             if r_text:
                 return r_text
         else:
-            text = f"管理：{user_mention(uid)}\n"
-            text += (f"状态：{code('未移除')}\n"
-                     f"原因：{code('权限错误')}")
+            text = (f"管理：{user_mention(uid)}\n"
+                    f"状态：{code('未移除')}\n"
+                    f"原因：{code('权限错误')}")
             return text
 
-    text = f"管理：{user_mention(uid)}\n"
-    text += (f"状态：{code('未移除')}\n"
-             f"原因：{code('格式有误')}")
+    text = (f"管理：{user_mention(uid)}\n"
+            f"状态：{code('未移除')}\n"
+            f"原因：{code('格式有误')}")
 
     return text
 
 
 def word_remove_try(message: Message) -> Optional[str]:
+    # Try to remove a word
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
     command_list = get_text(message).split(" ")
@@ -280,37 +253,30 @@ def word_remove_try(message: Message) -> Optional[str]:
 
 
 def words_ask(operation: str, key: str) -> str:
+    # Handle the reply to bot's asked question
     if key in glovar.ask_words:
         word_type = glovar.ask_words[key]["type"]
         new_word = glovar.ask_words[key]["new"]
         old_words = glovar.ask_words[key]["old"]
-        text = ""
-        for old in glovar.ask_words[key]["old"]:
-            text += f"{code(old)}\n\n"
-
-        text = text[:-2]
+        text = (f"状态：{code(f'已添加')}\n"
+                f"类别：{code(f'{glovar.names[word_type]}')}\n"
+                f"词组：{code(new_word)}\n")
+        end_text = "\n\n".join([code(w) for w in glovar.ask_words[key]["old"]])
+        # If admin decide to add new word
         if operation == "new":
             eval(f"glovar.{word_type}_words").add(new_word)
             re_compile(word_type)
-            text = (f"状态：{code(f'已添加')}\n"
-                    f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                    f"词组：{code(new_word)}\n"
-                    f"重复：------------------------\n\n{text}")
+            text += "重复：" + "-" * 24 + f"\n\n{end_text}"
+        # Else delete old words
         elif operation == "replace":
             eval(f"glovar.{word_type}_words").add(new_word)
             for old in old_words:
                 eval(f"glovar.{word_type}_words").discard(old)
 
             re_compile(word_type)
-            text = (f"状态：{code(f'已添加')}\n"
-                    f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                    f"词组：{code(new_word)}\n"
-                    f"替换：------------------------\n\n{text}")
+            text += f"替换：" + "-" * 24 + f"\n\n{end_text}"
         else:
-            text = (f"状态：{code(f'已取消')}\n"
-                    f"类别：{code(f'{glovar.names[word_type]}')}\n"
-                    f"词组：{code(new_word)}\n"
-                    f"重复：------------------------\n\n{text}")
+            text += f"重复：" + "-" * 24 + f"\n\n{end_text}"
 
         glovar.ask_words.pop(key, None)
     else:
@@ -321,9 +287,10 @@ def words_ask(operation: str, key: str) -> str:
 
 
 def words_list(message: Message) -> (str, InlineKeyboardMarkup):
+    # List words
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
-    command_list = list(filter(None, message.command))
+    command_list = list(filter(None, get_text(message).split(" ")))
     if len(command_list) > 1:
         word_type = command_list[1]
         if word_type in glovar.names:
@@ -342,6 +309,7 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
 
 
 def words_list_page(uid, word_type, page) -> (str, InlineKeyboardMarkup):
+    # Generate a words list page
     text = f"管理：{user_mention(uid)}\n"
     words = eval(f"glovar.{word_type}_words")
     w_list = list(words)
@@ -356,7 +324,9 @@ def words_list_page(uid, word_type, page) -> (str, InlineKeyboardMarkup):
 
 
 def words_page(w_list: list, action: str, action_type: str, page: int) -> (list, InlineKeyboardMarkup):
+    # Generate a list for words and markup buttons
     markup = None
+    # Get page count
     quo = int(len(w_list) / glovar.per_page)
     if quo != 0:
         page_count = quo + 1
@@ -422,10 +392,11 @@ def words_page(w_list: list, action: str, action_type: str, page: int) -> (list,
 
 
 def words_search(message: Message) -> (str, InlineKeyboardMarkup):
+    # Search words
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
     markup = None
-    command_list = message.command
+    command_list = get_text(message).split(" ")
     if len(command_list) > 1:
         word_type = list(filter(None, command_list))[1]
         if len(command_list) > 2 and (word_type in glovar.names or word_type == "all"):
@@ -459,17 +430,20 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
                      f"结果：{code('无法显示')}\n"
                      f"原因：{code('格式有误')}")
     else:
-        text = (f"结果：{code('无法显示')}\n"
-                f"原因：{code('格式有误')}")
+        text += (f"结果：{code('无法显示')}\n"
+                 f"原因：{code('格式有误')}")
 
     return text, markup
 
 
 def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMarkup):
+    # Generate searched words page
     text = f"管理：{user_mention(uid)}\n"
     if key in glovar.search_words:
         word_type = glovar.search_words[key]["type"]
         word = glovar.search_words[key]["word"]
+        text += (f"类别：{code(glovar.names.get(word_type, '全部'))}\n"
+                 f"查询：{code(word)}\n")
         markup = None
         words = glovar.search_words[key]["result"]
         if words:
@@ -489,13 +463,9 @@ def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMark
             else:
                 end_text = "\n\n".join([f"{code(w)}" for w in w_list])
 
-            text += (f"类别：{code(glovar.names.get(word_type, '全部'))}\n"
-                     f"查询：{code(word)}\n"
-                     f"结果：------------------------\n\n{end_text}")
+            text += "结果：" + "-" * 24 + f"\n\n{end_text}"
         else:
-            text += (f"类别：{code(glovar.names.get(word_type, '全部'))}\n"
-                     f"查询：{code(word)}\n"
-                     f"结果：{code('无法显示')}\n"
+            text += (f"结果：{code('无法显示')}\n"
                      f"原因：{code('没有找到')}")
     else:
         text += (f"结果：{code('无法显示')}\n"

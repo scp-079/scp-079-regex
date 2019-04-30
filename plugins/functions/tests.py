@@ -32,36 +32,34 @@ logger = logging.getLogger(__name__)
 
 
 def name_test(client: Client, message: Message) -> bool:
+    # Test user's or channel's name
     try:
         if message.forward_from or message.forward_from_name or message.forward_from_chat:
             cid = message.chat.id
             result = ""
             mid = message.message_id
-
             if message.forward_from:
                 user = message.forward_from
                 if user.is_deleted:
                     text = ""
                 else:
-                    first_name = user.first_name
-                    last_name = ""
+                    text = user.first_name
                     if user.last_name:
-                        last_name = message.forward_from.last_name
-
-                    text = f"{first_name} {last_name}"
+                        text += f" {message.forward_from.last_name}"
             elif message.forward_from_name:
                 text = message.forward_from_name
             else:
                 chat = message.forward_from_chat
                 text = chat.title
 
-            if text != "":
+            if text:
                 text = t2s(text)
                 result += f"来源名称：{code(text)}\n\n"
-                for word_type in ["nm", "wb"]:
+                # Can add more test to the "for in" list
+                for word_type in ["nm"]:
                     if glovar.compiled[word_type].search(text):
                         w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                        result += "\t" * 4 + f"{glovar.names[word_type]}：----------------\n\n"
+                        result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
                         for w in w_list:
                             result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -74,19 +72,20 @@ def name_test(client: Client, message: Message) -> bool:
 
 
 def sticker_test(client: Client, message: Message) -> bool:
+    # Test sticker set name
     try:
         if message.sticker and message.sticker.set_name:
             cid = message.chat.id
             result = ""
             mid = message.message_id
-
             text = message.sticker.set_name
             text = t2s(text)
             result += f"贴纸名称：{code(text)}\n\n"
+            # Can add more test to the "for in" list
             for word_type in ["sti"]:
                 if glovar.compiled[word_type].search(text):
                     w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                    result += "\t" * 4 + f"{glovar.names[word_type]}：----------------\n\n"
+                    result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
                     for w in w_list:
                         result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -99,6 +98,7 @@ def sticker_test(client: Client, message: Message) -> bool:
 
 
 def text_test(client: Client, message: Message) -> bool:
+    # Test message text or caption
     try:
         text = get_text(message)
         except_pattern = ("^版本：|"
@@ -108,19 +108,18 @@ def text_test(client: Client, message: Message) -> bool:
                           "^管理员|"
                           "^{|"
                           "^NSFW 得分")
-        if text and not re.search(except_pattern, text):
+        if text and not re.search(except_pattern, text, re.I):
             cid = message.chat.id
             result = ""
             mid = message.message_id
-
             for word_type in glovar.names:
                 if glovar.compiled[word_type].search(text):
                     w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                    result += f"{glovar.names[word_type]}：------------------------\n\n"
+                    result += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
                     for w in w_list:
                         result += "\t" * 4 + f"{code(w)}\n\n"
 
-            if result != "":
+            if result:
                 thread(send_message, (client, cid, result, mid))
 
             return True
