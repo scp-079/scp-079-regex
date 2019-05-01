@@ -107,7 +107,8 @@ def text_test(client: Client, message: Message) -> bool:
                           "^被举报|"
                           "^管理员|"
                           "^{|"
-                          "^NSFW 得分")
+                          "^NSFW 得分|"
+                          "^复查模型")
         if text and not re.search(except_pattern, text, re.I):
             cid = message.chat.id
             result = ""
