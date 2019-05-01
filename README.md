@@ -34,6 +34,7 @@ See [this article](https://scp-079.org/regex/).
 
 - plugins
     - functions
+        - `channel.py` : Send messages to channel
         - `etc.py` : Miscellaneous
         - `file.py` : Save files
         - `filters.py` : Some filters

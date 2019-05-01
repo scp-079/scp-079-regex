@@ -18,7 +18,7 @@
 
 import logging
 from time import sleep
-from typing import List
+from typing import List, Union
 
 from pyrogram import Client
 
@@ -32,17 +32,31 @@ from .telegram import send_document, send_message
 logger = logging.getLogger(__name__)
 
 
-def share_data(client: Client, sender: str, receivers: List[str], action: str, action_type: str, data=None) -> bool:
+def share_data(client: Client, receivers: List[str], action: str, action_type: str, data: Union[dict, int, str],
+               file: str = None) -> bool:
     # Use this function to share data in exchange channel
     try:
-        text = format_data(
-            sender=sender,
-            receivers=receivers,
-            action=action,
-            action_type=action_type,
-            data=data
-        )
-        thread(send_message, (client, glovar.exchange_channel_id, text))
+        sender = "REGEX"
+        if file:
+            text = format_data(
+                sender=sender,
+                receivers=receivers,
+                action=action,
+                action_type=action_type,
+                data=data
+            )
+            crypt_file("encrypt", f"data/{file}", f"tmp/{file}")
+            thread(send_document, (client, glovar.exchange_channel_id, f"tmp/{file}", text))
+        else:
+            text = format_data(
+                sender=sender,
+                receivers=receivers,
+                action=action,
+                action_type=action_type,
+                data=data
+            )
+            thread(send_message, (client, glovar.exchange_channel_id, text))
+
         return True
     except Exception as e:
         logger.warning(f"Share data error: {e}", exc_info=True)
@@ -56,7 +70,6 @@ def share_regex_update(client: Client) -> bool:
         if glovar.update_type == "reload":
             exchange_text = share_data(
                 client=client,
-                sender="REGEX",
                 receivers=receivers,
                 action="update",
                 action_type="reload",
@@ -66,7 +79,6 @@ def share_regex_update(client: Client) -> bool:
         else:
             exchange_text = share_data(
                 client=client,
-                sender="REGEX",
                 receivers=receivers,
                 action="update",
                 action_type="download",

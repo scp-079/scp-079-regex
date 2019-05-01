@@ -82,58 +82,6 @@ def delay(secs: int, target: Callable, args: list) -> bool:
     return True
 
 
-def get_command_context(message: Message) -> str:
-    command_list = get_text(message).split(" ")
-    if len(list(filter(None, command_list))) > 2:
-        i = 1
-        command_type = command_list[i]
-        while command_type == "" and i < len(command_list):
-            i += 1
-            command_type = command_list[i]
-
-        command_context = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
-    else:
-        command_context = ""
-
-    return command_context
-
-
-def get_text(message: Message) -> Optional[str]:
-    text = None
-    if message.text:
-        text = message.text
-    elif message.caption:
-        text = message.caption
-
-    if text:
-        text = t2s(text)
-
-    return text
-
-
-def italic(text) -> str:
-    if text != "":
-        return f"__{text}__"
-
-    return ""
-
-
-def random_str(i: int) -> str:
-    return ''.join(choice(ascii_letters + digits) for _ in range(i))
-
-
-def receive_data(message: Message) -> dict:
-    text = get_text(message)
-    try:
-        assert text is not None, f"Can't get text from message: {message}"
-        data = loads(text)
-        return data
-    except Exception as e:
-        logger.warning(f"Receive data error: {e}")
-
-    return {}
-
-
 def format_data(sender: str, receivers: List[str], action: str, action_type: str, data=None) -> str:
     """Make a unified format string for data exchange.
 
@@ -221,11 +169,14 @@ def format_data(sender: str, receivers: List[str], action: str, action_type: str
                 Config:
                     ask:
                         {
+                            "project_name": "Project name",
+                            "project_link": "Link to project",
                             "group_id": -10012345678,
                             "group_name": "Group Name",
                             "group_link": "link to group",
                             "user_id": 12345678
-                            "config": dict
+                            "config": dict,
+                            "default": dict
                         }
 
                     commit:
@@ -238,7 +189,7 @@ def format_data(sender: str, receivers: List[str], action: str, action_type: str
                         {
                             "group_id": -10012345678,
                             "user_id": 12345678,
-                            "message_id": 123
+                            "config_link": "link to config"
                         }
 
                 Declare:
@@ -342,6 +293,58 @@ def format_data(sender: str, receivers: List[str], action: str, action_type: str
     }
 
     return code_block(dumps(data, indent=4))
+
+
+def get_command_context(message: Message) -> str:
+    command_list = get_text(message).split(" ")
+    if len(list(filter(None, command_list))) > 2:
+        i = 1
+        command_type = command_list[i]
+        while command_type == "" and i < len(command_list):
+            i += 1
+            command_type = command_list[i]
+
+        command_context = get_text(message)[1 + len(command_list[0]) + i + len(command_list[1]):].strip()
+    else:
+        command_context = ""
+
+    return command_context
+
+
+def get_text(message: Message) -> Optional[str]:
+    text = None
+    if message.text:
+        text = message.text
+    elif message.caption:
+        text = message.caption
+
+    if text:
+        text = t2s(text)
+
+    return text
+
+
+def italic(text) -> str:
+    if text != "":
+        return f"__{text}__"
+
+    return ""
+
+
+def random_str(i: int) -> str:
+    return ''.join(choice(ascii_letters + digits) for _ in range(i))
+
+
+def receive_data(message: Message) -> dict:
+    text = get_text(message)
+    try:
+        assert text is not None, f"Can't get text from message: {message}"
+        data = loads(text)
+        return data
+    except Exception as e:
+        logger.warning(f"Receive data error: {e}")
+
+    return {}
 
 
 def t2s(text: str) -> str:
