@@ -22,7 +22,7 @@ import re
 from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import code, get_text, t2s, thread
+from .etc import code, get_full_name, get_text, t2s, thread
 from .telegram import send_message
 from .words import similar
 
@@ -40,12 +40,7 @@ def name_test(client: Client, message: Message) -> bool:
             mid = message.message_id
             if message.forward_from:
                 user = message.forward_from
-                if user.is_deleted:
-                    text = ""
-                else:
-                    text = user.first_name
-                    if user.last_name:
-                        text += f" {message.forward_from.last_name}"
+                text = get_full_name(user)
             elif message.forward_from_name:
                 text = message.forward_from_name
             else:
