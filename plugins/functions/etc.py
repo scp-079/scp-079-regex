@@ -21,11 +21,11 @@ from json import dumps, loads
 from random import choice
 from string import ascii_letters, digits
 from threading import Thread, Timer
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Union
 
 from cryptography.fernet import Fernet
 from opencc import convert
-from pyrogram import Message
+from pyrogram import Message, User
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -112,12 +112,34 @@ def get_command_context(message: Message) -> str:
     return command_context
 
 
-def get_text(message: Message) -> Optional[str]:
-    text = None
+def get_full_name(user: User) -> str:
+    text = ""
+    try:
+        if user and not user.is_deleted:
+            text = user.first_name
+            if user.last_name:
+                text += f" {user.last_name}"
+    except Exception as e:
+        logger.warning(f"Get full name error: {e}", exc_info=True)
+
+    return text
+
+
+def get_text(message: Message) -> str:
+    text = ""
     if message.text:
-        text = message.text
+        text += message.text
     elif message.caption:
-        text = message.caption
+        text += message.caption
+
+    if message.entities:
+        for en in message.entities:
+            if en.url:
+                text += f"\n{en.url}"
+    elif message.caption_entities:
+        for en in message.caption_entities:
+            if en.url:
+                text += f"\n{en.url}"
 
     if text:
         text = t2s(text)
@@ -139,7 +161,7 @@ def random_str(i: int) -> str:
 def receive_data(message: Message) -> dict:
     text = get_text(message)
     try:
-        assert text is not None, f"Can't get text from message: {message}"
+        assert text is not "", f"Can't get text from message: {message}"
         data = loads(text)
         return data
     except Exception as e:
