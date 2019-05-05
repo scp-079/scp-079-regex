@@ -57,8 +57,6 @@ names: dict = {
     "test": "测试用例"
 }
 
-version = "0.2.6"
-
 search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 # search_words = {
 #     "random": {
@@ -69,6 +67,8 @@ search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 #         "word": "regex"
 #     }
 # }
+
+version = "0.2.6"
 
 # Generate commands lists
 add_commands: list = ["add", "ad"]
