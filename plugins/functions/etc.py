@@ -119,6 +119,9 @@ def get_full_name(user: User) -> str:
             text = user.first_name
             if user.last_name:
                 text += f" {user.last_name}"
+
+        if text:
+            text = t2s(text)
     except Exception as e:
         logger.warning(f"Get full name error: {e}", exc_info=True)
 
