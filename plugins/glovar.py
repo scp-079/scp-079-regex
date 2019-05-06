@@ -68,7 +68,9 @@ search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 #     }
 # }
 
-version = "0.2.6"
+sender = "REGEX"
+
+version = "0.2.7"
 
 # Generate commands lists
 add_commands: list = ["add", "ad"]

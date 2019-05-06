@@ -36,10 +36,9 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
                file: str = None) -> bool:
     # Use this function to share data in exchange channel
     try:
-        sender = "REGEX"
         if file:
             text = format_data(
-                sender=sender,
+                sender=glovar.sender,
                 receivers=receivers,
                 action=action,
                 action_type=action_type,
@@ -49,7 +48,7 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
             thread(send_document, (client, glovar.exchange_channel_id, f"tmp/{file}", text))
         else:
             text = format_data(
-                sender=sender,
+                sender=glovar.sender,
                 receivers=receivers,
                 action=action,
                 action_type=action_type,
