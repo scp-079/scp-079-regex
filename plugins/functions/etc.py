@@ -127,19 +127,24 @@ def get_full_name(user: User) -> str:
 
 def get_text(message: Message) -> str:
     text = ""
-    if message.text:
-        text += message.text
-    elif message.caption:
-        text += message.caption
+    if message.text or message.caption:
+        if message.text:
+            text += message.text
+        else:
+            text += message.caption
 
-    if message.entities:
-        for en in message.entities:
-            if en.url:
-                text += f"\n{en.url}"
-    elif message.caption_entities:
-        for en in message.caption_entities:
-            if en.url:
-                text += f"\n{en.url}"
+        if message.entities or message.caption_entities:
+            if message.entities:
+                entities = message.entities
+            else:
+                entities = message.caption_entities
+
+            for en in entities:
+                if en.url:
+                    text += f"\n{en.url}"
+
+                if en.user:
+                    text += f"\n{get_full_name(en.user)}"
 
     if text:
         text = t2s(text)
