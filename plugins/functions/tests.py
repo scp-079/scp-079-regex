@@ -22,7 +22,7 @@ import re
 from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import code, get_full_name, get_text, t2s, thread
+from .etc import code, get_forward_name, get_text, t2s, thread
 from .telegram import send_message
 from .words import similar
 
@@ -34,32 +34,22 @@ logger = logging.getLogger(__name__)
 def name_test(client: Client, message: Message) -> bool:
     # Test user's or channel's name
     try:
-        if message.forward_from or message.forward_from_name or message.forward_from_chat:
+        text = get_forward_name(message)
+        if text:
             cid = message.chat.id
-            result = ""
             mid = message.message_id
-            if message.forward_from:
-                user = message.forward_from
-                text = get_full_name(user)
-            elif message.forward_from_name:
-                text = message.forward_from_name
-            else:
-                chat = message.forward_from_chat
-                text = chat.title
+            result = ""
+            result += f"来源名称：{code(text)}\n\n"
+            # Can add more test to the "for in" list
+            for word_type in ["nm"]:
+                if glovar.compiled[word_type].search(text):
+                    w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
+                    result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
+                    for w in w_list:
+                        result += "\t" * 8 + f"{code(w)}\n\n"
 
-            if text:
-                text = t2s(text)
-                result += f"来源名称：{code(text)}\n\n"
-                # Can add more test to the "for in" list
-                for word_type in ["nm"]:
-                    if glovar.compiled[word_type].search(text):
-                        w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
-                        result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
-                        for w in w_list:
-                            result += "\t" * 8 + f"{code(w)}\n\n"
-
-                thread(send_message, (client, cid, result, mid))
-                return True
+            thread(send_message, (client, cid, result, mid))
+            return True
     except Exception as e:
         logger.warning(f"Name test error: {e}", exc_info=True)
 
