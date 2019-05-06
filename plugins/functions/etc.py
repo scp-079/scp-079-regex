@@ -32,13 +32,15 @@ logger = logging.getLogger(__name__)
 
 
 def bold(text) -> str:
-    if text != "":
+    # Get a bold text
+    if text:
         return f"**{text}**"
 
     return ""
 
 
 def button_data(action: str, action_type: str = None, data: Union[int, str] = None) -> bytes:
+    # Get a button's bytes data
     button = {
         "a": action,
         "t": action_type,
@@ -48,20 +50,23 @@ def button_data(action: str, action_type: str = None, data: Union[int, str] = No
 
 
 def code(text) -> str:
-    if text != "":
+    # Get a code text
+    if text:
         return f"`{text}`"
 
     return ""
 
 
 def code_block(text) -> str:
-    if text != "":
+    # Get a code block text
+    if text:
         return f"```{text}```"
 
     return ""
 
 
 def crypt_str(operation: str, text: str, key: str) -> str:
+    # Encrypt or decrypt a string
     f = Fernet(key)
     text = text.encode("utf-8")
     if operation == "decrypt":
@@ -75,6 +80,7 @@ def crypt_str(operation: str, text: str, key: str) -> str:
 
 
 def delay(secs: int, target: Callable, args: list) -> bool:
+    # Call a function with delay
     t = Timer(secs, target, args)
     t.daemon = True
     t.start()
@@ -113,6 +119,7 @@ def get_command_context(message: Message) -> str:
 
 
 def get_full_name(user: User) -> str:
+    # Get user's full name
     text = ""
     try:
         if user and not user.is_deleted:
@@ -129,44 +136,51 @@ def get_full_name(user: User) -> str:
 
 
 def get_text(message: Message) -> str:
+    # Get message's text, including link and mentioned user's name
     text = ""
-    if message.text or message.caption:
-        if message.text:
-            text += message.text
-        else:
-            text += message.caption
-
-        if message.entities or message.caption_entities:
-            if message.entities:
-                entities = message.entities
+    try:
+        if message.text or message.caption:
+            if message.text:
+                text += message.text
             else:
-                entities = message.caption_entities
+                text += message.caption
 
-            for en in entities:
-                if en.url:
-                    text += f"\n{en.url}"
+            if message.entities or message.caption_entities:
+                if message.entities:
+                    entities = message.entities
+                else:
+                    entities = message.caption_entities
 
-                if en.user:
-                    text += f"\n{get_full_name(en.user)}"
+                for en in entities:
+                    if en.url:
+                        text += f"\n{en.url}"
 
-    if text:
-        text = t2s(text)
+                    if en.user:
+                        text += f"\n{get_full_name(en.user)}"
+
+        if text:
+            text = t2s(text)
+    except Exception as e:
+        logger.warning(f"Get text error: {e}", exc_info=True)
 
     return text
 
 
 def italic(text) -> str:
-    if text != "":
+    # Get italic text
+    if text:
         return f"__{text}__"
 
     return ""
 
 
 def random_str(i: int) -> str:
+    # Get a random string
     return ''.join(choice(ascii_letters + digits) for _ in range(i))
 
 
 def receive_data(message: Message) -> dict:
+    # Receive data from exchange channel
     text = get_text(message)
     try:
         assert text is not "", f"Can't get text from message: {message}"
@@ -179,10 +193,12 @@ def receive_data(message: Message) -> dict:
 
 
 def t2s(text: str) -> str:
+    # Covert Traditional Chinese to Simplified Chinese
     return convert(text, config="t2s.json")
 
 
 def thread(target: Callable, args: tuple) -> bool:
+    # Call a function using thread
     t = Thread(target=target, args=args)
     t.daemon = True
     t.start()
@@ -191,4 +207,5 @@ def thread(target: Callable, args: tuple) -> bool:
 
 
 def user_mention(uid: int) -> str:
+    # Get a mention text
     return f"[{uid}](tg://user?id={uid})"
