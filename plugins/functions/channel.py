@@ -36,6 +36,9 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
                file: str = None) -> bool:
     # Use this function to share data in exchange channel
     try:
+        if glovar.sender in receivers:
+            receivers.remove(glovar.sender)
+
         if file:
             text = format_data(
                 sender=glovar.sender,
@@ -67,25 +70,38 @@ def share_regex_update(client: Client) -> bool:
     try:
         receivers = glovar.update_to
         if glovar.update_type == "reload":
-            exchange_text = share_data(
+            share_data(
                 client=client,
                 receivers=receivers,
                 action="update",
                 action_type="reload",
                 data=crypt_str("encrypt", glovar.reload_path, glovar.key)
             )
-            delay(5, send_message, [client, glovar.exchange_channel_id, exchange_text])
-        else:
-            exchange_text = share_data(
-                client=client,
-                receivers=receivers,
-                action="update",
-                action_type="download",
-                data=crypt_str("encrypt", glovar.reload_path, glovar.key)
+            delay(
+                5,
+                share_data,
+                [
+                    client,
+                    receivers,
+                    "update",
+                    "reload",
+                    crypt_str("encrypt", glovar.reload_path, glovar.key)
+                ]
             )
+        else:
             sleep(5)
             crypt_file("encrypt", "data/compiled", "tmp/compiled")
-            thread(send_document, (client, glovar.exchange_channel_id, "tmp/compiled", exchange_text))
+            thread(
+                send_document,
+                (
+                    client,
+                    receivers,
+                    "update",
+                    "download",
+                    crypt_str("encrypt", glovar.reload_path, glovar.key),
+                    "tmp/compiled"
+                )
+            )
 
         return True
     except Exception as e:

@@ -89,6 +89,63 @@ other_commands: list = ["admin",
                         "warn_config"]
 all_commands += other_commands
 
+# Read data from config.ini
+
+# [basic]
+bot_token: str = ""
+prefix: List[str] = []
+prefix_str: str = "/!"
+
+# [channels]
+exchange_channel_id: int = 0
+regex_group_id: int = 0
+test_group_id: int = 0
+
+# [custom]
+per_page: int = 15
+reload_path: str = ""
+update_to: Union[str, list] = ""
+update_type: str = "reload"
+
+# [encrypt]
+key: Union[str, bytes] = ""
+password: str = ""
+
+try:
+    config = RawConfigParser()
+    config.read("config.ini")
+    # [basic]
+    bot_token = config["basic"].get("bot_token", bot_token)
+    prefix = list(config["basic"].get("prefix", prefix_str))
+    # [channels]
+    exchange_channel_id = int(config["channels"].get("exchange_channel_id", exchange_channel_id))
+    test_group_id = int(config["channels"].get("test_group_id", test_group_id))
+    regex_group_id = int(config["channels"].get("regex_group_id", regex_group_id))
+    # [custom]
+    per_page = int(config["custom"].get("per_page", per_page))
+    reload_path = config["custom"].get("reload_path", reload_path)
+    update_to = config["custom"].get("update_to", update_to)
+    update_to = update_to.split(" ")
+    update_type = config["custom"].get("update_type", update_type)
+    # [encrypt]
+    key = config["encrypt"].get("key", key)
+    key = key.encode("utf-8")
+    password = config["encrypt"].get("password", password)
+except Exception as e:
+    logger.warning(f"Read data from config.ini error: {e}", exc_info=True)
+
+# Check
+if (bot_token in {"", "[DATA EXPUNGED]"}
+        or prefix == []
+        or exchange_channel_id == 0
+        or test_group_id == 0
+        or regex_group_id == 0
+        or (update_type == "reload" and reload_path in {"", "[DATA EXPUNGED]"})
+        or key in {"", b"[DATA EXPUNGED]"}
+        or password in {"", "[DATA EXPUNGED]"}):
+    logger.critical("No proper settings")
+    raise SystemExit('No proper settings')
+
 # Load data from pickle
 
 # Init dir
@@ -164,63 +221,6 @@ try:
 except Exception as e:
     logger.critical(f"Load data compiled backup error: {e}", exc_info=True)
     raise SystemExit("[DATA CORRUPTION]")
-
-# Read data from config.ini
-
-# [basic]
-bot_token: str = ""
-prefix: List[str] = []
-prefix_str: str = "/!"
-
-# [channels]
-exchange_channel_id: int = 0
-regex_group_id: int = 0
-test_group_id: int = 0
-
-# [custom]
-per_page: int = 15
-reload_path: str = ""
-update_to: Union[str, list] = ""
-update_type: str = "reload"
-
-# [encrypt]
-key: Union[str, bytes] = ""
-password: str = ""
-
-try:
-    config = RawConfigParser()
-    config.read("config.ini")
-    # [basic]
-    bot_token = config["basic"].get("bot_token", bot_token)
-    prefix = list(config["basic"].get("prefix", prefix_str))
-    # [channels]
-    exchange_channel_id = int(config["channels"].get("exchange_channel_id", exchange_channel_id))
-    test_group_id = int(config["channels"].get("test_group_id", test_group_id))
-    regex_group_id = int(config["channels"].get("regex_group_id", regex_group_id))
-    # [custom]
-    per_page = int(config["custom"].get("per_page", per_page))
-    reload_path = config["custom"].get("reload_path", reload_path)
-    update_to = config["custom"].get("update_to", update_to)
-    update_to = update_to.split(" ")
-    update_type = config["custom"].get("update_type", update_type)
-    # [encrypt]
-    key = config["encrypt"].get("key", key)
-    key = key.encode("utf-8")
-    password = config["encrypt"].get("password", password)
-except Exception as e:
-    logger.warning(f"Read data from config.ini error: {e}", exc_info=True)
-
-# Check
-if (bot_token in {"", "[DATA EXPUNGED]"}
-        or prefix == []
-        or exchange_channel_id == 0
-        or test_group_id == 0
-        or regex_group_id == 0
-        or (update_type == "reload" and reload_path in {"", "[DATA EXPUNGED]"})
-        or key in {"", b"[DATA EXPUNGED]"}
-        or password in {"", "[DATA EXPUNGED]"}):
-    logger.critical("No proper settings")
-    raise SystemExit('No proper settings')
 
 # Start program
 copyright_text = (f"SCP-079-REGEX v{version}, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
