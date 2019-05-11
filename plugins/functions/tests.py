@@ -22,7 +22,7 @@ import re
 from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import code, get_forward_name, get_text, t2s, thread
+from .etc import code, get_forward_name, get_text, t2s, thread, user_mention
 from .telegram import send_message
 from .words import similar
 
@@ -39,6 +39,7 @@ def name_test(client: Client, message: Message) -> bool:
             cid = message.chat.id
             mid = message.message_id
             result = ""
+            result += f"管理员：{user_mention(message.from_user.id)}\n"
             result += f"来源名称：{code(text)}\n\n"
             # Can add more test to the "for in" list
             for word_type in ["nm"]:
@@ -62,6 +63,7 @@ def sticker_test(client: Client, message: Message) -> bool:
         if message.sticker and message.sticker.set_name:
             cid = message.chat.id
             result = ""
+            result += f"管理员：{user_mention(message.from_user.id)}\n"
             mid = message.message_id
             text = message.sticker.set_name
             text = t2s(text)
@@ -90,7 +92,7 @@ def text_test(client: Client, message: Message) -> bool:
                           "^#(bug|done|fixed|todo)|"
                           "^已(解禁|警告)|"
                           "^被举报|"
-                          "^管理员|"
+                          "^管理员：|"
                           "^{|"
                           "^NSFW 得分|"
                           "^复查模型")
@@ -106,6 +108,8 @@ def text_test(client: Client, message: Message) -> bool:
                         result += "\t" * 4 + f"{code(w)}\n\n"
 
             if result:
+                result = (f"管理员：{user_mention(message.from_user.id)}\n"
+                          f"{result}")
                 thread(send_message, (client, cid, result, mid))
 
             return True
