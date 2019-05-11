@@ -123,7 +123,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
                              "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                              "0123456789"
                              ]:
-                    if pattern.search(test, re.I | re.M | re.S):
+                    if pattern.search(test):
                         text += (f"状态：{code('未添加')}\n"
                                  f"类别：{code(glovar.names[word_type])}\n"
                                  f"词组：{code(word)}\n"
