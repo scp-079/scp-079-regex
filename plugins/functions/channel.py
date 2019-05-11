@@ -67,6 +67,7 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
 
 
 def share_regex_update(client: Client) -> bool:
+    # Use this function to share regex update to other bots
     try:
         receivers = glovar.update_to
         if glovar.update_type == "reload":
