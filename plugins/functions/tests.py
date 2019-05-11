@@ -39,7 +39,7 @@ def name_test(client: Client, message: Message) -> bool:
             cid = message.chat.id
             mid = message.message_id
             result = ""
-            result += f"管理员：{user_mention(message.from_user.id)}\n"
+            result += f"管理员：{user_mention(message.from_user.id)}\n\n"
             result += f"来源名称：{code(text)}\n\n"
             # Can add more test to the "for in" list
             for word_type in ["nm"]:
@@ -63,7 +63,7 @@ def sticker_test(client: Client, message: Message) -> bool:
         if message.sticker and message.sticker.set_name:
             cid = message.chat.id
             result = ""
-            result += f"管理员：{user_mention(message.from_user.id)}\n"
+            result += f"管理员：{user_mention(message.from_user.id)}\n\n"
             mid = message.message_id
             text = message.sticker.set_name
             text = t2s(text)
@@ -108,7 +108,7 @@ def text_test(client: Client, message: Message) -> bool:
                         result += "\t" * 4 + f"{code(w)}\n\n"
 
             if result:
-                result = (f"管理员：{user_mention(message.from_user.id)}\n"
+                result = (f"管理员：{user_mention(message.from_user.id)}\n\n"
                           f"{result}")
                 thread(send_message, (client, cid, result, mid))
 
