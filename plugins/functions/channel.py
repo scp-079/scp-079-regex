@@ -93,7 +93,7 @@ def share_regex_update(client: Client) -> bool:
             sleep(5)
             crypt_file("encrypt", "data/compiled", "tmp/compiled")
             thread(
-                send_document,
+                share_data,
                 (
                     client,
                     receivers,

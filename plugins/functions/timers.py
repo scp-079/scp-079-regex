@@ -57,14 +57,13 @@ def backup_files(client: Client) -> bool:
 def update_status(client: Client) -> bool:
     # Update running status to BACKUP
     try:
-        exchange_text = share_data(
+        share_data(
             client=client,
             receivers=["BACKUP"],
             action="update",
             action_type="status",
             data="awake"
         )
-        thread(send_message, (client, glovar.exchange_channel_id, exchange_text))
         return True
     except Exception as e:
         logger.warning(f"Update status error: {e}")
