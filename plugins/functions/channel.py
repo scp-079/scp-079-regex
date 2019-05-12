@@ -71,13 +71,6 @@ def share_regex_update(client: Client) -> bool:
     try:
         receivers = glovar.update_to
         if glovar.update_type == "reload":
-            share_data(
-                client=client,
-                receivers=receivers,
-                action="update",
-                action_type="reload",
-                data=crypt_str("encrypt", glovar.reload_path, glovar.key)
-            )
             delay(
                 5,
                 share_data,
