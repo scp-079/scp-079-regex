@@ -25,6 +25,7 @@ See [this article](https://scp-079.org/regex/).
 - [x] Copy the same pattern to other groups
 - [x] Support the HIDE channel
 - [x] Add more types
+- [x] Follow the hard core interaction principle
 
 ## Requirements
 
