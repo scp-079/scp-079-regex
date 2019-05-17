@@ -62,7 +62,6 @@ def ask_word(client, message):
                 r_message = message.reply_to_message
                 aid = get_admin(r_message)
                 if uid == aid:
-                    pass
                     callback_data_list = get_callback_data(r_message)
                     if callback_data_list and callback_data_list[0]["a"] == "ask":
                         r_mid = r_message.message_id
