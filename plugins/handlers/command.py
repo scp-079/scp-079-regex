@@ -22,10 +22,12 @@ from pyrogram import Client, Filters
 
 from .. import glovar
 from ..functions.channel import share_regex_update
-from ..functions.etc import bold, code, get_command_context, get_text, thread, user_mention
+from ..functions.etc import bold, code, get_callback_data, get_command_context, get_text, message_link
+from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group, test_group
-from ..functions.telegram import get_messages, send_message
-from .. functions.words import word_add, words_list, word_remove, words_search
+from ..functions.telegram import edit_message_text, get_messages, send_message
+from ..functions.words import get_admin, word_add, words_ask, words_list, words_list_page, word_remove, words_search
+from ..functions.words import words_search_page
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -46,6 +48,52 @@ def add_word(client, message):
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
+                   & Filters.command(["ask"], glovar.prefix))
+def ask_word(client, message):
+    try:
+        cid = message.chat.id
+        mid = message.message_id
+        uid = message.from_user.id
+        text = f"管理：{user_mention(uid)}\n"
+        command_list = list(filter(None, message.command))
+        if len(command_list) == 2 and command_list[1] in {"new", "replace", "cancel"}:
+            command_type = command_list[1]
+            if message.reply_to_message:
+                r_message = message.reply_to_message
+                aid = get_admin(r_message)
+                if uid == aid:
+                    pass
+                    callback_data_list = get_callback_data(r_message)
+                    if callback_data_list and callback_data_list[0]["a"] == "ask":
+                        r_mid = r_message.message_id
+                        ask_key = callback_data_list[0]["d"]
+                        ask_text = (f"管理：{user_mention(aid)}\n"
+                                    f"{words_ask(command_type, ask_key)}")
+                        thread(edit_message_text, (client, cid, r_mid, ask_text))
+                        if "已添加" in ask_text:
+                            thread(share_regex_update, (client,))
+
+                        text += (f"状态：{code('已操作')}\n"
+                                 f"查看：{message_link(cid, r_mid)}\n")
+                    else:
+                        text += (f"状态：{code('未操作')}\n"
+                                 f"原因：{code('来源有误')}\n")
+                else:
+                    text += (f"状态：{code('未操作')}\n"
+                             f"原因：{code('权限有误')}\n")
+            else:
+                text += (f"状态：{code('未操作')}\n"
+                         f"原因：{code('用法有误')}\n")
+        else:
+            text += (f"状态：{code('未操作')}\n"
+                     f"原因：{code('格式有误')}\n")
+
+        thread(send_message, (client, cid, text, mid))
+    except Exception as e:
+        logger.warning(f"Ask word error: {e}", exc_info=True)
+
+
+@Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.list_commands, glovar.prefix))
 def list_words(client, message):
     try:
@@ -55,6 +103,64 @@ def list_words(client, message):
         thread(send_message, (client, cid, text, mid, markup))
     except Exception as e:
         logger.warning(f"List words error: {e}", exc_info=True)
+
+
+@Client.on_message(Filters.incoming & Filters.group & regex_group
+                   & Filters.command(["page"], glovar.prefix))
+def page_word(client, message):
+    try:
+        cid = message.chat.id
+        mid = message.message_id
+        uid = message.from_user.id
+        text = f"管理：{user_mention(uid)}\n"
+        command_list = list(filter(None, message.command))
+        if len(command_list) == 2 and command_list[1] in {"previous", "next"}:
+            command_type = command_list[1]
+            if message.reply_to_message:
+                r_message = message.reply_to_message
+                aid = get_admin(r_message)
+                if uid == aid:
+                    pass
+                    callback_data_list = get_callback_data(r_message)
+                    if callback_data_list and ((command_type == "previous"
+                                                and callback_data_list[0]["a"] in {"list", "search"})
+                                               or (command_type == "next"
+                                                   and callback_data_list[-1]["a"] in {"list", "search"})):
+                        r_mid = r_message.message_id
+                        if command_type == "previous":
+                            i = 0
+                        else:
+                            i = -1
+
+                        action = callback_data_list[i]["a"]
+                        action_type = callback_data_list[i]["t"]
+                        page = callback_data_list[i]["d"]
+                        if action == "list":
+                            word_type = action_type
+                            text, markup = words_list_page(uid, word_type, page)
+                        else:
+                            search_key = action_type
+                            text, markup = words_search_page(uid, search_key, page)
+
+                        thread(edit_message_text, (client, cid, r_mid, text, markup))
+                        text += (f"状态：{code('已更新')}\n"
+                                 f"查看：{message_link(cid, r_mid)}\n")
+                    else:
+                        text += (f"状态：{code('未更新')}\n"
+                                 f"原因：{code('来源有误')}\n")
+                else:
+                    text += (f"状态：{code('未更新')}\n"
+                             f"原因：{code('权限有误')}\n")
+            else:
+                text += (f"状态：{code('未更新')}\n"
+                         f"原因：{code('用法有误')}\n")
+        else:
+            text += (f"状态：{code('未更新')}\n"
+                     f"原因：{code('格式有误')}\n")
+
+        thread(send_message, (client, cid, text, mid))
+    except Exception as e:
+        logger.warning(f"Page word error: {e}", exc_info=True)
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group

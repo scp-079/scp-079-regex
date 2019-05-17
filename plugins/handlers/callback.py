@@ -54,7 +54,7 @@ def answer(client, callback_query):
             elif action == "list":
                 word_type = action_type
                 page = data
-                text, markup = words_list_page(aid, word_type, page)
+                text, markup = words_list_page(uid, word_type, page)
                 thread(edit_message_text, (client, cid, mid, text, markup))
             elif action == "search":
                 key = action_type

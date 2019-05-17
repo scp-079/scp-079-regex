@@ -79,7 +79,7 @@ sender: str = "REGEX"
 
 should_hide: bool = False
 
-version: str = "0.2.8"
+version: str = "0.2.9"
 
 # Generate commands lists
 add_commands: list = ["add", "ad"]
