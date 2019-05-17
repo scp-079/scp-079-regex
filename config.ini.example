@@ -27,7 +27,6 @@ test_group_id = [DATA EXPUNGED]
 [custom]
 per_page = 15
 reload_path = [DATA EXPUNGED]
-update_to = USER WATCHER
 update_type = reload
 
 [encrypt]

@@ -97,14 +97,13 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
 def share_regex_update(client: Client) -> bool:
     # Use this function to share regex update to other bots
     try:
-        receivers = glovar.update_to
         if glovar.update_type == "reload":
             delay(
                 5,
                 share_data,
                 [
                     client,
-                    receivers,
+                    glovar.receivers_regex,
                     "update",
                     "reload",
                     crypt_str("encrypt", glovar.reload_path, glovar.key)
@@ -117,7 +116,7 @@ def share_regex_update(client: Client) -> bool:
                 share_data,
                 (
                     client,
-                    receivers,
+                    glovar.receivers_regex,
                     "update",
                     "download",
                     crypt_str("encrypt", glovar.reload_path, glovar.key),

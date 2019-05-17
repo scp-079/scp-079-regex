@@ -62,6 +62,8 @@ names: dict = {
     "test": "测试用例"
 }
 
+receivers_regex: List[str] = ["CLEAN", "NOSPAM", "WATCH"]
+
 search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 # search_words = {
 #     "random": {
@@ -112,7 +114,6 @@ test_group_id: int = 0
 # [custom]
 per_page: int = 15
 reload_path: str = ""
-update_to: Union[str, list] = ""
 update_type: str = "reload"
 
 # [encrypt]
@@ -133,8 +134,6 @@ try:
     # [custom]
     per_page = int(config["custom"].get("per_page", per_page))
     reload_path = config["custom"].get("reload_path", reload_path)
-    update_to = config["custom"].get("update_to", update_to)
-    update_to = update_to.split(" ")
     update_type = config["custom"].get("update_type", update_type)
     # [encrypt]
     key = config["encrypt"].get("key", key)
