@@ -21,11 +21,32 @@ import logging
 from pyrogram import Client, Filters
 
 from .. import glovar
-from ..functions.filters import test_group
+from ..functions.etc import receive_data
+from ..functions.filters import hide_channel, test_group
 from ..functions.tests import name_test, sticker_test, text_test
 
 # Enable logging
 logger = logging.getLogger(__name__)
+
+
+@Client.on_message(Filters.incoming & Filters.channel & hide_channel
+                   & ~Filters.command(glovar.all_commands, glovar.prefix))
+def exchange_emergency(_, message):
+    try:
+        # Read basic information
+        data = receive_data(message)
+        sender = data["from"]
+        receivers = data["to"]
+        action = data["action"]
+        action_type = data["type"]
+        data = data["data"]
+        if "EMERGENCY" in receivers:
+            if sender == "EMERGENCY":
+                if action == "backup":
+                    if action_type == "hide":
+                        glovar.should_hide = data
+    except Exception as e:
+        logger.warning(f"Exchange emergency error: {e}", exc_info=True)
 
 
 @Client.on_message(Filters.incoming & Filters.group & test_group & ~Filters.service

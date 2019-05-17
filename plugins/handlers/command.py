@@ -128,25 +128,25 @@ def same_words(client, message):
                                     return
                                 else:
                                     text += (f"状态：{code('未执行')}\n"
-                                             f"原因：{code('二级来源有误')}")
+                                             f"原因：{code('二级来源有误')}\n")
                             else:
                                 text += (f"状态：{code('未执行')}\n"
-                                         f"原因：{code('权限错误')}")
+                                         f"原因：{code('权限错误')}\n")
                         else:
                             text += (f"状态：{code('未执行')}\n"
-                                     f"原因：{code('来源有误')}")
+                                     f"原因：{code('来源有误')}\n")
                     else:
                         text += (f"状态：{code('未执行')}\n"
-                                 f"原因：{code('来源有误')}")
+                                 f"原因：{code('来源有误')}\n")
                 else:
                     text += (f"状态：{code('未执行')}\n"
-                             f"原因：{code('权限错误')}")
+                             f"原因：{code('权限错误')}\n")
             else:
                 text += (f"状态：{code('未执行')}\n"
-                         f"原因：{code('操作有误')}")
+                         f"原因：{code('操作有误')}\n")
         else:
             text += (f"状态：{code('未执行')}\n"
-                     f"原因：{code('格式有误')}")
+                     f"原因：{code('格式有误')}\n")
 
         thread(send_message, (client, cid, text, mid))
         if "已移除" in text or "已添加" in text:
@@ -174,8 +174,8 @@ def version(client, message):
         cid = message.chat.id
         aid = message.from_user.id
         mid = message.message_id
-        text = (f"版本：{bold(glovar.version)}\n"
-                f"管理员：{user_mention(aid)}")
+        text = (f"管理员：{user_mention(aid)}\n\n"
+                f"版本：{bold(glovar.version)}\n")
         thread(send_message, (client, cid, text, mid))
     except Exception as e:
         logger.warning(f"Version error: {e}", exc_info=True)
