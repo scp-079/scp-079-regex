@@ -149,7 +149,7 @@ def same_words(client, message):
                      f"原因：{code('格式有误')}")
 
         thread(send_message, (client, cid, text, mid))
-        if "已移除" in text:
+        if "已移除" in text or "已添加" in text:
             thread(share_regex_update, (client,))
     except Exception as e:
         logger.warning(f"Same words error: {e}", exc_info=True)

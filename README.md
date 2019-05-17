@@ -23,6 +23,8 @@ See [this article](https://scp-079.org/regex/).
 - [x] Test patterns in a group
 - [x] Simplified Chinese to Traditional Chinese
 - [x] Copy the same pattern to other groups
+- [x] Support the HIDE channel
+- [x] Add more types
 
 ## Requirements
 

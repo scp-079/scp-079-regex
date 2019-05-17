@@ -90,8 +90,6 @@ def text_test(client: Client, message: Message) -> bool:
         text = get_text(message)
         except_pattern = ("^版本：|"
                           "^#(bug|done|fixed|todo)|"
-                          "^已(解禁|警告)|"
-                          "^被举报|"
                           "^管理员：|"
                           "^{|"
                           "^NSFW 得分|"

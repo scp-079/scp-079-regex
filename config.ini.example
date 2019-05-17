@@ -20,6 +20,7 @@ prefix = /!
 
 [channels]
 exchange_channel_id = [DATA EXPUNGED]
+hide_channel_id = [DATA EXPUNGED]
 regex_group_id = [DATA EXPUNGED]
 test_group_id = [DATA EXPUNGED]
 

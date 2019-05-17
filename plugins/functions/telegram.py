@@ -18,16 +18,17 @@
 
 import logging
 from time import sleep
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Union
 
 from pyrogram import Client, InlineKeyboardMarkup, Message, Messages, ParseMode
-from pyrogram.errors import FloodWait
+from pyrogram.errors import ChannelInvalid, ChannelPrivate, FloodWait, PeerIdInvalid
 
 # Enable logging
 logger = logging.getLogger(__name__)
 
 
 def answer_callback(client: Client, query_id: str, text: str) -> Optional[bool]:
+    # Answer the callback
     result = None
     try:
         flood_wait = True
@@ -49,6 +50,7 @@ def answer_callback(client: Client, query_id: str, text: str) -> Optional[bool]:
 
 def edit_message_text(client: Client, cid: int, mid: int, text: str,
                       markup: InlineKeyboardMarkup = None) -> Optional[Message]:
+    # Edit the message's text
     result = None
     try:
         if text.strip():
@@ -74,6 +76,7 @@ def edit_message_text(client: Client, cid: int, mid: int, text: str,
 
 
 def get_messages(client: Client, cid: int, mids: Iterable[int]) -> Optional[Messages]:
+    # Get some messages
     result = None
     try:
         flood_wait = True
@@ -91,7 +94,8 @@ def get_messages(client: Client, cid: int, mids: Iterable[int]) -> Optional[Mess
 
 
 def send_document(client: Client, cid: int, file: str, text: str = None, mid: int = None,
-                  markup: InlineKeyboardMarkup = None) -> Optional[Message]:
+                  markup: InlineKeyboardMarkup = None) -> Optional[Union[bool, Message]]:
+    # Send a document to a chat
     result = None
     try:
         flood_wait = True
@@ -109,6 +113,8 @@ def send_document(client: Client, cid: int, file: str, text: str = None, mid: in
             except FloodWait as e:
                 flood_wait = True
                 sleep(e.x + 1)
+            except (PeerIdInvalid, ChannelInvalid, ChannelPrivate):
+                return False
     except Exception as e:
         logger.warning(f"Send document to {cid} error: {e}", exec_info=True)
 
@@ -116,7 +122,8 @@ def send_document(client: Client, cid: int, file: str, text: str = None, mid: in
 
 
 def send_message(client: Client, cid: int, text: str, mid: int = None,
-                 markup: InlineKeyboardMarkup = None) -> Optional[Message]:
+                 markup: InlineKeyboardMarkup = None) -> Optional[Union[bool, Message]]:
+    # Send a message to a chat
     result = None
     try:
         if text.strip():
@@ -135,6 +142,8 @@ def send_message(client: Client, cid: int, text: str, mid: int = None,
                 except FloodWait as e:
                     flood_wait = True
                     sleep(e.x + 1)
+                except (PeerIdInvalid, ChannelInvalid, ChannelPrivate):
+                    return False
     except Exception as e:
         logger.warning(f"Send message to {cid} error: {e}", exc_info=True)
 

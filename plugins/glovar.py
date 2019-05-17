@@ -43,6 +43,7 @@ ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
 
 names: dict = {
     "ad": "广告用语",
+    "aff": "推广链接",
     "ava": "头像分析",
     "bad": "敏感检测",
     "ban": "自动封禁",
@@ -51,6 +52,10 @@ names: dict = {
     "del": "自动删除",
     "eme": "应急模式",
     "nm": "名称封禁",
+    "rm": "RM 笑话",
+    "sho": "短链接",
+    "tgl": "TG 链接",
+    "tgp": "TG 代理",
     "wb": "追踪封禁",
     "wd": "追踪删除",
     "sti": "贴纸删除",
@@ -68,9 +73,11 @@ search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 #     }
 # }
 
-sender = "REGEX"
+sender: str = "REGEX"
 
-version = "0.2.7"
+should_hide: bool = False
+
+version: str = "0.2.8"
 
 # Generate commands lists
 add_commands: list = ["add", "ad"]
@@ -98,6 +105,7 @@ prefix_str: str = "/!"
 
 # [channels]
 exchange_channel_id: int = 0
+hide_channel_id: int = 0
 regex_group_id: int = 0
 test_group_id: int = 0
 
@@ -119,6 +127,7 @@ try:
     prefix = list(config["basic"].get("prefix", prefix_str))
     # [channels]
     exchange_channel_id = int(config["channels"].get("exchange_channel_id", exchange_channel_id))
+    hide_channel_id = int(config["channels"].get("hide_channel_id", hide_channel_id))
     test_group_id = int(config["channels"].get("test_group_id", test_group_id))
     regex_group_id = int(config["channels"].get("regex_group_id", regex_group_id))
     # [custom]
@@ -138,6 +147,7 @@ except Exception as e:
 if (bot_token in {"", "[DATA EXPUNGED]"}
         or prefix == []
         or exchange_channel_id == 0
+        or hide_channel_id == 0
         or test_group_id == 0
         or regex_group_id == 0
         or (update_type == "reload" and reload_path in {"", "[DATA EXPUNGED]"})
