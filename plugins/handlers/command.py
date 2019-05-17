@@ -137,12 +137,12 @@ def page_word(client, message):
                         page = callback_data_list[i]["d"]
                         if action == "list":
                             word_type = action_type
-                            text, markup = words_list_page(uid, word_type, page)
+                            page_text, markup = words_list_page(uid, word_type, page)
                         else:
                             search_key = action_type
-                            text, markup = words_search_page(uid, search_key, page)
+                            page_text, markup = words_search_page(uid, search_key, page)
 
-                        thread(edit_message_text, (client, cid, r_mid, text, markup))
+                        thread(edit_message_text, (client, cid, r_mid, page_text, markup))
                         text += (f"状态：{code('已更新')}\n"
                                  f"查看：{message_link(cid, r_mid)}\n")
                     else:
