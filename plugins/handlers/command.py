@@ -63,7 +63,7 @@ def ask_word(client, message):
                 aid = get_admin(r_message)
                 if uid == aid:
                     callback_data_list = get_callback_data(r_message)
-                    if callback_data_list and callback_data_list[0]["a"] == "ask":
+                    if r_message.from_user.is_self and callback_data_list and callback_data_list[0]["a"] == "ask":
                         r_mid = r_message.message_id
                         ask_key = callback_data_list[0]["d"]
                         ask_text = (f"管理：{user_mention(aid)}\n"
@@ -121,10 +121,10 @@ def page_word(client, message):
                 if uid == aid:
                     pass
                     callback_data_list = get_callback_data(r_message)
-                    if callback_data_list and ((command_type == "previous"
-                                                and callback_data_list[0]["a"] in {"list", "search"})
-                                               or (command_type == "next"
-                                                   and callback_data_list[-1]["a"] in {"list", "search"})):
+                    if (r_message.from_user.is_self
+                            and callback_data_list
+                            and ((command_type == "previous" and callback_data_list[0]["a"] in {"list", "search"})
+                                 or (command_type == "next" and callback_data_list[-1]["a"] in {"list", "search"}))):
                         r_mid = r_message.message_id
                         if command_type == "previous":
                             i = 0
