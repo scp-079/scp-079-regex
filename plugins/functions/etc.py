@@ -146,8 +146,8 @@ def get_forward_name(message: Message) -> str:
         if message.forward_from:
             user = message.forward_from
             text = get_full_name(user)
-        elif message.forward_from_name:
-            text = message.forward_from_name
+        elif message.forward_sender_name:
+            text = message.forward_sender_name
         elif message.forward_from_chat:
             chat = message.forward_from_chat
             text = chat.title
