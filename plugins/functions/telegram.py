@@ -20,7 +20,7 @@ import logging
 from time import sleep
 from typing import Iterable, Optional, Union
 
-from pyrogram import Client, InlineKeyboardMarkup, Message, Messages, ParseMode
+from pyrogram import Client, InlineKeyboardMarkup, Message, Messages
 from pyrogram.errors import ChannelInvalid, ChannelPrivate, FloodWait, PeerIdInvalid
 
 # Enable logging
@@ -62,7 +62,6 @@ def edit_message_text(client: Client, cid: int, mid: int, text: str,
                         chat_id=cid,
                         message_id=mid,
                         text=text,
-                        parse_mode=ParseMode.MARKDOWN,
                         disable_web_page_preview=True,
                         reply_markup=markup
                     )
@@ -106,7 +105,6 @@ def send_document(client: Client, cid: int, file: str, text: str = None, mid: in
                     chat_id=cid,
                     document=file,
                     caption=text,
-                    parse_mode=ParseMode.MARKDOWN,
                     reply_to_message_id=mid,
                     reply_markup=markup
                 )
@@ -134,7 +132,6 @@ def send_message(client: Client, cid: int, text: str, mid: int = None,
                     result = client.send_message(
                         chat_id=cid,
                         text=text,
-                        parse_mode=ParseMode.MARKDOWN,
                         disable_web_page_preview=True,
                         reply_to_message_id=mid,
                         reply_markup=markup
