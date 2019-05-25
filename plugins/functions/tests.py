@@ -90,10 +90,7 @@ def text_test(client: Client, message: Message) -> bool:
         text = get_text(message)
         except_pattern = ("^版本：|"
                           "^#(bug|done|fixed|todo)|"
-                          "^管理员：|"
-                          "^{|"
-                          "^NSFW 得分|"
-                          "^复查模型")
+                          "^{")
         if text and not re.search(except_pattern, text, re.I):
             cid = message.chat.id
             result = ""
