@@ -37,9 +37,10 @@ def name_test(client: Client, message: Message) -> bool:
         text = get_forward_name(message)
         if text:
             cid = message.chat.id
+            aid = message.from_user.id
             mid = message.message_id
             result = ""
-            result += f"管理员：{user_mention(message.from_user.id)}\n\n"
+            result += f"管理员：{user_mention(aid)}\n\n"
             result += f"来源名称：{code(text)}\n\n"
             # Can add more test to the "for in" list
             for word_type in ["nm"]:
@@ -62,9 +63,10 @@ def sticker_test(client: Client, message: Message) -> bool:
     try:
         if message.sticker and message.sticker.set_name:
             cid = message.chat.id
-            result = ""
-            result += f"管理员：{user_mention(message.from_user.id)}\n\n"
+            aid = message.from_user.id
             mid = message.message_id
+            result = ""
+            result += f"管理员：{user_mention(aid)}\n\n"
             text = message.sticker.set_name
             text = t2s(text)
             result += f"贴纸名称：{code(text)}\n\n"
@@ -93,8 +95,14 @@ def text_test(client: Client, message: Message) -> bool:
                           "^{")
         if text and not re.search(except_pattern, text, re.I):
             cid = message.chat.id
-            result = ""
+            message_text = text
+            if re.search("^管理员：[0-9]", message_text):
+                aid = int(message_text.split("\n")[0].split("：")[1])
+            else:
+                aid = message.from_user.id
+
             mid = message.message_id
+            result = ""
             for word_type in glovar.names:
                 if glovar.compiled[word_type].search(text):
                     w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
@@ -103,7 +111,7 @@ def text_test(client: Client, message: Message) -> bool:
                         result += "\t" * 4 + f"{code(w)}\n\n"
 
             if result:
-                result = (f"管理员：{user_mention(message.from_user.id)}\n\n"
+                result = (f"管理员：{user_mention(aid)}\n\n"
                           f"{result}")
                 thread(send_message, (client, cid, result, mid))
 

@@ -27,7 +27,6 @@ from .etc import crypt_str, delay, format_data, thread
 from .file import crypt_file
 from .telegram import send_document, send_message
 
-
 # Enable logging
 logger = logging.getLogger(__name__)
 

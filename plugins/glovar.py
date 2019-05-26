@@ -79,7 +79,7 @@ sender: str = "REGEX"
 
 should_hide: bool = False
 
-version: str = "0.2.9"
+version: str = "0.3.0"
 
 # Generate commands lists
 add_commands: list = ["add", "ad"]
@@ -88,15 +88,6 @@ remove_commands: list = ["remove", "rm"]
 same_commands: list = ["same", "copy", "c"]
 search_commands: list = ["search", "s", "find"]
 all_commands: list = add_commands + list_commands + remove_commands + same_commands + search_commands
-other_commands: list = ["admin",
-                        "admins",
-                        "ban",
-                        "forgive",
-                        "report",
-                        "version",
-                        "warn",
-                        "warn_config"]
-all_commands += other_commands
 
 # Read data from config.ini
 
@@ -152,7 +143,6 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or (update_type == "reload" and reload_path in {"", "[DATA EXPUNGED]"})
         or key in {"", b"[DATA EXPUNGED]"}
         or password in {"", "[DATA EXPUNGED]"}):
-    logger.critical("No proper settings")
     raise SystemExit('No proper settings')
 
 # Load data from pickle
@@ -232,6 +222,6 @@ except Exception as e:
     raise SystemExit("[DATA CORRUPTION]")
 
 # Start program
-copyright_text = (f"SCP-079-REGEX v{version}, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
+copyright_text = (f"SCP-079-{sender} v{version}, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
                   "Licensed under the terms of the GNU General Public License v3 or later (GPLv3+)\n")
 print(copyright_text)
