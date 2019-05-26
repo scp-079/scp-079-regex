@@ -26,7 +26,6 @@ from .etc import code, get_forward_name, get_text, t2s, thread, user_mention
 from .telegram import send_message
 from .words import similar
 
-
 # Enable logging
 logger = logging.getLogger(__name__)
 

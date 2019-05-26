@@ -151,7 +151,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
                              f"类别：{code(glovar.names[word_type])}\n"
                              f"词组：{code(word)}\n"
                              f"原因：{code('等待确认')}\n"
-                             f"重复：------------------------\n\n{end_text}")
+                             f"重复：" + "-" * 24 + f"\n\n{end_text}")
                     add_new = button_data("ask", "new", ask_key)
                     replace_all = button_data("ask", "replace", ask_key)
                     cancel = button_data("ask", "cancel", ask_key)
