@@ -91,8 +91,9 @@ def text_test(client: Client, message: Message) -> bool:
         text = get_text(message)
         except_pattern = ("^版本：|"
                           "^#(bug|done|fixed|todo)|"
-                          "^{")
-        if text and not re.search(except_pattern, text, re.I):
+                          "^{|"
+                          "^消息结构：")
+        if text and not re.search(except_pattern, text, re.I | re.M | re.S):
             cid = message.chat.id
             message_text = text
             if re.search("^管理员：[0-9]", message_text):
