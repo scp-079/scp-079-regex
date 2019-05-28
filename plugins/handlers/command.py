@@ -22,7 +22,7 @@ from pyrogram import Client, Filters
 
 from .. import glovar
 from ..functions.channel import share_regex_update
-from ..functions.etc import bold, code, get_callback_data, get_command_context, get_text, message_link
+from ..functions.etc import bold, code, general_link, get_callback_data, get_command_context, get_text, message_link
 from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group, test_group
 from ..functions.telegram import edit_message_text, get_messages, send_message
@@ -73,7 +73,7 @@ def ask_word(client, message):
                             thread(share_regex_update, (client,))
 
                         text += (f"状态：{code('已操作')}\n"
-                                 f"查看：{message_link(cid, r_mid)}\n")
+                                 f"查看：{general_link(cid, message_link(r_message))}\n")
                     else:
                         text += (f"状态：{code('未操作')}\n"
                                  f"原因：{code('来源有误')}\n")
@@ -143,7 +143,7 @@ def page_word(client, message):
 
                         thread(edit_message_text, (client, cid, r_mid, page_text, markup))
                         text += (f"状态：{code('已更新')}\n"
-                                 f"查看：{message_link(cid, r_mid)}\n")
+                                 f"查看：{general_link(cid, message_link(r_message))}\n")
                     else:
                         text += (f"状态：{code('未更新')}\n"
                                  f"原因：{code('来源有误')}\n")

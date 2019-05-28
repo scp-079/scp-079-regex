@@ -134,6 +134,36 @@ def format_data(sender: str, receivers: List[str], action: str, action_type: str
     return text
 
 
+def general_link(text: Union[int, str], link: str) -> str:
+    # Get a general markdown link
+    result = ""
+    try:
+        result = f"[{text}]({link})"
+    except Exception as e:
+        logger.warning(f"General link error: {e}", exc_info=True)
+
+    return result
+
+
+def get_channel_link(message: Union[int, Message]) -> str:
+    # Get a channel reference link
+    text = ""
+    try:
+        text = "https://t.me/"
+        if isinstance(message, int):
+            text += f"c/{str(message)[4:]}"
+        else:
+            if message.chat.username:
+                text += f"{message.chat.username}"
+            else:
+                cid = message.chat.id
+                text += f"c/{str(cid)[4:]}"
+    except Exception as e:
+        logger.warning(f"Get channel link error: {e}", exc_info=True)
+
+    return text
+
+
 def get_callback_data(message: Message) -> List[dict]:
     # Get a message's inline button's callback data
     callback_data_list = []
@@ -256,11 +286,12 @@ def italic(text) -> str:
     return ""
 
 
-def message_link(cid: int, mid: int) -> str:
+def message_link(message: Message) -> str:
     # Get a message link in a channel
     text = ""
     try:
-        text = f"[{mid}](https://t.me/c/{str(cid)[4:]}/{mid})"
+        mid = message.message_id
+        text = f"{get_channel_link(message)}/{mid}"
     except Exception as e:
         logger.warning(f"Message link error: {e}", exc_info=True)
 
