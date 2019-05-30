@@ -42,7 +42,7 @@ def name_test(client: Client, message: Message) -> bool:
             result += f"管理员：{user_mention(aid)}\n\n"
             result += f"来源名称：{code(text)}\n\n"
             # Can add more test to the "for in" list
-            for word_type in ["ad", "con", "iml", "nm"]:
+            for word_type in ["ad", "con", "iml", "nm", "wb"]:
                 if glovar.compiled[word_type].search(text):
                     w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
                     result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
