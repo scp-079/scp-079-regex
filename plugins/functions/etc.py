@@ -266,6 +266,19 @@ def get_text(message: Message) -> str:
                     if en.user:
                         text += f"\n{get_full_name(en.user)}"
 
+        if message.reply_markup and isinstance(message.reply_markup, InlineKeyboardMarkup):
+            reply_markup = message.reply_markup
+            if reply_markup.inline_keyboard:
+                inline_keyboard = reply_markup.inline_keyboard
+                if inline_keyboard:
+                    for button_row in inline_keyboard:
+                        for button in button_row:
+                            if button.text:
+                                text += f"\n{button.text}"
+
+                            if button.url:
+                                text += f"\n{button.url}"
+
         if text:
             text = t2s(text)
     except Exception as e:
