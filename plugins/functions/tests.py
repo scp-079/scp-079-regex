@@ -33,14 +33,15 @@ logger = logging.getLogger(__name__)
 def name_test(client: Client, message: Message) -> bool:
     # Test user's or channel's name
     try:
-        text = get_forward_name(message)
-        if text:
+        name_text = get_forward_name(message)
+        if name_text:
             cid = message.chat.id
             aid = message.from_user.id
             mid = message.message_id
+            text = ""
+            text += f"管理员：{user_mention(aid)}\n\n"
+            text += f"来源名称：{code(name_text)}\n\n"
             result = ""
-            result += f"管理员：{user_mention(aid)}\n\n"
-            result += f"来源名称：{code(text)}\n\n"
             # Can add more test to the "for in" list
             for word_type in ["ad", "con", "iml", "nm", "wb"]:
                 if glovar.compiled[word_type].search(text):
@@ -49,7 +50,12 @@ def name_test(client: Client, message: Message) -> bool:
                     for w in w_list:
                         result += "\t" * 8 + f"{code(w)}\n\n"
 
-            thread(send_message, (client, cid, result, mid))
+            if result:
+                text += result
+            else:
+                text = ""
+
+            thread(send_message, (client, cid, text, mid))
             return True
     except Exception as e:
         logger.warning(f"Name test error: {e}", exc_info=True)
@@ -88,14 +94,13 @@ def sticker_test(client: Client, message: Message) -> bool:
 def text_test(client: Client, message: Message) -> bool:
     # Test message text or caption
     try:
-        text = get_text(message)
+        message_text = get_text(message)
         except_pattern = ("^版本：|"
                           "^#(bug|done|fixed|todo)|"
                           "^{|"
                           "^消息结构：")
-        if text and not re.search(except_pattern, text, re.I | re.M | re.S):
+        if message_text and not re.search(except_pattern, message_text, re.I | re.M | re.S):
             cid = message.chat.id
-            message_text = text
             if re.search("^管理员：[0-9]", message_text):
                 aid = int(message_text.split("\n")[0].split("：")[1])
             else:
@@ -104,8 +109,8 @@ def text_test(client: Client, message: Message) -> bool:
             mid = message.message_id
             result = ""
             for word_type in glovar.names:
-                if glovar.compiled[word_type].search(text):
-                    w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
+                if glovar.compiled[word_type].search(message_text):
+                    w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, message_text)]
                     result += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
                     for w in w_list:
                         result += "\t" * 4 + f"{code(w)}\n\n"
