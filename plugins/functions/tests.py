@@ -44,8 +44,8 @@ def name_test(client: Client, message: Message) -> bool:
             result = ""
             # Can add more test to the "for in" list
             for word_type in ["ad", "con", "iml", "nm", "wb"]:
-                if glovar.compiled[word_type].search(text):
-                    w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, text)]
+                if glovar.compiled[word_type].search(name_text):
+                    w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, name_text)]
                     result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
                     for w in w_list:
                         result += "\t" * 8 + f"{code(w)}\n\n"
