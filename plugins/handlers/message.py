@@ -49,12 +49,6 @@ def exchange_emergency(_, message):
         logger.warning(f"Exchange emergency error: {e}", exc_info=True)
 
 
-@Client.on_message(Filters.incoming & Filters.group & test_group & ~Filters.service
-                   & ~Filters.command(glovar.all_commands, glovar.prefix))
-def test(client, message):
-    try:
-        name_test(client, message)
-        sticker_test(client, message)
-        text_test(client, message)
-    except Exception as e:
-        logger.warning(f"Test error: {e}", exc_info=True)
+@Client.on_message(Filters.incoming & Filters.private, group=-1)
+def test(_, message):
+    print(message)
