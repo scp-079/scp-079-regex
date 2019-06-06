@@ -108,11 +108,8 @@ def text_test(client: Client, message: Message) -> bool:
 
             mid = message.message_id
             result = ""
-            logger.warning("开始测试")
             for word_type in glovar.names:
-                logger.warning(f"测试 {word_type}")
                 if glovar.compiled[word_type].search(message_text):
-                    logger.warning(f"发现匹配，开始逐个测试")
                     w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, message_text)]
                     result += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
                     for w in w_list:
