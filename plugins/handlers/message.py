@@ -53,6 +53,7 @@ def exchange_emergency(_, message):
                    & ~Filters.command(glovar.all_commands, glovar.prefix))
 def test(client, message):
     try:
+        logger.warning(message)
         name_test(client, message)
         sticker_test(client, message)
         text_test(client, message)
