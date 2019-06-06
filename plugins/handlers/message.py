@@ -50,11 +50,5 @@ def exchange_emergency(_, message):
 
 
 @Client.on_message(Filters.incoming & Filters.group, group=-1)
-def test(client, message):
-    try:
-        logger.warning(message)
-        # name_test(client, message)
-        # sticker_test(client, message)
-        # text_test(client, message)
-    except Exception as e:
-        logger.warning(f"Test error: {e}", exc_info=True)
+def test(_, message):
+    print(message)
