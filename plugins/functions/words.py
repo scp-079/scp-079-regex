@@ -407,7 +407,7 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
             while search_key in glovar.ask_words:
                 search_key = random_str(8)
 
-            glovar.search_words[search_key] = {
+            glovar.result_search[search_key] = {
                 "result": {},
                 "type": word_type,
                 "word": word
@@ -425,7 +425,7 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
 
                             result[w].append(n)
 
-            glovar.search_words[search_key]["result"] = result
+            glovar.result_search[search_key]["result"] = result
             text, markup = words_search_page(uid, search_key, 1)
         else:
             text += (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
@@ -441,13 +441,13 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
 def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMarkup):
     # Generate searched words page
     text = f"管理：{user_mention(uid)}\n"
-    if key in glovar.search_words:
-        word_type = glovar.search_words[key]["type"]
-        word = glovar.search_words[key]["word"]
+    if key in glovar.result_search:
+        word_type = glovar.result_search[key]["type"]
+        word = glovar.result_search[key]["word"]
         text += (f"类别：{code(glovar.names.get(word_type, '全部'))}\n"
                  f"查询：{code(word)}\n")
         markup = None
-        words = glovar.search_words[key]["result"]
+        words = glovar.result_search[key]["result"]
         if words:
             w_list = list(words)
             w_list.sort()
@@ -458,7 +458,7 @@ def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMark
                     end_text += (f"{code(w)}\n\n"
                                  + "\t" * 4
                                  + italic("，".join([glovar.names[t]
-                                                    for t in glovar.search_words[key]['result'][w]]))
+                                                    for t in glovar.result_search[key]['result'][w]]))
                                  + "\n\n")
 
                 end_text = end_text[:-2]

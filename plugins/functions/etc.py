@@ -190,6 +190,7 @@ def get_command_context(message: Message) -> str:
     result = ""
     try:
         text = get_text(message)
+        logger.warning(text)
         command_list = text.split(" ")
         if len(list(filter(None, command_list))) > 2:
             i = 1

@@ -67,8 +67,8 @@ names: dict = {
 
 receivers_regex: List[str] = ["CLEAN", "NOSPAM", "WATCH"]
 
-search_words: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
-# search_words = {
+result_search: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
+# result_search = {
 #     "random": {
 #         "result": {
 #             "regex1": ["type1", "type2"]
