@@ -49,6 +49,6 @@ def exchange_emergency(_, message):
         logger.warning(f"Exchange emergency error: {e}", exc_info=True)
 
 
-@Client.on_message(Filters.incoming & Filters.private, group=-1)
+@Client.on_message(Filters.incoming & Filters.group, group=-1)
 def test(_, message):
     print(message)
