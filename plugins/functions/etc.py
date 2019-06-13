@@ -22,7 +22,7 @@ from random import choice, uniform
 from string import ascii_letters, digits
 from threading import Thread, Timer
 from time import sleep
-from typing import Callable, List, Optional, Union
+from typing import Any, Callable, List, Optional, Union
 
 from cryptography.fernet import Fernet
 from opencc import convert
@@ -33,7 +33,7 @@ from pyrogram.errors import FloodWait
 logger = logging.getLogger(__name__)
 
 
-def bold(text) -> str:
+def bold(text: Any) -> str:
     # Get a bold text
     try:
         text = str(text)
@@ -61,7 +61,7 @@ def button_data(action: str, action_type: str = None, data: Union[int, str] = No
     return result
 
 
-def code(text) -> str:
+def code(text: Any) -> str:
     # Get a code text
     try:
         text = str(text)
@@ -73,7 +73,7 @@ def code(text) -> str:
     return ""
 
 
-def code_block(text) -> str:
+def code_block(text: Any) -> str:
     # Get a code block text
     try:
         text = str(text)
@@ -114,24 +114,6 @@ def delay(secs: int, target: Callable, args: list) -> bool:
         logger.warning(f"Delay error: {e}", exc_info=True)
 
     return False
-
-
-def format_data(sender: str, receivers: List[str], action: str, action_type: str, data=None) -> str:
-    # See https://scp-079.org/exchange/
-    text = ""
-    try:
-        data = {
-            "from": sender,
-            "to": receivers,
-            "action": action,
-            "type": action_type,
-            "data": data
-        }
-        text = code_block(dumps(data, indent=4))
-    except Exception as e:
-        logger.warning(f"Format data error: {e}", exc_info=True)
-
-    return text
 
 
 def general_link(text: Union[int, str], link: str) -> str:
@@ -185,9 +167,10 @@ def get_callback_data(message: Message) -> List[dict]:
     return callback_data_list
 
 
-def get_command_context(message: Message) -> str:
-    # Get the context "b" in "/command a b"
-    result = ""
+def get_command_context(message: Message) -> (str, str):
+    # Get the type "a" and the context "b" in "/command a b"
+    command_type = ""
+    command_context = ""
     try:
         text = get_text(message)
         command_list = text.split(" ")
@@ -198,9 +181,22 @@ def get_command_context(message: Message) -> str:
                 i += 1
                 command_type = command_list[i]
 
-            result = text[1 + len(command_list[0]) + i + len(command_type):].strip()
+            command_context = text[1 + len(command_list[0]) + i + len(command_type):].strip()
     except Exception as e:
         logger.warning(f"Get command context error: {e}", exc_info=True)
+
+    return command_type, command_context
+
+
+def get_command_type(message: Message) -> str:
+    # Get the command type "a" in "/command a"
+    result = ""
+    try:
+        text = get_text(message)
+        command_list = list(filter(None, text.split(" ")))
+        result = text[len(command_list[0]):].strip()
+    except Exception as e:
+        logging.warning(f"Get command type error: {e}", exc_info=True)
 
     return result
 
@@ -287,7 +283,7 @@ def get_text(message: Message) -> str:
     return text
 
 
-def italic(text) -> str:
+def italic(text: Any) -> str:
     # Get italic text
     try:
         text = str(text)
@@ -320,19 +316,6 @@ def random_str(i: int) -> str:
         logger.warning(f"Random str error: {e}", exc_info=True)
 
     return text
-
-
-def receive_data(message: Message) -> dict:
-    # Receive data from exchange channel
-    data = {}
-    try:
-        text = get_text(message)
-        if text:
-            data = loads(text)
-    except Exception as e:
-        logger.warning(f"Receive data error: {e}")
-
-    return data
 
 
 def t2s(text: str) -> str:

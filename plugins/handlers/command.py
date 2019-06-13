@@ -18,7 +18,7 @@
 
 import logging
 
-from pyrogram import Client, Filters
+from pyrogram import Client, Filters, Message
 
 from .. import glovar
 from ..functions.channel import share_regex_update
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.add_commands, glovar.prefix))
-def add_word(client, message):
+def add_word(client: Client, message: Message):
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -49,7 +49,7 @@ def add_word(client, message):
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(["ask"], glovar.prefix))
-def ask_word(client, message):
+def ask_word(client: Client, message: Message):
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -94,7 +94,7 @@ def ask_word(client, message):
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.list_commands, glovar.prefix))
-def list_words(client, message):
+def list_words(client: Client, message: Message):
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -106,7 +106,7 @@ def list_words(client, message):
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(["page"], glovar.prefix))
-def page_word(client, message):
+def page_word(client: Client, message: Message):
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -164,7 +164,7 @@ def page_word(client, message):
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.remove_commands, glovar.prefix))
-def remove_word(client, message):
+def remove_word(client: Client, message: Message):
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -178,7 +178,7 @@ def remove_word(client, message):
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.same_commands, glovar.prefix))
-def same_words(client, message):
+def same_words(client: Client, message: Message):
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -199,7 +199,7 @@ def same_words(client, message):
                     # Check old command's format
                     if (len(old_command_list) > 2
                             and old_command_type in glovar.add_commands + glovar.remove_commands):
-                        old_word = get_command_context(old_message)
+                        _, old_word = get_command_context(old_message)
                         for new_word_type in new_word_type_list:
                             old_message.text = f"{old_command_type} {new_word_type} {old_word}"
                             if old_command_type in glovar.add_commands:
@@ -224,7 +224,7 @@ def same_words(client, message):
                                 old_command_type = old_command_list[0][1:]
                                 if (len(old_command_list) > 2
                                         and old_command_type in glovar.add_commands):
-                                    old_word = get_command_context(old_message)
+                                    _, old_word = get_command_context(old_message)
                                     for new_word_type in new_word_type_list:
                                         old_message.text = f"{old_command_type} {new_word_type} {old_word}"
                                         text = word_remove(old_message)
@@ -262,7 +262,7 @@ def same_words(client, message):
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.search_commands, glovar.prefix))
-def search_words(client, message):
+def search_words(client: Client, message: Message):
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -274,7 +274,7 @@ def search_words(client, message):
 
 @Client.on_message(Filters.incoming & Filters.group & test_group
                    & Filters.command(["version"], glovar.prefix))
-def version(client, message):
+def version(client: Client, message: Message):
     try:
         cid = message.chat.id
         aid = message.from_user.id

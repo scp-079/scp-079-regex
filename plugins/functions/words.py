@@ -92,12 +92,10 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
     # Add a word
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
-    command_list = get_text(message).split(" ")
     # Check if the command format is correct
-    if len(command_list) > 1:
-        word_type = list(filter(None, command_list))[1]
-        if len(command_list) > 2 and word_type in glovar.names:
-            word = get_command_context(message)
+    word_type, word = get_command_context(message)
+    if word_type:
+        if word and word_type in glovar.names:
             # Check if the word already exits
             if word in eval(f"glovar.{word_type}_words"):
                 text += (f"状态：{code('未添加')}\n"
@@ -225,12 +223,10 @@ def word_remove_try(message: Message) -> Optional[str]:
     # Try to remove a word
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
-    command_list = get_text(message).split(" ")
     # Check if the command format is correct
-    if len(command_list) > 1:
-        word_type = list(filter(None, command_list))[1]
-        if len(command_list) > 2 and word_type in glovar.names:
-            word = get_command_context(message)
+    word_type, word = get_command_context(message)
+    if word_type:
+        if word and word_type in glovar.names:
             if word in eval(f"glovar.{word_type}_words"):
                 eval(f"glovar.{word_type}_words").discard(word)
                 re_compile(word_type)
@@ -398,11 +394,15 @@ def words_search(message: Message) -> (str, InlineKeyboardMarkup):
     uid = message.from_user.id
     text = f"管理：{user_mention(uid)}\n"
     markup = None
-    command_list = get_text(message).split(" ")
-    if len(command_list) > 1:
-        word_type = list(filter(None, command_list))[1]
-        if len(command_list) > 2 and (word_type in glovar.names or word_type == "all"):
-            word = get_command_context(message)
+    # Check if the command format is correct
+    word_type, word = get_command_context(message)
+    if word_type:
+        if (word and (word_type in list(glovar.names) + ["all"])
+                or (not word and word_type not in list(glovar.names) + ["all"])):
+            if not word:
+                word = word_type
+                word_type = "all"
+
             search_key = random_str(8)
             while search_key in glovar.ask_words:
                 search_key = random_str(8)

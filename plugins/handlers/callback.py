@@ -19,7 +19,7 @@
 import logging
 from json import loads
 
-from pyrogram import Client
+from pyrogram import Client, CallbackQuery
 
 from ..functions.channel import share_regex_update
 from ..functions.etc import thread, user_mention
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 
 @Client.on_callback_query(regex_group)
-def answer(client, callback_query):
+def answer(client: Client, callback_query: CallbackQuery):
     try:
         cid = callback_query.message.chat.id
         uid = callback_query.from_user.id

@@ -82,7 +82,7 @@ sender: str = "REGEX"
 
 should_hide: bool = False
 
-version: str = "0.3.1"
+version: str = "0.3.2"
 
 # Generate commands lists
 add_commands: list = ["add", "ad"]
@@ -179,24 +179,6 @@ test_words: set = set()
 for word_type in names:
     locals()[f"{word_type}_words"] = {f"预留{names[f'{word_type}']}词组 {random_str(16)}"}
 
-# Load words data
-for word_type in names:
-    try:
-        try:
-            if exists(f"data/{word_type}_words") or exists(f"data/.{word_type}_words"):
-                with open(f"data/{word_type}_words", 'rb') as f:
-                    locals()[f"{word_type}_words"] = pickle.load(f)
-            else:
-                with open(f"data/{word_type}_words", 'wb') as f:
-                    pickle.dump(eval(f"{word_type}_words"), f)
-        except Exception as e:
-            logger.error(f"Load data {word_type}_words error: {e}")
-            with open(f"data/.{word_type}_words", 'rb') as f:
-                locals()[f"{word_type}_words"] = pickle.load(f)
-    except Exception as e:
-        logger.critical(f"Load data {word_type}_words backup error: {e}", exc_info=True)
-        raise SystemExit("[DATA CORRUPTION]")
-
 # Init compiled variable
 compiled: dict = {}
 # pattern = "|".join(type_words)
@@ -207,22 +189,24 @@ compiled: dict = {}
 for word_type in names:
     compiled[word_type] = re.compile(fr"预留{names[f'{word_type}']}词组 {random_str(16)}", re.I | re.M | re.S)
 
-# Load compiled data
-try:
+# Load data
+file_list = [f"{f}_words" for f in names] + ["compiled"]
+for file in file_list:
     try:
-        if exists("data/compiled") or exists("data/.compiled"):
-            with open(f"data/compiled", 'rb') as f:
-                locals()[f"compiled"] = pickle.load(f)
-        else:
-            with open(f"data/compiled", 'wb') as f:
-                pickle.dump(eval(f"compiled"), f)
+        try:
+            if exists(f"data/{file}") or exists(f"data/.{file}"):
+                with open(f"data/{file}", "rb") as f:
+                    locals()[f"{file}"] = pickle.load(f)
+            else:
+                with open(f"data/{file}", "wb") as f:
+                    pickle.dump(eval(f"{file}"), f)
+        except Exception as e:
+            logger.error(f"Load data {file} error: {e}")
+            with open(f"data/.{file}", "rb") as f:
+                locals()[f"{file}"] = pickle.load(f)
     except Exception as e:
-        logger.error(f"Load data compiled error: {e}")
-        with open(f"data/.compiled", 'rb') as f:
-            locals()[f"compiled"] = pickle.load(f)
-except Exception as e:
-    logger.critical(f"Load data compiled backup error: {e}", exc_info=True)
-    raise SystemExit("[DATA CORRUPTION]")
+        logger.critical(f"Load data {file} backup error: {e}")
+        raise SystemExit("[DATA CORRUPTION]")
 
 # Start program
 copyright_text = (f"SCP-079-{sender} v{version}, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"

@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 def backup_files(client: Client) -> bool:
     # Backup data files to BACKUP
     try:
-        for file in [f"{f}_words" for f in glovar.names] + ["compiled"]:
+        for file in glovar.file_list:
             try:
                 share_data(
                     client=client,
@@ -39,7 +39,7 @@ def backup_files(client: Client) -> bool:
                     action="backup",
                     action_type="pickle",
                     data=file,
-                    file=file
+                    file=f"data/{file}"
                 )
                 sleep(5)
             except Exception as e:

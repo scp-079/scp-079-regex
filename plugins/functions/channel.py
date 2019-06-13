@@ -17,14 +17,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import pickle
+from json import dumps, loads
 from time import sleep
-from typing import List, Union
+from typing import Any, List, Union
 
-from pyrogram import Client
+from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import crypt_str, delay, format_data, thread
-from .file import crypt_file
+from .etc import code_block, crypt_str, delay, get_text, thread
+from .file import crypt_file, delete_file, get_downloaded_path, get_new_path
 from .telegram import send_document, send_message
 
 # Enable logging
@@ -50,8 +52,68 @@ def exchange_to_hide(client: Client) -> bool:
     return False
 
 
+def format_data(sender: str, receivers: List[str], action: str, action_type: str, data=None) -> str:
+    # See https://scp-079.org/exchange/
+    text = ""
+    try:
+        data = {
+            "from": sender,
+            "to": receivers,
+            "action": action,
+            "type": action_type,
+            "data": data
+        }
+        text = code_block(dumps(data, indent=4))
+    except Exception as e:
+        logger.warning(f"Format data error: {e}", exc_info=True)
+
+    return text
+
+
+def receive_file_data(client: Client, message: Message, decrypt: bool = False) -> Any:
+    # Receive file's data from exchange channel
+    data = None
+    try:
+        if message.document:
+            file_id = message.document.file_id
+            path = get_downloaded_path(client, file_id)
+            if path:
+                if decrypt:
+                    # Decrypt the file, save to the tmp directory
+                    path_decrypted = get_new_path()
+                    crypt_file("decrypt", path, path_decrypted)
+                    path_final = path_decrypted
+                else:
+                    # Read the file directly
+                    path_decrypted = ""
+                    path_final = path
+
+                with open(path_final, "rb") as f:
+                    data = pickle.load(f)
+
+                thread(delete_file, (path,))
+                thread(delete_file, (path_decrypted,))
+    except Exception as e:
+        logger.warning(f"Receive file error: {e}", exc_info=True)
+
+    return data
+
+
+def receive_text_data(message: Message) -> dict:
+    # Receive text's data from exchange channel
+    data = {}
+    try:
+        text = get_text(message)
+        if text:
+            data = loads(text)
+    except Exception as e:
+        logger.warning(f"Receive data error: {e}")
+
+    return data
+
+
 def share_data(client: Client, receivers: List[str], action: str, action_type: str, data: Union[dict, int, str],
-               file: str = None) -> bool:
+               file: str = None, encrypt: bool = True) -> bool:
     # Use this function to share data in the exchange channel
     try:
         if glovar.sender in receivers:
@@ -70,8 +132,18 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
                 action_type=action_type,
                 data=data
             )
-            crypt_file("encrypt", f"data/{file}", f"tmp/{file}")
-            result = send_document(client, channel_id, f"tmp/{file}", text)
+            if encrypt:
+                # Encrypt the file, save to the tmp directory
+                file_path = get_new_path()
+                crypt_file("encrypt", file, file_path)
+            else:
+                # Send directly
+                file_path = file
+
+            result = send_document(client, channel_id, file_path, text)
+            # Delete the tmp file
+            if result and "tmp/" in file_path:
+                thread(delete_file, (file_path,))
         else:
             text = format_data(
                 sender=glovar.sender,
@@ -82,7 +154,9 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
             )
             result = send_message(client, channel_id, text)
 
+        # Sending failed due to channel issue
         if result is False:
+            # Use hide channel instead
             exchange_to_hide(client)
             thread(share_data, (client, receivers, action, action_type, data, file))
 
