@@ -119,7 +119,8 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
                 # Check if the pattern is special
                 for test in ["项脊轩，旧南阁子也。室仅方丈，可容一人居。",
                              "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                             "0123456789"
+                             "0123456789",
+                             "abcdefjghijklmnopqrstuvwxyz"
                              ]:
                     if pattern.search(test):
                         text += (f"状态：{code('未添加')}\n"
