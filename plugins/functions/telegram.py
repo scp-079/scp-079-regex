@@ -20,7 +20,6 @@ import logging
 from typing import Iterable, List, Optional, Union
 
 from pyrogram import Client, InlineKeyboardMarkup, Message
-from pyrogram.client.parser import Parser
 from pyrogram.errors import ChannelInvalid, ChannelPrivate, FloodWait, PeerIdInvalid
 
 from .etc import wait_flood
@@ -147,8 +146,6 @@ def send_message(client: Client, cid: int, text: str, mid: int = None,
     result = None
     try:
         if text.strip():
-            parser = Parser(None)
-            text = parser.parse(text)
             flood_wait = True
             while flood_wait:
                 flood_wait = False

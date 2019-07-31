@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from html import escape
 from json import dumps, loads
 from random import choice, uniform
 from string import ascii_letters, digits
@@ -66,7 +67,10 @@ def code(text: Any) -> str:
     try:
         text = str(text)
         if text.strip():
-            return f"<code>{text}</code>"
+            if "<![" in text:
+                return f"<code>{escape(text)}</code>"
+            else:
+                return f"<code>{text}</code>"
     except Exception as e:
         logger.warning(f"Code error: {e}", exc_info=True)
 
