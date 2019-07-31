@@ -317,7 +317,7 @@ def words_list_page(uid, word_type, page) -> (str, InlineKeyboardMarkup):
     end_text = "\n\n".join([code(w) for w in w_list])
     text += (f"类别：{code(glovar.names[word_type])}\n"
              f"查询：{code('全部')}\n"
-             f"结果：------------------------\n\n{end_text}")
+             f"结果：————————————————\n\n{end_text}")
 
     return text, markup
 
