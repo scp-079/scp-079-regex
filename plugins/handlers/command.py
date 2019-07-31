@@ -214,7 +214,7 @@ def same_words(client: Client, message: Message):
                     elif (old_command_type in glovar.remove_commands
                           and len(old_command_list) == 1):
                         # Get the message replied by old message
-                        old_message = get_messages(client, cid, [old_message.message_id]).messages[0]
+                        old_message = get_messages(client, cid, [old_message.message_id])[0]
                         if old_message.reply_to_message:
                             old_message = old_message.reply_to_message
                             aid = old_message.from_user.id

@@ -30,14 +30,15 @@ See [this article](https://scp-079.org/regex/).
 ## Requirements
 
 - Python 3.6 or higher.
-- `requirements.txt` ： APScheduler OpenCC pyAesCrypt pyrogram[fast] xeger
 - Ubuntu: `sudo apt update && sudo apt install opencc`
+- pip: `pip install -r requirements.txt` or `pip install -U APScheduler OpenCC pyAesCrypt pyrogram[fast] xeger`
+
 
 ## Files
 
 - plugins
     - functions
-        - `channel.py` : Send messages to channel
+        - `channel.py` : Functions about channel
         - `etc.py` : Miscellaneous
         - `file.py` : Save files
         - `filters.py` : Some filters
