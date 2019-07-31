@@ -88,21 +88,21 @@ def is_regex_group(_, update: Union[CallbackQuery, Message]) -> bool:
 
 
 exchange_channel = Filters.create(
-    name="Exchange Channel",
-    func=is_exchange_channel
+    func=is_exchange_channel,
+    name="Exchange Channel"
 )
 
 hide_channel = Filters.create(
-    name="Hide Channel",
-    func=is_hide_channel
+    func=is_hide_channel,
+    name="Hide Channel"
 )
 
 test_group = Filters.create(
-    name="Test Group",
-    func=is_test_group
+    func=is_test_group,
+    name="Test Group"
 )
 
 regex_group = Filters.create(
-    name="Regex Group",
-    func=is_regex_group
+    func=is_regex_group,
+    name="Regex Group"
 )
