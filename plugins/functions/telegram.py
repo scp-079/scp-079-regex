@@ -150,10 +150,11 @@ def send_message(client: Client, cid: int, text: str, mid: int = None,
             while flood_wait:
                 flood_wait = False
                 try:
+                    logger.warning(text)
                     result = client.send_message(
                         chat_id=cid,
                         text=text,
-                        parse_mode=None,    # Temporary
+                        parse_mode="html",    # Temporary
                         disable_web_page_preview=True,
                         reply_to_message_id=mid,
                         reply_markup=markup
