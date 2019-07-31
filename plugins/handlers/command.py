@@ -93,7 +93,7 @@ def ask_word(client: Client, message: Message):
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
-                   & Filters.command(["ls"], glovar.prefix))
+                   & Filters.command(glovar.list_commands, glovar.prefix))
 def list_words(client: Client, message: Message):
     try:
         cid = message.chat.id
