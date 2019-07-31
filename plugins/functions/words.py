@@ -150,7 +150,7 @@ def word_add(message: Message) -> (str, InlineKeyboardMarkup):
                              f"类别：{code(glovar.names[word_type])}\n"
                              f"词组：{code(word)}\n"
                              f"原因：{code('等待确认')}\n"
-                             f"重复：" + "—" * 16 + f"\n\n{end_text}")
+                             f"重复：" + "-" * 24 + f"\n\n{end_text}")
                     add_new = button_data("ask", "new", ask_key)
                     replace_all = button_data("ask", "replace", ask_key)
                     cancel = button_data("ask", "cancel", ask_key)
@@ -263,7 +263,7 @@ def words_ask(operation: str, key: str) -> str:
             eval(f"glovar.{word_type}_words").add(new_word)
             re_compile(word_type)
             begin_text = f"状态：{code(f'已添加')}\n"
-            text = begin_text + text + "重复：" + "—" * 16 + f"\n\n{end_text}"
+            text = begin_text + text + "重复：" + "-" * 24 + f"\n\n{end_text}"
         # Else delete old words
         elif operation == "replace":
             eval(f"glovar.{word_type}_words").add(new_word)
@@ -272,10 +272,10 @@ def words_ask(operation: str, key: str) -> str:
 
             re_compile(word_type)
             begin_text = f"状态：{code(f'已添加')}\n"
-            text = begin_text + text + "替换：" + "—" * 16 + f"\n\n{end_text}"
+            text = begin_text + text + "替换：" + "-" * 24 + f"\n\n{end_text}"
         else:
             begin_text = f"状态：{code(f'已取消')}\n"
-            text = begin_text + text + "重复：" + "—" * 16 + f"\n\n{end_text}"
+            text = begin_text + text + "重复：" + "-" * 24 + f"\n\n{end_text}"
 
         glovar.ask_words.pop(key, None)
     else:
@@ -317,7 +317,7 @@ def words_list_page(uid, word_type, page) -> (str, InlineKeyboardMarkup):
     end_text = "\n\n".join([code(w) for w in w_list])
     text += (f"类别：{code(glovar.names[word_type])}\n"
              f"查询：{code('全部')}\n"
-             f"结果：————————————————\n\n{end_text}")
+             f"结果：------------------------\n\n{end_text}")
 
     return text, markup
 
@@ -466,7 +466,7 @@ def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMark
             else:
                 end_text = "\n\n".join([f"{code(w)}" for w in w_list])
 
-            text += "结果：" + "—" * 16 + f"\n\n{end_text}"
+            text += "结果：" + "-" * 24 + f"\n\n{end_text}"
         else:
             text += (f"结果：{code('无法显示')}\n"
                      f"原因：{code('没有找到')}")

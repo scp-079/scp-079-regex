@@ -111,7 +111,7 @@ def text_test(client: Client, message: Message) -> bool:
             for word_type in glovar.names:
                 if glovar.compiled[word_type].search(message_text):
                     w_list = [w for w in eval(f"glovar.{word_type}_words") if similar("test", w, message_text)]
-                    result += f"{glovar.names[word_type]}：" + "—" * 16 + "\n\n"
+                    result += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
                     for w in w_list:
                         result += "\t" * 4 + f"{code(w)}\n\n"
 
