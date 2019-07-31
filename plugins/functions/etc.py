@@ -67,9 +67,8 @@ def code(text: Any) -> str:
     try:
         text = str(text)
         if text.strip():
-            if "<![" in text:
+            if "<!" in text:
                 text = "<code>{}</code>".format(escape(text))
-                logger.warning(text)
                 return text
             else:
                 return f"<code>{text}</code>"

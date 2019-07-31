@@ -148,7 +148,6 @@ def send_message(client: Client, cid: int, text: str, mid: int = None,
         if text.strip():
             text_list = [text[i:i + 4096] for i in range(0, len(text), 4096)]
             for text_unit in text_list:
-                logger.warning(text_unit)
                 flood_wait = True
                 while flood_wait:
                     flood_wait = False
