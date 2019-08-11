@@ -297,11 +297,13 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
         else:
             text += (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
                      f"结果：{code('无法显示')}\n"
-                     f"原因：{code('格式有误')}")
+                     f"原因：{code('格式有误')}\n")
             markup = None
     else:
         text += (f"结果：{code('无法显示')}\n"
-                 f"原因：{code('格式有误')}")
+                 f"原因：{code('格式有误')}\n"
+                 f"可选：" + "-" * 24 + "\n\n"
+                 f"\n".join([code(name) for name in glovar.names]))
         markup = None
 
     return text, markup
@@ -314,10 +316,10 @@ def words_list_page(uid, word_type, page) -> (str, InlineKeyboardMarkup):
     w_list = list(words)
     w_list.sort()
     w_list, markup = words_page(w_list, "list", word_type, page)
-    end_text = "\n\n".join([code(w) for w in w_list])
     text += (f"类别：{code(glovar.names[word_type])}\n"
              f"查询：{code('全部')}\n"
-             f"结果：------------------------\n\n{end_text}")
+             f"结果：" + "-" * 24 + "\n\n"
+             f"\n\n".join([code(w) for w in w_list]))
 
     return text, markup
 
