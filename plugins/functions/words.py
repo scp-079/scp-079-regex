@@ -303,7 +303,7 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
         text += (f"结果：{code('无法显示')}\n"
                  f"原因：{code('格式有误')}\n"
                  f"可选：" + "-" * 24 + "\n\n" +
-                 f"\n".join([f"{code(name)} {italic(glovar.names[name])}" for name in glovar.names]))
+                 f"\n".join([f"{code(name)}    {italic(glovar.names[name])}" for name in glovar.names]))
         markup = None
 
     return text, markup
