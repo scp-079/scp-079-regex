@@ -56,12 +56,30 @@ def add_word(client: Client, word_type: str, word: str) -> bool:
 def get_admin(message: Message) -> Optional[int]:
     # Get message's origin commander
     try:
-        aid = int(message.text.partition("\n")[0].partition("：")[2])
+        aid = int(message.text.split("\n")[0].split("：")[1])
+
         return aid
     except Exception as e:
         logger.warning(f"Get admin error: {e}", exc_info=True)
 
     return None
+
+
+def get_desc(message: Message) -> bool:
+    # Get the list message's desc value
+    try:
+        text_list = message.text.split("\n")
+        for text in text_list:
+            text_units = text.split("：")
+            if text_units[0] == "顺序":
+                if text_units[1] == "升序":
+                    return False
+                else:
+                    return True
+    except Exception as e:
+        logger.warning(f"Get desc error: {e}", exc_info=True)
+
+    return True
 
 
 def remove_word(client: Client, word_type: str, words: List[str]) -> bool:
@@ -304,6 +322,7 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
             text, markup = words_list_page(uid, word_type, 1, desc)
         else:
             text += (f"类别：{code(glovar.names.get(word_type, word_type))}\n"
+                     f"顺序：{code((lambda x: '降序' if x else '升序')(desc))}\n"
                      f"结果：{code('无法显示')}\n"
                      f"原因：{code('格式有误')}\n")
             markup = None

@@ -25,8 +25,8 @@ from ..functions.etc import bold, code, general_link, get_callback_data, get_com
 from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group, test_group
 from ..functions.telegram import edit_message_text, get_messages, send_message
-from ..functions.words import get_admin, word_add, words_ask, words_list, words_list_page, word_remove, words_search
-from ..functions.words import words_search_page
+from ..functions.words import get_admin, get_desc, word_add, words_ask, words_list, words_list_page, word_remove
+from ..functions.words import words_search, words_search_page
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -130,7 +130,8 @@ def page_word(client: Client, message: Message):
                         page = callback_data_list[i]["d"]
                         if action == "list":
                             word_type = action_type
-                            page_text, markup = words_list_page(uid, word_type, page)
+                            desc = get_desc(r_message)
+                            page_text, markup = words_list_page(uid, word_type, page, desc)
                         else:
                             search_key = action_type
                             page_text, markup = words_search_page(uid, search_key, page)

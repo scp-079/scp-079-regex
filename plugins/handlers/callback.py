@@ -23,7 +23,7 @@ from pyrogram import Client, CallbackQuery
 
 from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group
-from .. functions.words import get_admin, words_ask, words_list_page, words_search_page
+from .. functions.words import get_admin, get_desc, words_ask, words_list_page, words_search_page
 from ..functions.telegram import answer_callback, edit_message_text
 
 # Enable logging
@@ -51,7 +51,8 @@ def answer(client: Client, callback_query: CallbackQuery):
             elif action == "list":
                 word_type = action_type
                 page = data
-                text, markup = words_list_page(uid, word_type, page)
+                desc = get_desc(callback_query.message)
+                text, markup = words_list_page(uid, word_type, page, desc)
                 thread(edit_message_text, (client, cid, mid, text, markup))
             elif action == "search":
                 key = action_type
