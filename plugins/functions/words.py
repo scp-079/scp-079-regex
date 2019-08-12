@@ -460,6 +460,9 @@ def word_remove_try(client: Client, message: Message) -> Optional[str]:
     word_type, word = get_command_context(message)
     if word_type:
         if word and word_type in glovar.names:
+            if "(?#" in word and "(?# " not in word:
+                word = word.replace("(?#", "(?# ")
+
             if eval(f"glovar.{word_type}_words").get(word, {}):
                 remove_word(client, word_type, [word])
                 text += (f"状态：{code(f'已移除')}\n"
