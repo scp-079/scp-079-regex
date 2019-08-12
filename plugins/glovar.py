@@ -84,11 +84,11 @@ receivers: Dict[str, List[str]] = {
     "bad": ["NOSPAM"],
     "ban": ["NOSPAM", "WATCH"],
     "bio": ["NOSPAM"],
-    "con": ["NOSPAM", "WATCH"],
+    "con": ["CAPTCHA", "CLEAN", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "del": ["NOSPAM"],
     "eme": ["NOSPAM"],
     "iml": ["CLEAN", "WATCH"],
-    "nm": ["NOSPAM"],
+    "nm": ["NOSPAM", "WATCH"],
     "rm": ["TIP"],
     "sho": ["NOSPAM", "WATCH"],
     "spc": ["NOSPAM", "WATCH"],
@@ -96,7 +96,7 @@ receivers: Dict[str, List[str]] = {
     "sti": ["NOSPAM"],
     "tgl": ["CLEAN", "WATCH"],
     "tgp": ["CLEAN", "WATCH"],
-    "wb": ["NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "wb": ["CAPTCHA", "CLEAN", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "wd": ["WATCH"],
     "test": []
 }
