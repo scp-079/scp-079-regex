@@ -151,6 +151,9 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
     if word_type:
         if word and word_type in glovar.names:
             # Check if the word already exits
+            if "(?#" in word and "(?# " not in word:
+                word = word.replace("(?#", "(?# ")
+
             if eval(f"glovar.{word_type}_words").get(word, {}):
                 text += (f"状态：{code('未添加')}\n"
                          f"类别：{code(glovar.names[word_type])}\n"
