@@ -345,6 +345,7 @@ def words_list_page(uid: int, word_type: str, page: int, desc: bool) -> (str, In
     w_list = sorted(keys, key=lambda k: words[k]["average"], reverse=desc)
     w_list, markup = words_page(w_list, "list", word_type, page)
     text += (f"类别：{code(glovar.names[word_type])}\n"
+             f"顺序：{code((lambda x: '降序' if x else '升序')(desc))}\n"
              f"查询：{code('全部')}\n"
              f"结果：" + "-" * 24 + "\n\n" +
              f"\n\n".join([(f"{code(w)} {italic(words[w]['average'])} "
