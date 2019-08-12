@@ -348,10 +348,10 @@ def words_list_page(uid: int, word_type: str, page: int, desc: bool) -> (str, In
              f"顺序：{code((lambda x: '降序' if x else '升序')(desc))}\n"
              f"查询：{code('全部')}\n"
              f"结果：" + "-" * 24 + "\n\n" +
-             "\n\n".join([(f"{code(f'{w:.2f}')} {italic(words[w]['average'])} "
-                           f"{code('/')} {italic(words[w]['today'])} "
-                           f"{code('/')} {italic(words[w]['total'])}")
-                          for w in w_list]))
+             f"\n\n".join([(f"{code(w)} {italic(round(words[w]['average'], 1))} "
+                            f"{code('/')} {italic(words[w]['today'])} "
+                            f"{code('/')} {italic(words[w]['total'])}")
+                           for w in w_list]))
 
     return text, markup
 
