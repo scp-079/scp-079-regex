@@ -285,7 +285,7 @@ def words_ask(client: Client, operation: str, key: str) -> str:
 
 def words_count(data: Any, word_type: str) -> bool:
     # Calculate the rules' usage
-    if glovar.lock_count.acquire():
+    if glovar.lock["count"].acquire():
         try:
             if data:
                 data_set = set(data)
@@ -304,7 +304,7 @@ def words_count(data: Any, word_type: str) -> bool:
         except Exception as e:
             logger.warning(f"Words count error: {e}", exc_info=True)
         finally:
-            glovar.lock_count.release()
+            glovar.lock["count"].release()
 
     return False
 

@@ -49,7 +49,9 @@ default_word_status: Dict[str, Union[float, int]] = {
     "today": 0
 }
 
-lock_count: Lock = Lock()
+lock: Dict[str, Lock] = {
+    "count": Lock()
+}
 
 names: Dict[str, str] = {
     "ad": "广告用语",
