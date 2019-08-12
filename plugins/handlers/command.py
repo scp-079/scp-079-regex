@@ -21,7 +21,6 @@ import logging
 from pyrogram import Client, Filters, Message
 
 from .. import glovar
-from ..functions.channel import share_regex_update
 from ..functions.etc import bold, code, general_link, get_callback_data, get_command_context, get_text, message_link
 from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group, test_group
@@ -39,10 +38,8 @@ def add_word(client: Client, message: Message):
     try:
         cid = message.chat.id
         mid = message.message_id
-        text, markup = word_add(message)
+        text, markup = word_add(client, message)
         thread(send_message, (client, cid, text, mid, markup))
-        if "已添加" in text:
-            thread(share_regex_update, (client,))
     except Exception as e:
         logger.warning(f"Add word error: {e}", exc_info=True)
 
@@ -67,11 +64,8 @@ def ask_word(client: Client, message: Message):
                         r_mid = r_message.message_id
                         ask_key = callback_data_list[0]["d"]
                         ask_text = (f"管理：{user_mention(aid)}\n"
-                                    f"{words_ask(command_type, ask_key)}")
+                                    f"{words_ask(client, command_type, ask_key)}")
                         thread(edit_message_text, (client, cid, r_mid, ask_text))
-                        if "已添加" in ask_text:
-                            thread(share_regex_update, (client,))
-
                         text += (f"状态：{code('已操作')}\n"
                                  f"查看：{general_link(r_mid, message_link(r_message))}\n")
                     else:
@@ -168,10 +162,8 @@ def remove_word(client: Client, message: Message):
     try:
         cid = message.chat.id
         mid = message.message_id
-        text = word_remove(message)
+        text = word_remove(client, message)
         thread(send_message, (client, cid, text, mid))
-        if "已移除" in text:
-            thread(share_regex_update, (client,))
     except Exception as e:
         logger.warning(f"Remove word error: {e}", exc_info=True)
 
@@ -203,10 +195,10 @@ def same_words(client: Client, message: Message):
                         for new_word_type in new_word_type_list:
                             old_message.text = f"{old_command_type} {new_word_type} {old_word}"
                             if old_command_type in glovar.add_commands:
-                                text, markup = word_add(old_message)
+                                text, markup = word_add(client, old_message)
                                 thread(send_message, (client, cid, text, mid, markup))
                             else:
-                                text = word_remove(old_message)
+                                text = word_remove(client, old_message)
                                 thread(send_message, (client, cid, text, mid))
 
                         return
@@ -227,7 +219,7 @@ def same_words(client: Client, message: Message):
                                     _, old_word = get_command_context(old_message)
                                     for new_word_type in new_word_type_list:
                                         old_message.text = f"{old_command_type} {new_word_type} {old_word}"
-                                        text = word_remove(old_message)
+                                        text = word_remove(client, old_message)
                                         thread(send_message, (client, cid, text, mid))
 
                                     return
@@ -254,8 +246,6 @@ def same_words(client: Client, message: Message):
                      f"原因：{code('格式有误')}\n")
 
         thread(send_message, (client, cid, text, mid))
-        if "已移除" in text or "已添加" in text:
-            thread(share_regex_update, (client,))
     except Exception as e:
         logger.warning(f"Same words error: {e}", exc_info=True)
 

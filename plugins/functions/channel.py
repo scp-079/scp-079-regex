@@ -19,14 +19,13 @@
 import logging
 import pickle
 from json import dumps, loads
-from time import sleep
 from typing import Any, List, Union
 
 from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import code_block, crypt_str, delay, get_text, thread
-from .file import crypt_file, delete_file, get_downloaded_path, get_new_path
+from .etc import code, code_block, get_text, thread
+from .file import crypt_file, data_to_file, delete_file, get_downloaded_path, get_new_path
 from .telegram import send_document, send_message
 
 # Enable logging
@@ -37,14 +36,17 @@ def exchange_to_hide(client: Client) -> bool:
     # Let other bots exchange data in the hide channel instead
     try:
         glovar.should_hide = True
-        text = format_data(
-            sender="EMERGENCY",
+        share_data(
+            client=client,
             receivers=["EMERGENCY"],
             action="backup",
             action_type="hide",
             data=True
         )
-        thread(send_message, (client, glovar.hide_channel_id, text))
+        text = (f"项目编号：{code(glovar.sender)}\n"
+                f"发现状况：{code('数据交换频道失效')}\n"
+                f"自动处理：{code('启用 1 号协议')}\n")
+        thread(send_message, (client, glovar.critical_channel_id, text))
         return True
     except Exception as e:
         logger.warning(f"Exchange to hide error: {e}", exc_info=True)
@@ -119,86 +121,75 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
         if glovar.sender in receivers:
             receivers.remove(glovar.sender)
 
-        if glovar.should_hide:
-            channel_id = glovar.hide_channel_id
-        else:
-            channel_id = glovar.exchange_channel_id
-
-        if file:
-            text = format_data(
-                sender=glovar.sender,
-                receivers=receivers,
-                action=action,
-                action_type=action_type,
-                data=data
-            )
-            if encrypt:
-                # Encrypt the file, save to the tmp directory
-                file_path = get_new_path()
-                crypt_file("encrypt", file, file_path)
+        if receivers:
+            if glovar.should_hide:
+                channel_id = glovar.hide_channel_id
             else:
-                # Send directly
-                file_path = file
+                channel_id = glovar.exchange_channel_id
 
-            result = send_document(client, channel_id, file_path, text)
-            # Delete the tmp file
-            if result and "tmp/" in file_path:
-                thread(delete_file, (file_path,))
-        else:
-            text = format_data(
-                sender=glovar.sender,
-                receivers=receivers,
-                action=action,
-                action_type=action_type,
-                data=data
-            )
-            result = send_message(client, channel_id, text)
+            if file:
+                text = format_data(
+                    sender=glovar.sender,
+                    receivers=receivers,
+                    action=action,
+                    action_type=action_type,
+                    data=data
+                )
+                if encrypt:
+                    # Encrypt the file, save to the tmp directory
+                    file_path = get_new_path()
+                    crypt_file("encrypt", file, file_path)
+                else:
+                    # Send directly
+                    file_path = file
 
-        # Sending failed due to channel issue
-        if result is False:
-            # Use hide channel instead
-            exchange_to_hide(client)
-            thread(share_data, (client, receivers, action, action_type, data, file))
+                result = send_document(client, channel_id, file_path, text)
+                # Delete the tmp file
+                if result:
+                    for f in [file, file_path]:
+                        if "tmp/" in f:
+                            thread(delete_file, (f,))
+            else:
+                text = format_data(
+                    sender=glovar.sender,
+                    receivers=receivers,
+                    action=action,
+                    action_type=action_type,
+                    data=data
+                )
+                result = send_message(client, channel_id, text)
 
-        return True
+            # Sending failed due to channel issue
+            if result is False:
+                # Use hide channel instead
+                exchange_to_hide(client)
+                thread(share_data, (client, receivers, action, action_type, data, file, encrypt))
+
+            return True
     except Exception as e:
         logger.warning(f"Share data error: {e}", exc_info=True)
 
     return False
 
 
-def share_regex_update(client: Client) -> bool:
+def share_regex_update(client: Client, word_tye: str) -> bool:
     # Use this function to share regex update to other bots
     try:
-        if glovar.update_type == "reload":
-            delay(
-                5,
-                share_data,
-                [
-                    client,
-                    glovar.receivers_regex,
-                    "update",
-                    "reload",
-                    crypt_str("encrypt", glovar.reload_path, glovar.key)
-                ]
+        file = data_to_file(eval(f"glovar.{word_tye}_words"))
+        thread(
+            share_data,
+            (
+                client,
+                glovar.receivers[word_tye],
+                "update",
+                "download",
+                f"{word_tye}_words",
+                file
             )
-        else:
-            sleep(5)
-            crypt_file("encrypt", "data/compiled", "tmp/compiled")
-            thread(
-                share_data,
-                (
-                    client,
-                    glovar.receivers_regex,
-                    "update",
-                    "download",
-                    crypt_str("encrypt", glovar.reload_path, glovar.key),
-                    "tmp/compiled"
-                )
-            )
+        )
 
         return True
     except Exception as e:
-        logger.warning(f"Data exchange error: {e}", exc_info=True)
+        logger.warning(f"Share regex update error: {e}", exc_info=True)
 
     return False

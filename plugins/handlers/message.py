@@ -21,17 +21,18 @@ import logging
 from pyrogram import Client, Filters, Message
 
 from .. import glovar
-from ..functions.channel import receive_text_data
-from ..functions.filters import hide_channel, test_group
+from ..functions.channel import receive_file_data, receive_text_data
+from ..functions.filters import exchange_channel, hide_channel, test_group
 from ..functions.tests import name_test, sticker_test, text_test
+from ..functions.words import words_count
 
 # Enable logging
 logger = logging.getLogger(__name__)
 
 
 @Client.on_message(Filters.incoming & Filters.channel & hide_channel
-                   & ~Filters.command(glovar.all_commands, glovar.prefix))
-def exchange_emergency(_, message: Message):
+                   & ~Filters.command(glovar.all_commands, glovar.prefix), group=-1)
+def exchange_emergency(_: Client, message: Message):
     try:
         # Read basic information
         data = receive_text_data(message)
@@ -42,12 +43,41 @@ def exchange_emergency(_, message: Message):
             action_type = data["type"]
             data = data["data"]
             if "EMERGENCY" in receivers:
-                if sender == "EMERGENCY":
-                    if action == "backup":
-                        if action_type == "hide":
+                if action == "backup":
+                    if action_type == "hide":
+                        if data is True:
+                            glovar.should_hide = data
+                        elif data is False and sender == "MANAGE":
                             glovar.should_hide = data
     except Exception as e:
         logger.warning(f"Exchange emergency error: {e}", exc_info=True)
+
+
+@Client.on_message(Filters.channel & exchange_channel
+                   & ~Filters.command(glovar.all_commands, glovar.prefix))
+def process_data(client: Client, message: Message):
+    try:
+        data = receive_text_data(message)
+        if data:
+            sender = data["from"]
+            receivers = data["to"]
+            action = data["action"]
+            action_type = data["type"]
+            data = data["data"]
+            # This will look awkward,
+            # seems like it can be simplified,
+            # but this is to ensure that the permissions are clear,
+            # so it is intentionally written like this
+            if glovar.sender in receivers:
+                if sender in {"CLEAN", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"}:
+
+                    if action == "update":
+                        if action_type == "download":
+                            word_type = data.replace("_words")
+                            data = receive_file_data(client, message, True)
+                            words_count(data, word_type)
+    except Exception as e:
+        logger.warning(f"Process data error: {e}", exc_info=True)
 
 
 @Client.on_message(Filters.incoming & Filters.group & test_group & ~Filters.service

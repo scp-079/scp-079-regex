@@ -23,9 +23,10 @@ from configparser import RawConfigParser
 from os import mkdir
 from os.path import exists
 from shutil import rmtree
+from threading import Lock
 from typing import Dict, List, Union
 
-from .functions.etc import random_str
+from .functions.etc import get_now, random_str
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -41,7 +42,16 @@ ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
 #     }
 # }
 
-names: dict = {
+default_word_status: Dict[str, Union[float, int]] = {
+    "time": get_now(),
+    "total": 0,
+    "average": 0.0,
+    "today": 0
+}
+
+lock_count: Lock = Lock()
+
+names: Dict[str, str] = {
     "ad": "广告用语",
     "aff": "推广链接",
     "ava": "头像分析",
@@ -65,7 +75,29 @@ names: dict = {
     "test": "测试用例"
 }
 
-receivers_regex: List[str] = ["CLEAN", "NOSPAM", "WATCH"]
+receivers: Dict[str, List[str]] = {
+    "ad": ["NOSPAM", "WATCH"],
+    "aff": ["CLEAN", "WATCH"],
+    "ava": ["NOSPAM"],
+    "bad": ["NOSPAM"],
+    "ban": ["NOSPAM"],
+    "bio": ["NOSPAM"],
+    "con": ["NOSPAM", "WATCH"],
+    "del": ["NOSPAM"],
+    "eme": ["NOSPAM"],
+    "iml": ["CLEAN", "WATCH"],
+    "nm": ["NOSPAM"],
+    "rm": ["TIP"],
+    "sho": ["NOSPAM", "WATCH"],
+    "spc": ["NOSPAM", "WATCH"],
+    "spe": ["NOSPAM", "WATCH"],
+    "sti": ["NOSPAM"],
+    "tgl": ["CLEAN", "WATCH"],
+    "tgp": ["CLEAN", "WATCH"],
+    "wb": ["NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "wd": ["WATCH"],
+    "test": []
+}
 
 result_search: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 # result_search = {
@@ -82,7 +114,7 @@ sender: str = "REGEX"
 
 should_hide: bool = False
 
-version: str = "0.3.2"
+version: str = "0.3.3"
 
 # Generate commands lists
 add_commands: list = ["add", "ad"]
@@ -100,6 +132,7 @@ prefix: List[str] = []
 prefix_str: str = "/!"
 
 # [channels]
+critical_channel_id: int = 0
 exchange_channel_id: int = 0
 hide_channel_id: int = 0
 regex_group_id: int = 0
@@ -107,8 +140,6 @@ test_group_id: int = 0
 
 # [custom]
 per_page: int = 15
-reload_path: str = ""
-update_type: str = "reload"
 
 # [encrypt]
 key: Union[str, bytes] = ""
@@ -121,14 +152,13 @@ try:
     bot_token = config["basic"].get("bot_token", bot_token)
     prefix = list(config["basic"].get("prefix", prefix_str))
     # [channels]
+    critical_channel_id = int(config["channels"].get("critical_channel_id", critical_channel_id))
     exchange_channel_id = int(config["channels"].get("exchange_channel_id", exchange_channel_id))
     hide_channel_id = int(config["channels"].get("hide_channel_id", hide_channel_id))
     test_group_id = int(config["channels"].get("test_group_id", test_group_id))
     regex_group_id = int(config["channels"].get("regex_group_id", regex_group_id))
     # [custom]
     per_page = int(config["custom"].get("per_page", per_page))
-    reload_path = config["custom"].get("reload_path", reload_path)
-    update_type = config["custom"].get("update_type", update_type)
     # [encrypt]
     key = config["encrypt"].get("key", key)
     key = key.encode("utf-8")
@@ -139,11 +169,11 @@ except Exception as e:
 # Check
 if (bot_token in {"", "[DATA EXPUNGED]"}
         or prefix == []
+        or critical_channel_id == 0
         or exchange_channel_id == 0
         or hide_channel_id == 0
         or test_group_id == 0
         or regex_group_id == 0
-        or (update_type == "reload" and reload_path in {"", "[DATA EXPUNGED]"})
         or key in {"", b"[DATA EXPUNGED]"}
         or password in {"", "[DATA EXPUNGED]"}):
     raise SystemExit('No proper settings')
@@ -161,24 +191,37 @@ for path in ["data", "tmp"]:
         mkdir(path)
 
 # Init words variables
-ad_words: set = set()
-ava_words: set = set()
-bad_words: set = set()
-ban_words: set = set()
-bio_words: set = set()
-con_words: set = set()
-del_words: set = set()
-eme_words: set = set()
-nm_words: set = set()
-wb_words: set = set()
-wd_words: set = set()
-sti_words: set = set()
-test_words: set = set()
-# type_words = {"regex1", "regex2"}
+ad_words: Dict[str, Dict[str, Union[float, int]]] = {}
+aff_words: Dict[str, Dict[str, Union[float, int]]] = {}
+ava_words: Dict[str, Dict[str, Union[float, int]]] = {}
+bad_words: Dict[str, Dict[str, Union[float, int]]] = {}
+ban_words: Dict[str, Dict[str, Union[float, int]]] = {}
+bio_words: Dict[str, Dict[str, Union[float, int]]] = {}
+con_words: Dict[str, Dict[str, Union[float, int]]] = {}
+del_words: Dict[str, Dict[str, Union[float, int]]] = {}
+eme_words: Dict[str, Dict[str, Union[float, int]]] = {}
+iml_words: Dict[str, Dict[str, Union[float, int]]] = {}
+nm_words: Dict[str, Dict[str, Union[float, int]]] = {}
+rm_words: Dict[str, Dict[str, Union[float, int]]] = {}
+sho_words: Dict[str, Dict[str, Union[float, int]]] = {}
+spc_words: Dict[str, Dict[str, Union[float, int]]] = {}
+spe_words: Dict[str, Dict[str, Union[float, int]]] = {}
+sti_words: Dict[str, Dict[str, Union[float, int]]] = {}
+tgl_words: Dict[str, Dict[str, Union[float, int]]] = {}
+tgp_words: Dict[str, Dict[str, Union[float, int]]] = {}
+wb_words: Dict[str, Dict[str, Union[float, int]]] = {}
+wd_words: Dict[str, Dict[str, Union[float, int]]] = {}
+test_words: Dict[str, Dict[str, Union[float, int]]] = {}
+# type_words = {
+#     "regex": {
+#         "time": 12345678,
+#         "total": 20,
+#         "average": 1.1,
+#         "today": 3
+#     }
+# }
 
-for word_type in names:
-    locals()[f"{word_type}_words"] = {f"预留{names[f'{word_type}']}词组 {random_str(16)}"}
-
+# TEMP BEGIN
 # Init compiled variable
 compiled: dict = {}
 # pattern = "|".join(type_words)
@@ -188,9 +231,10 @@ compiled: dict = {}
 
 for word_type in names:
     compiled[word_type] = re.compile(fr"预留{names[f'{word_type}']}词组 {random_str(16)}", re.I | re.M | re.S)
+# TEMP END
 
 # Load data
-file_list = [f"{f}_words" for f in names] + ["compiled"]
+file_list = [f"{f}_words" for f in names] + ["compiled"]    # TEMP
 for file in file_list:
     try:
         try:

@@ -17,6 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import re
+from copy import deepcopy
 from typing import Union
 
 from pyrogram import CallbackQuery, Filters, Message
@@ -106,3 +108,15 @@ regex_group = Filters.create(
     func=is_regex_group,
     name="Regex Group"
 )
+
+
+def is_regex_text(text: str, word_type: str) -> bool:
+    # Check if the text hit the regex rules
+    try:
+        for word in deepcopy(eval(f"glovar.{word_type}_words")):
+            if re.search(word, text, re.I | re.S | re.M):
+                return True
+    except Exception as e:
+        logger.warning(f"Is regex text error: {e}", exc_info=True)
+
+    return False
