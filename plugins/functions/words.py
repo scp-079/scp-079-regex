@@ -42,7 +42,6 @@ def add_word(client: Client, word_type: str, word: str) -> bool:
     try:
         eval(f"glovar.{word_type}_words")[word] = deepcopy(glovar.default_word_status)
         save(f"{word_type}_words")
-        share_regex_update(client, word_type)
         # TEMP
         re_compile(word_type)
 
@@ -89,7 +88,6 @@ def remove_word(client: Client, word_type: str, words: List[str]) -> bool:
             eval(f"glovar.{word_type}_words").pop(word, {})
 
         save(f"{word_type}_words")
-        share_regex_update(client, word_type)
         # TEMP
         re_compile(word_type)
 
@@ -234,6 +232,7 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
                 else:
                     glovar.ask_words.pop(ask_key, None)
                     add_word(client, word_type, word)
+                    share_regex_update(client, word_type)
                     text += (f"状态：{code(f'已添加')}\n"
                              f"类别：{code(glovar.names[word_type])}\n"
                              f"词组：{code(word)}")
@@ -263,12 +262,14 @@ def words_ask(client: Client, operation: str, key: str) -> str:
         # If admin decide to add new word
         if operation == "new":
             add_word(client, word_type, new_word)
+            share_regex_update(client, word_type)
             begin_text = f"状态：{code(f'已添加')}\n"
             text = begin_text + text + "重复：" + "-" * 24 + f"\n\n{end_text}"
         # Else delete old words
         elif operation == "replace":
             add_word(client, word_type, new_word)
             remove_word(client, word_type, old_words)
+            share_regex_update(client, word_type)
             begin_text = f"状态：{code(f'已添加')}\n"
             text = begin_text + text + "替换：" + "-" * 24 + f"\n\n{end_text}"
         else:

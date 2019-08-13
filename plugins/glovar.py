@@ -97,7 +97,7 @@ receivers: Dict[str, List[str]] = {
     "tgl": ["CLEAN", "WATCH"],
     "tgp": ["CLEAN", "WATCH"],
     "wb": ["CAPTCHA", "CLEAN", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "wd": ["WATCH"],
+    "wd": ["NOSPAM", "WATCH"],
     "test": []
 }
 
