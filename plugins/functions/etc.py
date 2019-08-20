@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import re
 from html import escape
 from json import dumps, loads
 from random import choice, uniform
@@ -289,8 +290,8 @@ def get_text(message: Message) -> str:
 
         if text:
             text = t2s(text)
-            text = text.replace("  ", " ")
-            text = text.replace("  ", " ")
+            text = re.sub(r"\s\s", " ", text)
+            text = re.sub(r"\s\s", " ", text)
     except Exception as e:
         logger.warning(f"Get text error: {e}", exc_info=True)
 
