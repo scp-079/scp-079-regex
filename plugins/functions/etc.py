@@ -289,6 +289,8 @@ def get_text(message: Message) -> str:
 
         if text:
             text = t2s(text)
+            text = text.replace("  ", " ")
+            text = text.replace("  ", " ")
     except Exception as e:
         logger.warning(f"Get text error: {e}", exc_info=True)
 
