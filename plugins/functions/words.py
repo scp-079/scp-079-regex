@@ -28,7 +28,7 @@ from .. import glovar
 from .channel import share_regex_update
 from .etc import code, button_data, get_command_context, get_now, get_text, italic, random_str
 from .etc import user_mention
-from .file import save
+from .file import save, save_thread
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ def add_word(word_type: str, word: str) -> bool:
     # Add a word
     try:
         eval(f"glovar.{word_type}_words")[word] = deepcopy(glovar.default_word_status)
-        save(f"{word_type}_words")
+        save_thread(f"{word_type}_words")
         # TEMP
         re_compile(word_type)
 
@@ -87,7 +87,7 @@ def remove_word(word_type: str, words: List[str]) -> bool:
         for word in words:
             eval(f"glovar.{word_type}_words").pop(word, {})
 
-        save(f"{word_type}_words")
+        save_thread(f"{word_type}_words")
         # TEMP
         re_compile(word_type)
 
