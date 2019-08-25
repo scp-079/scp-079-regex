@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 xg = Xeger(limit=32)
 
 
-def add_word(client: Client, word_type: str, word: str) -> bool:
+def add_word(word_type: str, word: str) -> bool:
     # Add a word
     try:
         eval(f"glovar.{word_type}_words")[word] = deepcopy(glovar.default_word_status)
@@ -81,7 +81,7 @@ def get_desc(message: Message) -> bool:
     return True
 
 
-def remove_word(client: Client, word_type: str, words: List[str]) -> bool:
+def remove_word(word_type: str, words: List[str]) -> bool:
     # Remove a word
     try:
         for word in words:
@@ -231,7 +231,7 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
                     )
                 else:
                     glovar.ask_words.pop(ask_key, None)
-                    add_word(client, word_type, word)
+                    add_word(word_type, word)
                     share_regex_update(client, word_type)
                     text += (f"状态：{code(f'已添加')}\n"
                              f"类别：{code(glovar.names[word_type])}\n"
@@ -261,14 +261,14 @@ def words_ask(client: Client, operation: str, key: str) -> str:
         end_text = "\n\n".join([code(w) for w in glovar.ask_words[key]["old"]])
         # If admin decide to add new word
         if operation == "new":
-            add_word(client, word_type, new_word)
+            add_word(word_type, new_word)
             share_regex_update(client, word_type)
             begin_text = f"状态：{code(f'已添加')}\n"
             text = begin_text + text + "重复：" + "-" * 24 + f"\n\n{end_text}"
         # Else delete old words
         elif operation == "replace":
-            add_word(client, word_type, new_word)
-            remove_word(client, word_type, old_words)
+            add_word(word_type, new_word)
+            remove_word(word_type, old_words)
             share_regex_update(client, word_type)
             begin_text = f"状态：{code(f'已添加')}\n"
             text = begin_text + text + "替换：" + "-" * 24 + f"\n\n{end_text}"
@@ -284,7 +284,7 @@ def words_ask(client: Client, operation: str, key: str) -> str:
     return text
 
 
-def words_count(data: Any, word_type: str) -> bool:
+def words_count(word_type: str, data: Any) -> bool:
     # Calculate the rules' usage
     if glovar.lock["count"].acquire():
         try:
@@ -465,10 +465,11 @@ def word_remove_try(client: Client, message: Message) -> Optional[str]:
                 word = word.replace("(?#", "(?# ")
 
             if eval(f"glovar.{word_type}_words").get(word, {}):
-                remove_word(client, word_type, [word])
+                remove_word(word_type, [word])
                 text += (f"状态：{code(f'已移除')}\n"
                          f"类别：{code(f'{glovar.names[word_type]}')}\n"
                          f"词组：{code(word)}")
+                share_regex_update(client, word_type)
             else:
                 text += (f"状态：{code('未移除')}\n"
                          f"类别：{code(f'{glovar.names[word_type]}')}\n"

@@ -334,7 +334,7 @@ def random_str(i: int) -> str:
 
 
 def t2s(text: str) -> str:
-    # Covert Traditional Chinese to Simplified Chinese
+    # Convert Traditional Chinese to Simplified Chinese
     try:
         text = convert(text, config="t2s.json")
     except Exception as e:

@@ -18,7 +18,6 @@
 
 import logging
 import re
-from copy import deepcopy
 from typing import Union
 
 from pyrogram import CallbackQuery, Filters, Message
@@ -110,10 +109,10 @@ regex_group = Filters.create(
 )
 
 
-def is_regex_text(text: str, word_type: str) -> bool:
+def is_regex_text(word_type: str, text: str) -> bool:
     # Check if the text hit the regex rules
     try:
-        for word in deepcopy(eval(f"glovar.{word_type}_words")):
+        for word in list(eval(f"glovar.{word_type}_words")):
             if re.search(word, text, re.I | re.S | re.M):
                 return True
     except Exception as e:

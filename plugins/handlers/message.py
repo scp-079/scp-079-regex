@@ -72,10 +72,10 @@ def process_data(client: Client, message: Message):
                 if sender in {"CLEAN", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"}:
 
                     if action == "update":
-                        if action_type == "download":
+                        if action_type == "count":
                             word_type = data.replace("_words")
                             data = receive_file_data(client, message, True)
-                            words_count(data, word_type)
+                            words_count(word_type, data)
     except Exception as e:
         logger.warning(f"Process data error: {e}", exc_info=True)
 

@@ -43,7 +43,7 @@ def name_test(client: Client, message: Message) -> bool:
             result = ""
             # Can add more test to the "for in" list
             for word_type in ["ad", "con", "iml", "nm", "wb"]:
-                if is_regex_text(text, word_type):
+                if is_regex_text(word_type, text):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if similar("test", w, text)]
                     result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
                     for w in w_list:
@@ -108,7 +108,7 @@ def text_test(client: Client, message: Message) -> bool:
             mid = message.message_id
             result = ""
             for word_type in glovar.names:
-                if is_regex_text(text, word_type):
+                if is_regex_text(word_type, text):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if similar("test", w, text)]
                     result += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
                     for w in w_list:
