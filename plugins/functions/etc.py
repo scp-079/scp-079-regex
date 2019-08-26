@@ -301,8 +301,8 @@ def get_text(message: Message) -> str:
 
         if text:
             text = t2s(text)
-            text = re.sub(r"\s\s", " ", text)
-            text = re.sub(r"\s\s", " ", text)
+            text = re.sub(r"\s(?<!\n)\s(?<!\n)", " ", text)
+            text = re.sub(r"\s(?<!\n)\s(?<!\n)", " ", text)
     except Exception as e:
         logger.warning(f"Get text error: {e}", exc_info=True)
 
