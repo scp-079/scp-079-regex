@@ -42,6 +42,7 @@ See [this article](https://scp-079.org/regex/).
         - `etc.py` : Miscellaneous
         - `file.py` : Save files
         - `filters.py` : Some filters
+        - `receive.py` : Receive data from exchange channel
         - `telegram.py` : Some telegram functions
         - `tests.py` : Test functions
         - `timers.py` : Timer functions

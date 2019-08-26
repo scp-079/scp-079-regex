@@ -35,6 +35,7 @@ logger = logging.getLogger(__name__)
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.add_commands, glovar.prefix))
 def add_word(client: Client, message: Message):
+    # Add a new word
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -47,6 +48,7 @@ def add_word(client: Client, message: Message):
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(["ask"], glovar.prefix))
 def ask_word(client: Client, message: Message):
+    # Deal with a duplicated word
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -89,6 +91,7 @@ def ask_word(client: Client, message: Message):
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.list_commands, glovar.prefix))
 def list_words(client: Client, message: Message):
+    # List words
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -101,6 +104,7 @@ def list_words(client: Client, message: Message):
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(["page"], glovar.prefix))
 def page_word(client: Client, message: Message):
+    # Change words page
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -160,6 +164,7 @@ def page_word(client: Client, message: Message):
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.remove_commands, glovar.prefix))
 def remove_word(client: Client, message: Message):
+    # Remove a word
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -172,6 +177,7 @@ def remove_word(client: Client, message: Message):
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.same_commands, glovar.prefix))
 def same_words(client: Client, message: Message):
+    # Same with other types
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -254,6 +260,7 @@ def same_words(client: Client, message: Message):
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.search_commands, glovar.prefix))
 def search_words(client: Client, message: Message):
+    # Search words
     try:
         cid = message.chat.id
         mid = message.message_id
@@ -266,6 +273,7 @@ def search_words(client: Client, message: Message):
 @Client.on_message(Filters.incoming & Filters.group & test_group
                    & Filters.command(["version"], glovar.prefix))
 def version(client: Client, message: Message):
+    # Check the program's version
     try:
         cid = message.chat.id
         aid = message.from_user.id

@@ -17,16 +17,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import pickle
-from json import dumps, loads
-from time import sleep
-from typing import Any, List, Union
+from json import dumps
+from typing import List, Union
 
-from pyrogram import Client, Message
+from pyrogram import Client
 
 from .. import glovar
-from .etc import code, code_block, get_text, thread
-from .file import crypt_file, data_to_file, delete_file, get_downloaded_path, get_new_path
+from .etc import code, code_block, thread
+from .file import crypt_file, data_to_file, delete_file, get_new_path
 from .telegram import send_document, send_message
 
 # Enable logging
@@ -48,6 +46,7 @@ def exchange_to_hide(client: Client) -> bool:
                 f"发现状况：{code('数据交换频道失效')}\n"
                 f"自动处理：{code('启用 1 号协议')}\n")
         thread(send_message, (client, glovar.critical_channel_id, text))
+
         return True
     except Exception as e:
         logger.warning(f"Exchange to hide error: {e}", exc_info=True)
@@ -71,48 +70,6 @@ def format_data(sender: str, receivers: List[str], action: str, action_type: str
         logger.warning(f"Format data error: {e}", exc_info=True)
 
     return text
-
-
-def receive_file_data(client: Client, message: Message, decrypt: bool = False) -> Any:
-    # Receive file's data from exchange channel
-    data = None
-    try:
-        if message.document:
-            file_id = message.document.file_id
-            path = get_downloaded_path(client, file_id)
-            if path:
-                if decrypt:
-                    # Decrypt the file, save to the tmp directory
-                    path_decrypted = get_new_path()
-                    crypt_file("decrypt", path, path_decrypted)
-                    path_final = path_decrypted
-                else:
-                    # Read the file directly
-                    path_decrypted = ""
-                    path_final = path
-
-                with open(path_final, "rb") as f:
-                    data = pickle.load(f)
-
-                thread(delete_file, (path,))
-                thread(delete_file, (path_decrypted,))
-    except Exception as e:
-        logger.warning(f"Receive file error: {e}", exc_info=True)
-
-    return data
-
-
-def receive_text_data(message: Message) -> dict:
-    # Receive text's data from exchange channel
-    data = {}
-    try:
-        text = get_text(message)
-        if text:
-            data = loads(text)
-    except Exception as e:
-        logger.warning(f"Receive data error: {e}")
-
-    return data
 
 
 def share_data(client: Client, receivers: List[str], action: str, action_type: str, data: Union[dict, int, str],

@@ -26,7 +26,7 @@ from xeger import Xeger
 
 from .. import glovar
 from .channel import share_regex_update
-from .etc import code, button_data, get_command_context, get_now, get_text, italic, random_str
+from .etc import code, button_data, get_command_context, get_int, get_now, get_text, italic, random_str
 from .etc import user_mention
 from .file import save, save_thread
 
@@ -55,7 +55,7 @@ def add_word(word_type: str, word: str) -> bool:
 def get_admin(message: Message) -> Optional[int]:
     # Get message's origin commander
     try:
-        aid = int(message.text.split("\n")[0].split("：")[1])
+        aid = get_int(message.text.split("\n")[0].split("：")[1])
 
         return aid
     except Exception as e:

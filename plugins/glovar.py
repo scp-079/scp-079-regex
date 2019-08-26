@@ -29,6 +29,12 @@ from typing import Dict, List, Union
 from .functions.etc import get_now, random_str
 
 # Enable logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.WARNING,
+    filename='log',
+    filemode='w'
+)
 logger = logging.getLogger(__name__)
 
 # Init
@@ -178,7 +184,8 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or regex_group_id == 0
         or key in {"", b"[DATA EXPUNGED]"}
         or password in {"", "[DATA EXPUNGED]"}):
-    raise SystemExit('No proper settings')
+    logger.critical("No proper settings")
+    raise SystemExit("No proper settings")
 
 # Load data from pickle
 

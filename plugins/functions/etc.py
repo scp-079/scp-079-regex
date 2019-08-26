@@ -241,6 +241,17 @@ def get_full_name(user: User) -> str:
     return text
 
 
+def get_int(text: str) -> int:
+    # Get a int from a string
+    result = None
+    try:
+        result = int(text)
+    except Exception as e:
+        logger.info(f"Get int error: {e}", exc_info=True)
+
+    return result
+
+
 def get_now() -> int:
     # Check time for now
     result = 0
@@ -349,6 +360,7 @@ def thread(target: Callable, args: tuple) -> bool:
         t = Thread(target=target, args=args)
         t.daemon = True
         t.start()
+
         return True
     except Exception as e:
         logger.warning(f"Thread error: {e}", exc_info=True)
@@ -371,6 +383,7 @@ def wait_flood(e: FloodWait) -> bool:
     # Wait flood secs
     try:
         sleep(e.x + uniform(0.5, 1.0))
+
         return True
     except Exception as e:
         logger.warning(f"Wait flood error: {e}", exc_info=True)

@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 
 @Client.on_callback_query(regex_group)
 def answer(client: Client, callback_query: CallbackQuery):
+    # Answer the callback query
     try:
         cid = callback_query.message.chat.id
         uid = callback_query.from_user.id

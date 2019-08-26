@@ -21,10 +21,9 @@ import logging
 from pyrogram import Client, Filters, Message
 
 from .. import glovar
-from ..functions.channel import receive_file_data, receive_text_data
 from ..functions.filters import exchange_channel, hide_channel, test_group
+from ..functions.receive import receive_count, receive_text_data
 from ..functions.tests import name_test, sticker_test, text_test
-from ..functions.words import words_count
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -33,6 +32,7 @@ logger = logging.getLogger(__name__)
 @Client.on_message(Filters.incoming & Filters.channel & hide_channel
                    & ~Filters.command(glovar.all_commands, glovar.prefix), group=-1)
 def exchange_emergency(_: Client, message: Message):
+    # Sent emergency channel transfer request
     try:
         # Read basic information
         data = receive_text_data(message)
@@ -56,6 +56,7 @@ def exchange_emergency(_: Client, message: Message):
 @Client.on_message(Filters.channel & exchange_channel
                    & ~Filters.command(glovar.all_commands, glovar.prefix))
 def process_data(client: Client, message: Message):
+    # Process the data in exchange channel
     try:
         data = receive_text_data(message)
         if data:
@@ -72,10 +73,9 @@ def process_data(client: Client, message: Message):
                 if sender in {"CLEAN", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"}:
 
                     if action == "update":
+
                         if action_type == "count":
-                            word_type = data.replace("_words")
-                            data = receive_file_data(client, message, True)
-                            words_count(word_type, data)
+                            receive_count(client, message, data)
     except Exception as e:
         logger.warning(f"Process data error: {e}", exc_info=True)
 
@@ -83,6 +83,7 @@ def process_data(client: Client, message: Message):
 @Client.on_message(Filters.incoming & Filters.group & test_group & ~Filters.service
                    & ~Filters.command(glovar.all_commands, glovar.prefix))
 def test(client: Client, message: Message):
+    # Show test results in TEST group
     try:
         name_test(client, message)
         sticker_test(client, message)
