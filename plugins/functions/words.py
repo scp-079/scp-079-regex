@@ -134,8 +134,13 @@ def similar(mode: str, a: str, b: str) -> bool:
                 or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
             return False
     else:
+        b = b.replace("\n", " ")
+        b = re.sub(r"\s\s", " ", b)
+        b = re.sub(r"\s\s", " ", b)
         if not re.search(a, b, re.I | re.M | re.S):
-            return False
+            b = re.sub(r"\s", "", b)
+            if not re.search(a, b, re.I | re.M | re.S):
+                return False
 
     return True
 
