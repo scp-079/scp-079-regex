@@ -112,6 +112,10 @@ regex_group = Filters.create(
 def is_regex_text(word_type: str, text: str) -> bool:
     # Check if the text hit the regex rules
     try:
+        if text:
+            text = re.sub(r"\s\s", " ", text)
+            text = re.sub(r"\s\s", " ", text)
+
         for word in list(eval(f"glovar.{word_type}_words")):
             if re.search(word, text, re.I | re.S | re.M):
                 return True
