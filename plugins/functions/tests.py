@@ -23,7 +23,7 @@ from copy import deepcopy
 from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import code, get_forward_name, get_text, t2s, thread, user_mention
+from .etc import code, get_forward_name, get_int, get_text, t2s, thread, user_mention
 from .filters import is_regex_text
 from .telegram import send_message
 from .words import similar
@@ -101,11 +101,7 @@ def text_test(client: Client, message: Message) -> bool:
         if text and not re.search(except_pattern, text, re.I | re.M | re.S):
             cid = message.chat.id
             if re.search("^管理员：[0-9]", text):
-                logger.warning(text)
-                logger.warning(text.split("\n"))
-                logger.warning(text.split("\n\n"))
-                logger.warning(text.split("\n\n")[0].split("："))
-                aid = int(text.split("\n\n")[0].split("：")[1])
+                aid = get_int(text.split("\n\n")[0].split("：")[1])
             else:
                 aid = message.from_user.id
 
