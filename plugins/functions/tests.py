@@ -101,6 +101,10 @@ def text_test(client: Client, message: Message) -> bool:
         if text and not re.search(except_pattern, text, re.I | re.M | re.S):
             cid = message.chat.id
             if re.search("^管理员：[0-9]", text):
+                logger.warning(text)
+                logger.warning(text.split("\n"))
+                logger.warning(text.split("\n\n"))
+                logger.warning(text.split("\n\n")[0].split("："))
                 aid = int(text.split("\n\n")[0].split("：")[1])
             else:
                 aid = message.from_user.id
