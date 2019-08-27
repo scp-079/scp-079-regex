@@ -34,20 +34,24 @@ logger = logging.getLogger(__name__)
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.add_commands, glovar.prefix))
-def add_word(client: Client, message: Message):
+def add_word(client: Client, message: Message) -> bool:
     # Add a new word
     try:
         cid = message.chat.id
         mid = message.message_id
         text, markup = word_add(client, message)
         thread(send_message, (client, cid, text, mid, markup))
+
+        return True
     except Exception as e:
         logger.warning(f"Add word error: {e}", exc_info=True)
+
+    return False
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(["ask"], glovar.prefix))
-def ask_word(client: Client, message: Message):
+def ask_word(client: Client, message: Message) -> bool:
     # Deal with a duplicated word
     try:
         cid = message.chat.id
@@ -84,26 +88,34 @@ def ask_word(client: Client, message: Message):
                      f"原因：{code('格式有误')}\n")
 
         thread(send_message, (client, cid, text, mid))
+
+        return True
     except Exception as e:
         logger.warning(f"Ask word error: {e}", exc_info=True)
+
+    return False
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.list_commands, glovar.prefix))
-def list_words(client: Client, message: Message):
+def list_words(client: Client, message: Message) -> bool:
     # List words
     try:
         cid = message.chat.id
         mid = message.message_id
         text, markup = words_list(message)
         thread(send_message, (client, cid, text, mid, markup))
+
+        return True
     except Exception as e:
         logger.warning(f"List words error: {e}", exc_info=True)
+
+    return False
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(["page"], glovar.prefix))
-def page_word(client: Client, message: Message):
+def page_word(client: Client, message: Message) -> bool:
     # Change words page
     try:
         cid = message.chat.id
@@ -157,26 +169,34 @@ def page_word(client: Client, message: Message):
                      f"原因：{code('格式有误')}\n")
 
         thread(send_message, (client, cid, text, mid))
+
+        return True
     except Exception as e:
         logger.warning(f"Page word error: {e}", exc_info=True)
+
+    return False
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.remove_commands, glovar.prefix))
-def remove_word(client: Client, message: Message):
+def remove_word(client: Client, message: Message) -> bool:
     # Remove a word
     try:
         cid = message.chat.id
         mid = message.message_id
         text = word_remove(client, message)
         thread(send_message, (client, cid, text, mid))
+
+        return True
     except Exception as e:
         logger.warning(f"Remove word error: {e}", exc_info=True)
+
+    return False
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.same_commands, glovar.prefix))
-def same_words(client: Client, message: Message):
+def same_words(client: Client, message: Message) -> bool:
     # Same with other types
     try:
         cid = message.chat.id
@@ -208,7 +228,7 @@ def same_words(client: Client, message: Message):
                                 text = word_remove(client, old_message)
                                 thread(send_message, (client, cid, text, mid))
 
-                        return
+                        return True
                     # If origin old message just simply "/rm", bot should check which message it replied to
                     elif (old_command_type in glovar.remove_commands
                           and len(old_command_list) == 1):
@@ -229,7 +249,7 @@ def same_words(client: Client, message: Message):
                                         text = word_remove(client, old_message)
                                         thread(send_message, (client, cid, text, mid))
 
-                                    return
+                                    return True
                                 else:
                                     text += (f"状态：{code('未执行')}\n"
                                              f"原因：{code('二级来源有误')}\n")
@@ -253,26 +273,34 @@ def same_words(client: Client, message: Message):
                      f"原因：{code('格式有误')}\n")
 
         thread(send_message, (client, cid, text, mid))
+
+        return True
     except Exception as e:
         logger.warning(f"Same words error: {e}", exc_info=True)
+
+    return False
 
 
 @Client.on_message(Filters.incoming & Filters.group & regex_group
                    & Filters.command(glovar.search_commands, glovar.prefix))
-def search_words(client: Client, message: Message):
+def search_words(client: Client, message: Message) -> bool:
     # Search words
     try:
         cid = message.chat.id
         mid = message.message_id
         text, markup = words_search(message)
         thread(send_message, (client, cid, text, mid, markup))
+
+        return True
     except Exception as e:
         logger.warning(f"Search words error: {e}", exc_info=True)
+
+    return False
 
 
 @Client.on_message(Filters.incoming & Filters.group & test_group
                    & Filters.command(["version"], glovar.prefix))
-def version(client: Client, message: Message):
+def version(client: Client, message: Message) -> bool:
     # Check the program's version
     try:
         cid = message.chat.id
@@ -281,5 +309,9 @@ def version(client: Client, message: Message):
         text = (f"管理员：{user_mention(aid)}\n\n"
                 f"版本：{bold(glovar.version)}\n")
         thread(send_message, (client, cid, text, mid))
+
+        return True
     except Exception as e:
         logger.warning(f"Version error: {e}", exc_info=True)
+
+    return False

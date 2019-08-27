@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 @Client.on_callback_query(regex_group)
-def answer(client: Client, callback_query: CallbackQuery):
+def answer(client: Client, callback_query: CallbackQuery) -> bool:
     # Answer the callback query
     try:
         cid = callback_query.message.chat.id
@@ -62,5 +62,9 @@ def answer(client: Client, callback_query: CallbackQuery):
                 thread(edit_message_text, (client, cid, mid, text, markup))
 
             thread(answer_callback, (client, callback_query.id, ""))
+
+        return True
     except Exception as e:
         logger.warning(f"Answer callback error: {e}", exc_info=True)
+
+    return False
