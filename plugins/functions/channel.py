@@ -54,7 +54,8 @@ def exchange_to_hide(client: Client) -> bool:
     return False
 
 
-def format_data(sender: str, receivers: List[str], action: str, action_type: str, data=None) -> str:
+def format_data(sender: str, receivers: List[str], action: str, action_type: str,
+                data: Union[bool, dict, int, str] = None) -> str:
     # See https://scp-079.org/exchange/
     text = ""
     try:
@@ -72,7 +73,7 @@ def format_data(sender: str, receivers: List[str], action: str, action_type: str
     return text
 
 
-def share_data(client: Client, receivers: List[str], action: str, action_type: str, data: Union[dict, int, str],
+def share_data(client: Client, receivers: List[str], action: str, action_type: str, data: Union[bool, dict, int, str],
                file: str = None, encrypt: bool = True) -> bool:
     # Use this function to share data in the exchange channel
     try:
