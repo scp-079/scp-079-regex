@@ -200,27 +200,9 @@ for path in ["data", "tmp"]:
         mkdir(path)
 
 # Init words variables
-ad_words: Dict[str, Dict[str, Union[float, int]]] = {}
-aff_words: Dict[str, Dict[str, Union[float, int]]] = {}
-ava_words: Dict[str, Dict[str, Union[float, int]]] = {}
-bad_words: Dict[str, Dict[str, Union[float, int]]] = {}
-ban_words: Dict[str, Dict[str, Union[float, int]]] = {}
-bio_words: Dict[str, Dict[str, Union[float, int]]] = {}
-con_words: Dict[str, Dict[str, Union[float, int]]] = {}
-del_words: Dict[str, Dict[str, Union[float, int]]] = {}
-eme_words: Dict[str, Dict[str, Union[float, int]]] = {}
-iml_words: Dict[str, Dict[str, Union[float, int]]] = {}
-nm_words: Dict[str, Dict[str, Union[float, int]]] = {}
-rm_words: Dict[str, Dict[str, Union[float, int]]] = {}
-sho_words: Dict[str, Dict[str, Union[float, int]]] = {}
-spc_words: Dict[str, Dict[str, Union[float, int]]] = {}
-spe_words: Dict[str, Dict[str, Union[float, int]]] = {}
-sti_words: Dict[str, Dict[str, Union[float, int]]] = {}
-tgl_words: Dict[str, Dict[str, Union[float, int]]] = {}
-tgp_words: Dict[str, Dict[str, Union[float, int]]] = {}
-wb_words: Dict[str, Dict[str, Union[float, int]]] = {}
-wd_words: Dict[str, Dict[str, Union[float, int]]] = {}
-test_words: Dict[str, Dict[str, Union[float, int]]] = {}
+for word_type in names:
+    locals()[f"{word_type}_words"]: Dict[str, Dict[str, Union[float, int]]] = {}
+
 # type_words = {
 #     "regex": {
 #         "time": 12345678,
@@ -243,7 +225,7 @@ for word_type in names:
 # TEMP END
 
 # Load data
-file_list = [f"{f}_words" for f in names] + ["compiled"]    # TEMP
+file_list = [f"{word_type}_words" for word_type in names] + ["compiled"]    # TEMP
 for file in file_list:
     try:
         try:
