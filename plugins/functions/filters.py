@@ -116,6 +116,8 @@ def is_regex_text(word_type: str, text: str) -> bool:
             text = text.replace("\n", " ")
             text = re.sub(r"\s\s", " ", text)
             text = re.sub(r"\s\s", " ", text)
+        else:
+            return False
 
         for word in list(eval(f"glovar.{word_type}_words")):
             if re.search(word, text, re.I | re.S | re.M):
