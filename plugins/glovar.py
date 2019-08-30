@@ -93,7 +93,7 @@ receivers: Dict[str, List[str]] = {
     "con": ["NOSPAM", "WATCH"],
     "del": ["NOSPAM"],
     "eme": ["NOSPAM"],
-    "iml": ["CLEAN", "WATCH"],
+    "iml": ["CLEAN", "NOSPAM", "WATCH"],
     "nm": ["NOSPAM", "WATCH"],
     "rm": ["TIP"],
     "sho": ["CLEAN", "NOSPAM", "WATCH"],
