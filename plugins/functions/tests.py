@@ -106,17 +106,21 @@ def text_test(client: Client, message: Message) -> bool:
                 aid = message.from_user.id
 
             mid = message.message_id
-            result = ""
+            result_list = [""]
             for word_type in glovar.names:
+                if len(result_list[-1]) > 3000:
+                    result_list.append("")
+
                 if is_regex_text(word_type, text):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if similar("test", w, text)]
-                    result += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
+                    result_list[-1] += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
                     for w in w_list:
-                        result += "\t" * 4 + f"{code(w)}\n\n"
+                        result_list[-1] += "\t" * 4 + f"{code(w)}\n\n"
 
-            if result:
-                result = f"管理员：{user_mention(aid)}\n\n" + result
-                thread(send_message, (client, cid, result, mid))
+            for result in result_list:
+                if result:
+                    result = f"管理员：{user_mention(aid)}\n\n" + result
+                    send_message(client, cid, result, mid)
 
             return True
     except Exception as e:
