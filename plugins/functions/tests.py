@@ -108,7 +108,7 @@ def text_test(client: Client, message: Message) -> bool:
             mid = message.message_id
             result_list = [""]
             for word_type in glovar.names:
-                if len(result_list[-1]) > 3000:
+                if len(result_list[-1]) > 2000:
                     result_list.append("")
 
                 if is_regex_text(word_type, text):
