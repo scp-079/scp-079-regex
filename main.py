@@ -43,5 +43,5 @@ scheduler.add_job(update_status, "cron", [app], minute=30)
 scheduler.add_job(backup_files, "cron", [app], hour=20)
 scheduler.start()
 
-# Hold
-app.idle()
+# Run
+app.run()
