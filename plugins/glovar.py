@@ -50,9 +50,9 @@ ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
 
 default_word_status: Dict[str, Union[float, int]] = {
     "time": get_now(),
-    "total": 0,
     "average": 0.0,
-    "today": 0
+    "today": 0,
+    "total": 0
 }
 
 lock: Dict[str, Lock] = {
@@ -205,10 +205,10 @@ for word_type in names:
 
 # type_words = {
 #     "regex": {
-#         "time": 12345678,
-#         "total": 20,
+#         "time": 15112345678,
 #         "average": 1.1,
-#         "today": 3
+#         "today": 3,
+#         "total": 20
 #     }
 # }
 
