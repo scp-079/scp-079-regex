@@ -91,7 +91,7 @@ receivers: Dict[str, List[str]] = {
     "ban": ["CLEAN", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "bio": ["NOSPAM"],
     "con": ["CLEAN", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "del": ["NOSPAM"],
+    "del": ["NOSPAM", "WATCH"],
     "eme": ["NOSPAM"],
     "iml": ["CLEAN", "NOSPAM", "WATCH"],
     "nm": ["NOSPAM", "WATCH"],
