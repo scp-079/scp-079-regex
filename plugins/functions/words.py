@@ -56,7 +56,7 @@ def format_word(word: str) -> str:
     # Format a word
     result = word
     try:
-        if word and re.search(r"((?<!\\)|(?<=\\\\))\(\?#\s*", word):
+        if word:
             result = re.sub(r"((?<!\\)|(?<=\\\\))\(\?#\s*", "(?# ", word)
     except Exception as e:
         logger.warning(f"Format word error: {e}", exc_info=True)
