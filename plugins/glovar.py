@@ -84,13 +84,13 @@ names: Dict[str, str] = {
 }
 
 receivers: Dict[str, List[str]] = {
-    "ad": ["NOSPAM", "WATCH"],
+    "ad": ["CLEAN", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "aff": ["CLEAN", "WATCH"],
     "ava": ["NOSPAM"],
     "bad": ["NOSPAM"],
-    "ban": ["NOSPAM", "WATCH"],
+    "ban": ["CLEAN", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "bio": ["NOSPAM"],
-    "con": ["NOSPAM", "WATCH"],
+    "con": ["CLEAN", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "del": ["NOSPAM"],
     "eme": ["NOSPAM"],
     "iml": ["CLEAN", "NOSPAM", "WATCH"],

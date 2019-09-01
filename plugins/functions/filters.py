@@ -109,27 +109,26 @@ regex_group = Filters.create(
 )
 
 
-def is_regex_text(word_type: str, text: str) -> bool:
+def is_regex_text(word_type: str, text: str, again: bool = False) -> bool:
     # Check if the text hit the regex rules
     result = False
     try:
         if text:
-            text = text.replace("\n", " ")
-            text = re.sub(r"\s\s", " ", text)
-            text = re.sub(r"\s\s", " ", text)
+            if not again:
+                text = re.sub(r"\s{2,}", " ", text)
+            elif " " in text:
+                text = re.sub(r"\s", "", text)
+            else:
+                return False
         else:
             return False
 
         for word in list(eval(f"glovar.{word_type}_words")):
             if re.search(word, text, re.I | re.S | re.M):
-                result = True
-            else:
-                text = re.sub(r"\s", "", text)
-                if re.search(word, text, re.I | re.S | re.M):
-                    result = True
+                return True
 
-            if result:
-                return result
+        # Try again
+        return is_regex_text(word_type, text, True)
     except Exception as e:
         logger.warning(f"Is regex text error: {e}", exc_info=True)
 
