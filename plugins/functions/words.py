@@ -52,6 +52,18 @@ def add_word(word_type: str, word: str) -> bool:
     return False
 
 
+def format_word(word: str) -> str:
+    # Format a word
+    result = word
+    try:
+        if word and re.search(r"((?<!\\)|(?<=\\\\))\(\?#\s*", word):
+            result = re.sub(r"((?<!\\)|(?<=\\\\))\(\?#\s*", "(?# ", word)
+    except Exception as e:
+        logger.warning(f"Format word error: {e}", exc_info=True)
+
+    return result
+
+
 def get_admin(message: Message) -> Optional[int]:
     # Get message's origin commander
     try:
@@ -154,9 +166,7 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
     if word_type:
         if word and word_type in glovar.names:
             # Check if the word already exits
-            if "(?#" in word and "(?# " not in word:
-                word = word.replace("(?#", "(?# ")
-
+            word = format_word(word)
             if eval(f"glovar.{word_type}_words").get(word, {}):
                 text += (f"状态：{code('未添加')}\n"
                          f"类别：{code(glovar.names[word_type])}\n"
@@ -466,9 +476,7 @@ def word_remove_try(client: Client, message: Message) -> Optional[str]:
     word_type, word = get_command_context(message)
     if word_type:
         if word and word_type in glovar.names:
-            if "(?#" in word and "(?# " not in word:
-                word = word.replace("(?#", "(?# ")
-
+            word = format_word(word)
             if eval(f"glovar.{word_type}_words").get(word, {}):
                 remove_word(word_type, [word])
                 text += (f"状态：{code(f'已移除')}\n"
