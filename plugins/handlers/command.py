@@ -204,6 +204,8 @@ def push_words(client: Client, message: Message) -> bool:
                      f"状态：{code('未推送')}\n"
                      f"原因：{code('格式有误')}\n")
 
+        thread(send_message, (client, cid, text, mid))
+
         return True
     except Exception as e:
         logger.warning(f"Push words error: {e}", exc_info=True)
