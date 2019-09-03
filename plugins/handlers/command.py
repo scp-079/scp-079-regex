@@ -117,6 +117,7 @@ def count_words(client: Client, message: Message) -> bool:
                 receivers += glovar.receivers[word_type]
 
             receivers = list(set(receivers))
+            receivers.sort()
             share_data(
                 client=client,
                 receivers=receivers,
