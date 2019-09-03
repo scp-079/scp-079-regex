@@ -55,8 +55,8 @@ default_word_status: Dict[str, Union[float, int]] = {
     "total": 0
 }
 
-lock: Dict[str, Lock] = {
-    "count": Lock()
+locks: Dict[str, Lock] = {
+    "regex": Lock()
 }
 
 names: Dict[str, str] = {

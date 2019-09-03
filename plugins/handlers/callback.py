@@ -21,6 +21,7 @@ from json import loads
 
 from pyrogram import Client, CallbackQuery
 
+from .. import glovar
 from ..functions.etc import thread, user_mention
 from ..functions.filters import regex_group
 from .. functions.words import get_admin, get_desc, words_ask, words_list_page, words_search_page
@@ -46,9 +47,13 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
             action_type = callback_data["t"]
             data = callback_data["d"]
             if action == "ask":
-                text = (f"管理：{user_mention(aid)}\n"
-                        f"{words_ask(client, action_type, data)}")
-                thread(edit_message_text, (client, cid, mid, text))
+                if glovar.locks["regex"].acquire():
+                    try:
+                        text = (f"管理：{user_mention(aid)}\n"
+                                f"{words_ask(client, action_type, data)}")
+                        thread(edit_message_text, (client, cid, mid, text))
+                    finally:
+                        glovar.locks["regex"].release()
             elif action == "list":
                 word_type = action_type
                 page = data

@@ -23,6 +23,7 @@ from pyrogram import Client
 
 from .. import glovar
 from .channel import share_data
+from .file import save
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -48,6 +49,24 @@ def backup_files(client: Client) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Backup error: {e}", exc_info=True)
+
+    return False
+
+
+def reset_count() -> bool:
+    # Reset the daily usage
+    if glovar.locks["regex"].acquire():
+        try:
+            for word_type in glovar.names:
+                for word in list(eval(f"glovar.{word_type}_words")):
+                    eval(f"glovar.{word_type}_words")[word]["today"] = 0
+                    save(f"{word_type}_words")
+
+            return True
+        except Exception as e:
+            logger.warning(f"Reset count error: {e}", exc_info=True)
+        finally:
+            glovar.locks["regex"].release()
 
     return False
 

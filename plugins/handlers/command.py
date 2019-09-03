@@ -37,15 +37,18 @@ logger = logging.getLogger(__name__)
                    & Filters.command(glovar.add_commands, glovar.prefix))
 def add_word(client: Client, message: Message) -> bool:
     # Add a new word
-    try:
-        cid = message.chat.id
-        mid = message.message_id
-        text, markup = word_add(client, message)
-        thread(send_message, (client, cid, text, mid, markup))
+    if glovar.locks["regex"].acquire():
+        try:
+            cid = message.chat.id
+            mid = message.message_id
+            text, markup = word_add(client, message)
+            thread(send_message, (client, cid, text, mid, markup))
 
-        return True
-    except Exception as e:
-        logger.warning(f"Add word error: {e}", exc_info=True)
+            return True
+        except Exception as e:
+            logger.warning(f"Add word error: {e}", exc_info=True)
+        finally:
+            glovar.locks["regex"].release()
 
     return False
 
@@ -54,45 +57,48 @@ def add_word(client: Client, message: Message) -> bool:
                    & Filters.command(["ask"], glovar.prefix))
 def ask_word(client: Client, message: Message) -> bool:
     # Deal with a duplicated word
-    try:
-        cid = message.chat.id
-        mid = message.message_id
-        uid = message.from_user.id
-        text = f"管理：{user_mention(uid)}\n"
-        command_list = list(filter(None, message.command))
-        if len(command_list) == 2 and command_list[1] in {"new", "replace", "cancel"}:
-            command_type = command_list[1]
-            if message.reply_to_message:
-                r_message = message.reply_to_message
-                aid = get_admin(r_message)
-                if uid == aid:
-                    callback_data_list = get_callback_data(r_message)
-                    if r_message.from_user.is_self and callback_data_list and callback_data_list[0]["a"] == "ask":
-                        r_mid = r_message.message_id
-                        ask_key = callback_data_list[0]["d"]
-                        ask_text = (f"管理：{user_mention(aid)}\n"
-                                    f"{words_ask(client, command_type, ask_key)}")
-                        thread(edit_message_text, (client, cid, r_mid, ask_text))
-                        text += (f"状态：{code('已操作')}\n"
-                                 f"查看：{general_link(r_mid, message_link(r_message))}\n")
+    if glovar.locks["regex"].acquire():
+        try:
+            cid = message.chat.id
+            mid = message.message_id
+            uid = message.from_user.id
+            text = f"管理：{user_mention(uid)}\n"
+            command_list = list(filter(None, message.command))
+            if len(command_list) == 2 and command_list[1] in {"new", "replace", "cancel"}:
+                command_type = command_list[1]
+                if message.reply_to_message:
+                    r_message = message.reply_to_message
+                    aid = get_admin(r_message)
+                    if uid == aid:
+                        callback_data_list = get_callback_data(r_message)
+                        if r_message.from_user.is_self and callback_data_list and callback_data_list[0]["a"] == "ask":
+                            r_mid = r_message.message_id
+                            ask_key = callback_data_list[0]["d"]
+                            ask_text = (f"管理：{user_mention(aid)}\n"
+                                        f"{words_ask(client, command_type, ask_key)}")
+                            thread(edit_message_text, (client, cid, r_mid, ask_text))
+                            text += (f"状态：{code('已操作')}\n"
+                                     f"查看：{general_link(r_mid, message_link(r_message))}\n")
+                        else:
+                            text += (f"状态：{code('未操作')}\n"
+                                     f"原因：{code('来源有误')}\n")
                     else:
                         text += (f"状态：{code('未操作')}\n"
-                                 f"原因：{code('来源有误')}\n")
+                                 f"原因：{code('权限有误')}\n")
                 else:
                     text += (f"状态：{code('未操作')}\n"
-                             f"原因：{code('权限有误')}\n")
+                             f"原因：{code('用法有误')}\n")
             else:
                 text += (f"状态：{code('未操作')}\n"
-                         f"原因：{code('用法有误')}\n")
-        else:
-            text += (f"状态：{code('未操作')}\n"
-                     f"原因：{code('格式有误')}\n")
+                         f"原因：{code('格式有误')}\n")
 
-        thread(send_message, (client, cid, text, mid))
+            thread(send_message, (client, cid, text, mid))
 
-        return True
-    except Exception as e:
-        logger.warning(f"Ask word error: {e}", exc_info=True)
+            return True
+        except Exception as e:
+            logger.warning(f"Ask word error: {e}", exc_info=True)
+        finally:
+            glovar.locks["regex"].release()
 
     return False
 
@@ -181,32 +187,35 @@ def page_word(client: Client, message: Message) -> bool:
                    & Filters.command(["push"], glovar.prefix))
 def push_words(client: Client, message: Message) -> bool:
     # Push words
-    try:
-        cid = message.chat.id
-        mid = message.message_id
-        uid = message.from_user.id
-        text = f"管理：{user_mention(uid)}\n"
-        command_type = get_command_type(message)
-        if command_type and command_type in glovar.names:
-            share_regex_update(client, command_type)
-            text += (f"类别：{code(glovar.names[command_type])}\n"
-                     f"状态：{code('已推送')}\n")
-        elif command_type == "all":
-            for word_type in glovar.names:
-                thread(share_regex_update, (client, word_type))
+    if glovar.locks["regex"].acquire():
+        try:
+            cid = message.chat.id
+            mid = message.message_id
+            uid = message.from_user.id
+            text = f"管理：{user_mention(uid)}\n"
+            command_type = get_command_type(message)
+            if command_type and command_type in glovar.names:
+                share_regex_update(client, command_type)
+                text += (f"类别：{code(glovar.names[command_type])}\n"
+                         f"状态：{code('已推送')}\n")
+            elif command_type == "all":
+                for word_type in glovar.names:
+                    thread(share_regex_update, (client, word_type))
 
-            text += (f"类别：{code('全部')}\n"
-                     f"状态：{code('已推送')}\n")
-        else:
-            text += (f"类别：{code(command_type or '未知')}\n"
-                     f"状态：{code('未推送')}\n"
-                     f"原因：{code('格式有误')}\n")
+                text += (f"类别：{code('全部')}\n"
+                         f"状态：{code('已推送')}\n")
+            else:
+                text += (f"类别：{code(command_type or '未知')}\n"
+                         f"状态：{code('未推送')}\n"
+                         f"原因：{code('格式有误')}\n")
 
-        thread(send_message, (client, cid, text, mid))
+            thread(send_message, (client, cid, text, mid))
 
-        return True
-    except Exception as e:
-        logger.warning(f"Push words error: {e}", exc_info=True)
+            return True
+        except Exception as e:
+            logger.warning(f"Push words error: {e}", exc_info=True)
+        finally:
+            glovar.locks["regex"].release()
 
     return False
 
@@ -215,15 +224,18 @@ def push_words(client: Client, message: Message) -> bool:
                    & Filters.command(glovar.remove_commands, glovar.prefix))
 def remove_word(client: Client, message: Message) -> bool:
     # Remove a word
-    try:
-        cid = message.chat.id
-        mid = message.message_id
-        text = word_remove(client, message)
-        thread(send_message, (client, cid, text, mid))
+    if glovar.locks["regex"].acquire():
+        try:
+            cid = message.chat.id
+            mid = message.message_id
+            text = word_remove(client, message)
+            thread(send_message, (client, cid, text, mid))
 
-        return True
-    except Exception as e:
-        logger.warning(f"Remove word error: {e}", exc_info=True)
+            return True
+        except Exception as e:
+            logger.warning(f"Remove word error: {e}", exc_info=True)
+        finally:
+            glovar.locks["regex"].release()
 
     return False
 
@@ -232,85 +244,88 @@ def remove_word(client: Client, message: Message) -> bool:
                    & Filters.command(glovar.same_commands, glovar.prefix))
 def same_words(client: Client, message: Message) -> bool:
     # Same with other types
-    try:
-        cid = message.chat.id
-        mid = message.message_id
-        uid = message.from_user.id
-        text = f"管理：{user_mention(uid)}\n"
-        # Get this new command's list
-        new_command_list = list(filter(None, message.command))
-        new_word_type_list = new_command_list[1:]
-        # Check new command's format
-        if len(new_command_list) > 1 and all([new_word_type in glovar.names for new_word_type in new_word_type_list]):
-            if message.reply_to_message:
-                old_message = message.reply_to_message
-                aid = old_message.from_user.id
-                # Check permission
-                if uid == aid:
-                    old_command_list = list(filter(None, get_text(old_message).split(" ")))
-                    old_command_type = old_command_list[0][1:]
-                    # Check old command's format
-                    if (len(old_command_list) > 2
-                            and old_command_type in glovar.add_commands + glovar.remove_commands):
-                        _, old_word = get_command_context(old_message)
-                        for new_word_type in new_word_type_list:
-                            old_message.text = f"{old_command_type} {new_word_type} {old_word}"
-                            if old_command_type in glovar.add_commands:
-                                text, markup = word_add(client, old_message)
-                                thread(send_message, (client, cid, text, mid, markup))
-                            else:
-                                text = word_remove(client, old_message)
-                                thread(send_message, (client, cid, text, mid))
+    if glovar.locks["regex"].acquire():
+        try:
+            cid = message.chat.id
+            mid = message.message_id
+            uid = message.from_user.id
+            text = f"管理：{user_mention(uid)}\n"
+            # Get this new command's list
+            _, command_context = get_command_context(message)
+            new_word_type_list = command_context.split()
+            # Check new command's format
+            if new_word_type_list and all([new_word_type in glovar.names for new_word_type in new_word_type_list]):
+                if message.reply_to_message:
+                    old_message = message.reply_to_message
+                    aid = old_message.from_user.id
+                    # Check permission
+                    if uid == aid:
+                        old_command_list = list(filter(None, get_text(old_message).split(" ")))
+                        old_command_type = old_command_list[0][1:]
+                        # Check old command's format
+                        if (len(old_command_list) > 2
+                                and old_command_type in glovar.add_commands + glovar.remove_commands):
+                            _, old_word = get_command_context(old_message)
+                            for new_word_type in new_word_type_list:
+                                old_message.text = f"{old_command_type} {new_word_type} {old_word}"
+                                if old_command_type in glovar.add_commands:
+                                    text, markup = word_add(client, old_message)
+                                    thread(send_message, (client, cid, text, mid, markup))
+                                else:
+                                    text = word_remove(client, old_message)
+                                    thread(send_message, (client, cid, text, mid))
 
-                        return True
-                    # If origin old message just simply "/rm", bot should check which message it replied to
-                    elif (old_command_type in glovar.remove_commands
-                          and len(old_command_list) == 1):
-                        # Get the message replied by old message
-                        old_message = get_messages(client, cid, [old_message.message_id])[0]
-                        if old_message.reply_to_message:
-                            old_message = old_message.reply_to_message
-                            aid = old_message.from_user.id
-                            # Check permission
-                            if uid == aid:
-                                old_command_list = list(filter(None, get_text(old_message).split(" ")))
-                                old_command_type = old_command_list[0][1:]
-                                if (len(old_command_list) > 2
-                                        and old_command_type in glovar.add_commands):
-                                    _, old_word = get_command_context(old_message)
-                                    for new_word_type in new_word_type_list:
-                                        old_message.text = f"{old_command_type} {new_word_type} {old_word}"
-                                        text = word_remove(client, old_message)
-                                        thread(send_message, (client, cid, text, mid))
+                            return True
+                        # If origin old message just simply "/rm", bot should check which message it replied to
+                        elif (old_command_type in glovar.remove_commands
+                              and len(old_command_list) == 1):
+                            # Get the message replied by old message
+                            old_message = get_messages(client, cid, [old_message.message_id])[0]
+                            if old_message.reply_to_message:
+                                old_message = old_message.reply_to_message
+                                aid = old_message.from_user.id
+                                # Check permission
+                                if uid == aid:
+                                    old_command_list = list(filter(None, get_text(old_message).split(" ")))
+                                    old_command_type = old_command_list[0][1:]
+                                    if (len(old_command_list) > 2
+                                            and old_command_type in glovar.add_commands):
+                                        _, old_word = get_command_context(old_message)
+                                        for new_word_type in new_word_type_list:
+                                            old_message.text = f"{old_command_type} {new_word_type} {old_word}"
+                                            text = word_remove(client, old_message)
+                                            thread(send_message, (client, cid, text, mid))
 
-                                    return True
+                                        return True
+                                    else:
+                                        text += (f"状态：{code('未执行')}\n"
+                                                 f"原因：{code('二级来源有误')}\n")
                                 else:
                                     text += (f"状态：{code('未执行')}\n"
-                                             f"原因：{code('二级来源有误')}\n")
+                                             f"原因：{code('权限错误')}\n")
                             else:
                                 text += (f"状态：{code('未执行')}\n"
-                                         f"原因：{code('权限错误')}\n")
+                                         f"原因：{code('来源有误')}\n")
                         else:
                             text += (f"状态：{code('未执行')}\n"
                                      f"原因：{code('来源有误')}\n")
                     else:
                         text += (f"状态：{code('未执行')}\n"
-                                 f"原因：{code('来源有误')}\n")
+                                 f"原因：{code('权限错误')}\n")
                 else:
                     text += (f"状态：{code('未执行')}\n"
-                             f"原因：{code('权限错误')}\n")
+                             f"原因：{code('操作有误')}\n")
             else:
                 text += (f"状态：{code('未执行')}\n"
-                         f"原因：{code('操作有误')}\n")
-        else:
-            text += (f"状态：{code('未执行')}\n"
-                     f"原因：{code('格式有误')}\n")
+                         f"原因：{code('格式有误')}\n")
 
-        thread(send_message, (client, cid, text, mid))
+            thread(send_message, (client, cid, text, mid))
 
-        return True
-    except Exception as e:
-        logger.warning(f"Same words error: {e}", exc_info=True)
+            return True
+        except Exception as e:
+            logger.warning(f"Same words error: {e}", exc_info=True)
+        finally:
+            glovar.locks["regex"].release()
 
     return False
 

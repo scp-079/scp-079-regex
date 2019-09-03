@@ -301,14 +301,14 @@ def words_ask(client: Client, operation: str, key: str) -> str:
 
 def words_count(word_type: str, data: Any) -> bool:
     # Calculate the rules' usage
-    if glovar.lock["count"].acquire():
+    if glovar.locks["regex"].acquire():
         try:
             if data:
                 data_set = set(data)
                 word_set = set(eval(f"glovar.{word_type}_words"))
                 the_set = data_set & word_set
                 for word in the_set:
-                    eval(f"glovar.{word_type}_words")[word]["today"] = data[word]
+                    eval(f"glovar.{word_type}_words")[word]["today"] += data[word]
                     eval(f"glovar.{word_type}_words")[word]["total"] += data[word]
                     total = eval(f"glovar.{word_type}_words")[word]["total"]
                     time = get_now() - eval(f"glovar.{word_type}_words")[word]["time"]
@@ -320,7 +320,7 @@ def words_count(word_type: str, data: Any) -> bool:
         except Exception as e:
             logger.warning(f"Words count error: {e}", exc_info=True)
         finally:
-            glovar.lock["count"].release()
+            glovar.locks["regex"].release()
 
     return False
 
