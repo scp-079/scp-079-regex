@@ -184,7 +184,7 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or hide_channel_id == 0
         or test_group_id == 0
         or regex_group_id == 0
-        or key in {"", b"[DATA EXPUNGED]"}
+        or key in {b"", b"[DATA EXPUNGED]"}
         or password in {"", "[DATA EXPUNGED]"}):
     logger.critical("No proper settings")
     raise SystemExit("No proper settings")
