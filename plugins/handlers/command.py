@@ -192,7 +192,8 @@ def push_words(client: Client, message: Message) -> bool:
             cid = message.chat.id
             mid = message.message_id
             uid = message.from_user.id
-            text = f"管理：{user_mention(uid)}\n"
+            text = (f"管理：{user_mention(uid)}\n"
+                    f"操作：{code('手动推送')}\n")
             command_type = get_command_type(message)
             if command_type and command_type in glovar.names:
                 share_regex_update(client, command_type)
