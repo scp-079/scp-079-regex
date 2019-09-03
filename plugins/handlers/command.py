@@ -190,15 +190,13 @@ def push_words(client: Client, message: Message) -> bool:
         if command_type and command_type in glovar.names:
             share_regex_update(client, command_type)
             text += (f"类别：{code(glovar.names[command_type])}\n"
-                     f"状态：{code('已推送')}\n"
-                     f"原因：{code('格式有误')}\n")
+                     f"状态：{code('已推送')}\n")
         elif command_type == "all":
             for word_type in glovar.names:
                 share_regex_update(client, word_type)
 
             text += (f"类别：{code('全部')}\n"
-                     f"状态：{code('已推送')}\n"
-                     f"原因：{code('格式有误')}\n")
+                     f"状态：{code('已推送')}\n")
         else:
             text += (f"类别：{code(command_type or '未知')}\n"
                      f"状态：{code('未推送')}\n"
