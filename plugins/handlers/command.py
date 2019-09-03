@@ -21,8 +21,9 @@ import logging
 from pyrogram import Client, Filters, Message
 
 from .. import glovar
-from ..functions.etc import bold, code, general_link, get_callback_data, get_command_context, get_text, message_link
-from ..functions.etc import thread, user_mention
+from ..functions.channel import share_regex_update
+from ..functions.etc import bold, code, general_link, get_callback_data, get_command_context, get_command_type, get_text
+from ..functions.etc import message_link, thread, user_mention
 from ..functions.filters import regex_group, test_group
 from ..functions.telegram import edit_message_text, get_messages, send_message
 from ..functions.words import get_admin, get_desc, word_add, words_ask, words_list, words_list_page, word_remove
@@ -122,9 +123,8 @@ def page_word(client: Client, message: Message) -> bool:
         mid = message.message_id
         uid = message.from_user.id
         text = f"管理：{user_mention(uid)}\n"
-        command_list = list(filter(None, message.command))
-        if len(command_list) == 2 and command_list[1] in {"previous", "next"}:
-            command_type = command_list[1]
+        command_type = get_command_type(message)
+        if command_type and command_type in {"previous", "next"}:
             if message.reply_to_message:
                 r_message = message.reply_to_message
                 aid = get_admin(r_message)
@@ -173,6 +173,40 @@ def page_word(client: Client, message: Message) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Page word error: {e}", exc_info=True)
+
+    return False
+
+
+@Client.on_message(Filters.incoming & Filters.group & regex_group
+                   & Filters.command(["push"], glovar.prefix))
+def push_words(client: Client, message: Message) -> bool:
+    # Push words
+    try:
+        cid = message.chat.id
+        mid = message.message_id
+        uid = message.from_user.id
+        text = f"管理：{user_mention(uid)}\n"
+        command_type = get_command_type(message)
+        if command_type and command_type in glovar.names:
+            share_regex_update(client, command_type)
+            text += (f"类别：{code(glovar.names[command_type])}\n"
+                     f"状态：{code('已推送')}\n"
+                     f"原因：{code('格式有误')}\n")
+        elif command_type == "all":
+            for word_type in glovar.names:
+                share_regex_update(client, word_type)
+
+            text += (f"类别：{code('全部')}\n"
+                     f"状态：{code('已推送')}\n"
+                     f"原因：{code('格式有误')}\n")
+        else:
+            text += (f"类别：{code(command_type or '未知')}\n"
+                     f"状态：{code('未推送')}\n"
+                     f"原因：{code('格式有误')}\n")
+
+        return True
+    except Exception as e:
+        logger.warning(f"Push words error: {e}", exc_info=True)
 
     return False
 

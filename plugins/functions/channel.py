@@ -131,16 +131,16 @@ def share_data(client: Client, receivers: List[str], action: str, action_type: s
     return False
 
 
-def share_regex_update(client: Client, word_tye: str) -> bool:
+def share_regex_update(client: Client, word_type: str) -> bool:
     # Use this function to share regex update to other bots
     try:
-        file = data_to_file(eval(f"glovar.{word_tye}_words"))
+        file = data_to_file(eval(f"glovar.{word_type}_words"))
         share_data(
             client=client,
-            receivers=glovar.receivers[word_tye],
+            receivers=glovar.receivers[word_type],
             action="update",
             action_type="download",
-            data=f"{word_tye}_words",
+            data=f"{word_type}_words",
             file=file
         )
 
