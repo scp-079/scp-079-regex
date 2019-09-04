@@ -288,10 +288,11 @@ def same_words(client: Client, message: Message) -> bool:
             uid = message.from_user.id
             text = f"管理：{user_mention(uid)}\n"
             # Get this new command's list
-            _, command_context = get_command_context(message)
-            new_word_type_list = command_context.split()
+            new_command_list = list(filter(None, message.command))
+            new_word_type_list = new_command_list[1:]
             # Check new command's format
-            if new_word_type_list and all([new_word_type in glovar.names for new_word_type in new_word_type_list]):
+            if (len(new_command_list) > 1
+                    and all([new_word_type in glovar.names for new_word_type in new_word_type_list])):
                 if message.reply_to_message:
                     old_message = message.reply_to_message
                     aid = old_message.from_user.id
