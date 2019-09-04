@@ -132,7 +132,8 @@ same_commands: list = ["same", "copy", "c"]
 search_commands: list = ["search", "s", "find"]
 all_commands: list = add_commands + list_commands + remove_commands + same_commands + search_commands + ["count",
                                                                                                          "push",
-                                                                                                         "version"]
+                                                                                                         "version",
+                                                                                                         "mention"]
 
 # Read data from config.ini
 
