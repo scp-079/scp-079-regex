@@ -27,7 +27,7 @@ from typing import Any, Callable, List, Optional, Union
 
 from cryptography.fernet import Fernet
 from opencc import convert
-from pyrogram import InlineKeyboardMarkup, Message, User
+from pyrogram import InlineKeyboardButton, InlineKeyboardMarkup, Message, User
 from pyrogram.errors import FloodWait
 
 # Enable logging
@@ -249,6 +249,78 @@ def get_int(text: str) -> int:
         logger.info(f"Get int error: {e}", exc_info=True)
 
     return result
+
+
+def get_list_page(the_list: list, action: str, action_type: str, per_page: int,
+                  page: int) -> (list, InlineKeyboardMarkup):
+    # Generate a list for elements and markup buttons
+    markup = None
+    try:
+        # Get page count
+        quo = int(len(the_list) / per_page)
+        if quo != 0:
+            page_count = quo + 1
+            if len(the_list) % per_page == 0:
+                page_count = page_count - 1
+
+            if page != page_count:
+                the_list = the_list[(page - 1) * per_page:page * per_page]
+            else:
+                the_list = the_list[(page - 1) * per_page:len(the_list)]
+            if page_count > 1:
+                if page == 1:
+                    markup = InlineKeyboardMarkup(
+                        [
+                            [
+                                InlineKeyboardButton(
+                                    f"第 {page} 页",
+                                    callback_data=button_data("none")
+                                ),
+                                InlineKeyboardButton(
+                                    ">>",
+                                    callback_data=button_data(action, action_type, page + 1)
+                                )
+                            ]
+                        ]
+                    )
+                elif page == page_count:
+                    markup = InlineKeyboardMarkup(
+                        [
+                            [
+                                InlineKeyboardButton(
+                                    "<<",
+                                    callback_data=button_data(action, action_type, page - 1)
+                                ),
+                                InlineKeyboardButton(
+                                    f"第 {page} 页",
+                                    callback_data=button_data("none")
+                                )
+                            ]
+                        ]
+                    )
+                else:
+                    markup = InlineKeyboardMarkup(
+                        [
+                            [
+                                InlineKeyboardButton(
+                                    "<<",
+                                    callback_data=button_data(action, action_type, page - 1)
+                                ),
+                                InlineKeyboardButton(
+                                    f"第 {page} 页",
+                                    callback_data=button_data("none")
+                                ),
+                                InlineKeyboardButton(
+                                    '>>',
+                                    callback_data=button_data(action, action_type, page + 1)
+                                )
+                            ]
+                        ]
+                    )
+    except Exception as e:
+        logger.warning(f"Get list page error: {e}", exc_info=True)
+
+    return the_list, markup
 
 
 def get_now() -> int:

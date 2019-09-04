@@ -26,8 +26,8 @@ from xeger import Xeger
 
 from .. import glovar
 from .channel import share_regex_update
-from .etc import code, button_data, get_command_context, get_int, get_now, get_text, italic, random_str
-from .etc import user_mention
+from .etc import code, button_data, get_command_context, get_int, get_list_page, get_now, get_text, italic
+from .etc import random_str, user_mention
 from .file import save, save_thread
 
 # Enable logging
@@ -362,7 +362,7 @@ def words_list_page(uid: int, word_type: str, page: int, desc: bool) -> (str, In
     keys = list(words.keys())
     keys.sort()
     w_list = sorted(keys, key=lambda k: words[k]["average"], reverse=desc)
-    w_list, markup = words_page(w_list, "list", word_type, page)
+    w_list, markup = get_list_page(w_list, "list", word_type, glovar.per_page, page)
     text += (f"类别：{code(glovar.names[word_type])}\n"
              f"顺序：{code((lambda x: '降序' if x else '升序')(desc))}\n"
              f"查询：{code('全部')}\n"
@@ -373,74 +373,6 @@ def words_list_page(uid: int, word_type: str, page: int, desc: bool) -> (str, In
                            for w in w_list]))
 
     return text, markup
-
-
-def words_page(w_list: list, action: str, action_type: str, page: int) -> (list, InlineKeyboardMarkup):
-    # Generate a list for words and markup buttons
-    markup = None
-    # Get page count
-    quo = int(len(w_list) / glovar.per_page)
-    if quo != 0:
-        page_count = quo + 1
-        if len(w_list) % glovar.per_page == 0:
-            page_count = page_count - 1
-
-        if page != page_count:
-            w_list = w_list[(page - 1) * glovar.per_page:page * glovar.per_page]
-        else:
-            w_list = w_list[(page - 1) * glovar.per_page:len(w_list)]
-        if page_count > 1:
-            if page == 1:
-                markup = InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(
-                                f"第 {page} 页",
-                                callback_data=button_data("none")
-                            ),
-                            InlineKeyboardButton(
-                                ">>",
-                                callback_data=button_data(action, action_type, page + 1)
-                            )
-                        ]
-                    ]
-                )
-            elif page == page_count:
-                markup = InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(
-                                "<<",
-                                callback_data=button_data(action, action_type, page - 1)
-                            ),
-                            InlineKeyboardButton(
-                                f"第 {page} 页",
-                                callback_data=button_data("none")
-                            )
-                        ]
-                    ]
-                )
-            else:
-                markup = InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(
-                                "<<",
-                                callback_data=button_data(action, action_type, page - 1)
-                            ),
-                            InlineKeyboardButton(
-                                f"第 {page} 页",
-                                callback_data=button_data("none")
-                            ),
-                            InlineKeyboardButton(
-                                '>>',
-                                callback_data=button_data(action, action_type, page + 1)
-                            )
-                        ]
-                    ]
-                )
-
-    return w_list, markup
 
 
 def word_remove(client: Client, message: Message) -> str:
@@ -560,7 +492,7 @@ def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMark
         if words:
             w_list = list(words)
             w_list.sort()
-            w_list, markup = words_page(w_list, "search", key, page)
+            w_list, markup = get_list_page(w_list, "search", key, glovar.per_page, page)
             if word_type == "all":
                 end_text = ""
                 for w in w_list:
