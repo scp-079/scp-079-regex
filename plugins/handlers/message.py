@@ -92,13 +92,16 @@ def process_data(client: Client, message: Message) -> bool:
                    & ~Filters.command(glovar.all_commands, glovar.prefix))
 def test(client: Client, message: Message) -> bool:
     # Show test results in TEST group
-    try:
-        name_test(client, message)
-        sticker_test(client, message)
-        text_test(client, message)
+    if glovar.locks["test"].acquire():
+        try:
+            name_test(client, message)
+            sticker_test(client, message)
+            text_test(client, message)
 
-        return True
-    except Exception as e:
-        logger.warning(f"Test error: {e}", exc_info=True)
+            return True
+        except Exception as e:
+            logger.warning(f"Test error: {e}", exc_info=True)
+        finally:
+            glovar.locks["test"].release()
 
     return False
