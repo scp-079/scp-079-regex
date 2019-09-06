@@ -21,7 +21,7 @@ import logging
 from pyrogram import Client, Filters, Message
 
 from .. import glovar
-from ..functions.filters import exchange_channel, hide_channel, test_group
+from ..functions.filters import exchange_channel, from_user, hide_channel, test_group
 from ..functions.receive import receive_count, receive_text_data
 from ..functions.tests import name_test, sticker_test, text_test
 
@@ -88,7 +88,7 @@ def process_data(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & test_group & ~Filters.service
+@Client.on_message(Filters.incoming & Filters.group & test_group & from_user & ~Filters.service
                    & ~Filters.command(glovar.all_commands, glovar.prefix))
 def test(client: Client, message: Message) -> bool:
     # Show test results in TEST group

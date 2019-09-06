@@ -24,7 +24,7 @@ from .. import glovar
 from ..functions.channel import share_data, share_regex_update
 from ..functions.etc import bold, code, general_link, get_callback_data, get_command_context, get_command_type, get_text
 from ..functions.etc import message_link, thread, user_mention
-from ..functions.filters import regex_group, test_group
+from ..functions.filters import from_user, regex_group, test_group
 from ..functions.telegram import edit_message_text, get_messages, send_message
 from ..functions.words import get_admin, get_desc, word_add, words_ask, words_list, words_list_page, word_remove
 from ..functions.words import words_search, words_search_page
@@ -33,7 +33,7 @@ from ..functions.words import words_search, words_search_page
 logger = logging.getLogger(__name__)
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
                    & Filters.command(glovar.add_commands, glovar.prefix))
 def add_word(client: Client, message: Message) -> bool:
     # Add a new word
@@ -53,7 +53,7 @@ def add_word(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
                    & Filters.command(["ask"], glovar.prefix))
 def ask_word(client: Client, message: Message) -> bool:
     # Deal with a duplicated word
@@ -103,7 +103,7 @@ def ask_word(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
                    & Filters.command(["count"], glovar.prefix))
 def count_words(client: Client, message: Message) -> bool:
     # Count words
@@ -139,7 +139,7 @@ def count_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
                    & Filters.command(glovar.list_commands, glovar.prefix))
 def list_words(client: Client, message: Message) -> bool:
     # List words
@@ -156,7 +156,7 @@ def list_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
                    & Filters.command(["page"], glovar.prefix))
 def page_word(client: Client, message: Message) -> bool:
     # Change words page
@@ -219,7 +219,7 @@ def page_word(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
                    & Filters.command(["push"], glovar.prefix))
 def push_words(client: Client, message: Message) -> bool:
     # Push words
@@ -257,7 +257,7 @@ def push_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
                    & Filters.command(glovar.remove_commands, glovar.prefix))
 def remove_word(client: Client, message: Message) -> bool:
     # Remove a word
@@ -277,7 +277,7 @@ def remove_word(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
                    & Filters.command(glovar.same_commands, glovar.prefix))
 def same_words(client: Client, message: Message) -> bool:
     # Same with other types
@@ -368,7 +368,7 @@ def same_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
                    & Filters.command(glovar.search_commands, glovar.prefix))
 def search_words(client: Client, message: Message) -> bool:
     # Search words
@@ -385,7 +385,7 @@ def search_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & test_group
+@Client.on_message(Filters.incoming & Filters.group & test_group & from_user
                    & Filters.command(["version"], glovar.prefix))
 def version(client: Client, message: Message) -> bool:
     # Check the program's version
