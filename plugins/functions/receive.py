@@ -35,7 +35,7 @@ def receive_count(client: Client, message: Message, data: str) -> bool:
     # Receive count
     try:
         word_type = data.replace("_words", "")
-        data = receive_file_data(client, message, True)
+        data = receive_file_data(client, message)
         words_count(word_type, data)
 
         return True
@@ -45,7 +45,7 @@ def receive_count(client: Client, message: Message, data: str) -> bool:
     return False
 
 
-def receive_file_data(client: Client, message: Message, decrypt: bool = False) -> Any:
+def receive_file_data(client: Client, message: Message, decrypt: bool = True) -> Any:
     # Receive file's data from exchange channel
     data = None
     try:
