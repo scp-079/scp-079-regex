@@ -304,29 +304,16 @@ def words_count(word_type: str, data: Any) -> bool:
     if glovar.locks["regex"].acquire():
         try:
             if data:
-                words_dict = deepcopy(eval(f"glovar.{word_type}_words"))
                 data_set = set(data)
-                word_set = set(words_dict)
+                word_set = set(eval(f"glovar.{word_type}_words"))
                 the_set = data_set & word_set
                 for word in the_set:
-                    logger.warning(word)
-                    logger.warning(words_dict[word]["today"])
-                    logger.warning(data[word])
+                    eval(f"glovar.{word_type}_words")[word]["today"] += data[word]
+                    eval(f"glovar.{word_type}_words")[word]["total"] += data[word]
+                    total = eval(f"glovar.{word_type}_words")[word]["total"]
+                    time = get_now() - eval(f"glovar.{word_type}_words")[word]["time"]
+                    eval(f"glovar.{word_type}_words")[word]["average"] = total / (time / 86400)
 
-                    words_dict[word]["today"] += data[word]
-
-                    logger.warning(words_dict[word]["today"])
-                    logger.warning(words_dict[word]["total"])
-
-                    words_dict[word]["total"] += data[word]
-
-                    total = words_dict[word]["total"]
-
-                    logger.warning(total)
-                    time = get_now() - words_dict[word]["time"]
-                    words_dict[word]["average"] = total / (time / 86400)
-
-                exec(f"glovar.{word_type}_words = words_dict")
                 save(f"{word_type}_words")
 
                 return True
