@@ -45,9 +45,9 @@ def name_test(client: Client, message: Message) -> bool:
             for word_type in ["ad", "con", "iml", "nm", "wb"]:
                 if is_regex_text(word_type, text):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if similar("test", w, text)]
-                    result += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
+                    result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
                     for w in w_list:
-                        result += "\t" * 4 + f"{code(w)}\n\n"
+                        result += "\t" * 8 + f"{code(w)}\n\n"
 
             if result:
                 result = (f"管理员：{user_mention(aid)}\n\n"
@@ -78,9 +78,9 @@ def sticker_test(client: Client, message: Message) -> bool:
                 if is_regex_text(word_type, sticker_name):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
                               if similar("test", w, sticker_name)]
-                    result += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
+                    result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
                     for w in w_list:
-                        result += "\t" * 4 + f"{code(w)}\n\n"
+                        result += "\t" * 8 + f"{code(w)}\n\n"
 
             sticker_title = get_sticker_title(client, sticker_name)
             result += f"贴纸标题：{code(sticker_title)}\n\n"
@@ -89,9 +89,9 @@ def sticker_test(client: Client, message: Message) -> bool:
                 if is_regex_text(word_type, sticker_title):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
                               if similar("test", w, sticker_title)]
-                    result += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
+                    result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
                     for w in w_list:
-                        result += "\t" * 4 + f"{code(w)}\n\n"
+                        result += "\t" * 8 + f"{code(w)}\n\n"
 
             thread(send_message, (client, cid, result, mid))
 
