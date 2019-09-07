@@ -36,6 +36,7 @@ def receive_count(client: Client, message: Message, data: str) -> bool:
     try:
         word_type = data.replace("_words", "")
         data = receive_file_data(client, message, True)
+        logger.warning(data)
         words_count(word_type, data)
 
         return True

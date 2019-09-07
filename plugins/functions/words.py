@@ -305,12 +305,21 @@ def words_count(word_type: str, data: Any) -> bool:
         try:
             if data:
                 data_set = set(data)
+                logger.warning(data_set)
                 word_set = set(eval(f"glovar.{word_type}_words"))
+                logger.warning(word_set)
                 the_set = data_set & word_set
+                logger.warning(the_set)
                 for word in the_set:
+                    logger.warning(word)
+                    logger.warning(eval(f"glovar.{word_type}_words")[word]["today"])
+                    logger.warning(data[word])
                     eval(f"glovar.{word_type}_words")[word]["today"] += data[word]
+                    logger.warning(eval(f"glovar.{word_type}_words")[word]["today"])
+                    logger.warning(eval(f"glovar.{word_type}_words")[word]["total"])
                     eval(f"glovar.{word_type}_words")[word]["total"] += data[word]
                     total = eval(f"glovar.{word_type}_words")[word]["total"]
+                    logger.warning(eval(f"glovar.{word_type}_words")[word]["total"])
                     time = get_now() - eval(f"glovar.{word_type}_words")[word]["time"]
                     eval(f"glovar.{word_type}_words")[word]["average"] = total / (time / 86400)
 
