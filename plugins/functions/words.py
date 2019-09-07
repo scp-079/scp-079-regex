@@ -314,12 +314,14 @@ def words_count(word_type: str, data: Any) -> bool:
                     logger.warning(word)
                     logger.warning(eval(f"glovar.{word_type}_words")[word]["today"])
                     logger.warning(data[word])
-                    today = eval(f"glovar.{word_type}_words")[word]["today"]
-                    today += deepcopy(data[word])
-                    eval(f"glovar.{word_type}_words")[word]["today"] = deepcopy(today)
+
+                    locals()[f"glovar.{word_type}_words"][word]["today"] += data[word]
+
                     logger.warning(eval(f"glovar.{word_type}_words")[word]["today"])
                     logger.warning(eval(f"glovar.{word_type}_words")[word]["total"])
+
                     eval(f"glovar.{word_type}_words")[word]["total"] += data[word]
+
                     total = eval(f"glovar.{word_type}_words")[word]["total"]
                     logger.warning(eval(f"glovar.{word_type}_words")[word]["total"])
                     time = get_now() - eval(f"glovar.{word_type}_words")[word]["time"]
