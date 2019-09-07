@@ -51,7 +51,7 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
                     try:
                         text = (f"管理：{user_mention(aid)}\n"
                                 f"{words_ask(client, action_type, data)}")
-                        thread(edit_message_text, (client, cid, mid, text))
+                        edit_message_text(client, cid, mid, text)
                     finally:
                         glovar.locks["regex"].release()
             elif action == "list":
@@ -59,12 +59,12 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
                 page = data
                 desc = get_desc(callback_query.message)
                 text, markup = words_list_page(uid, word_type, page, desc)
-                thread(edit_message_text, (client, cid, mid, text, markup))
+                edit_message_text(client, cid, mid, text, markup)
             elif action == "search":
                 key = action_type
                 page = data
                 text, markup = words_search_page(uid, key, page)
-                thread(edit_message_text, (client, cid, mid, text, markup))
+                edit_message_text(client, cid, mid, text, markup)
 
             thread(answer_callback, (client, callback_query.id, ""))
 
