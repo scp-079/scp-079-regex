@@ -24,9 +24,10 @@ from os import mkdir
 from os.path import exists
 from shutil import rmtree
 from threading import Lock
+from time import time
 from typing import Dict, List, Union
 
-from .functions.etc import get_now, random_str
+from .functions.etc import random_str
 
 # Enable logging
 logging.basicConfig(
@@ -49,7 +50,7 @@ ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
 # }
 
 default_word_status: Dict[str, Union[float, int]] = {
-    "time": get_now(),
+    "time": int(time()),
     "average": 0.0,
     "today": 0,
     "total": 0
