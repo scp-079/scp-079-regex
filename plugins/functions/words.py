@@ -315,7 +315,7 @@ def words_count(word_type: str, data: Any) -> bool:
                     logger.warning(eval(f"glovar.{word_type}_words")[word]["today"])
                     logger.warning(data[word])
 
-                    locals()[f"glovar.{word_type}_words"][word]["today"] += data[word]
+                    globals()[f"glovar.{word_type}_words"][word]["today"] += data[word]
 
                     logger.warning(eval(f"glovar.{word_type}_words")[word]["today"])
                     logger.warning(eval(f"glovar.{word_type}_words")[word]["total"])
