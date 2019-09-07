@@ -20,9 +20,12 @@ import logging
 from typing import Iterable, List, Optional, Union
 
 from pyrogram import Client, InlineKeyboardMarkup, Message
+from pyrogram.api.functions.messages import GetStickerSet
+from pyrogram.api.types import InputStickerSetShortName, StickerSet
+from pyrogram.api.types.messages import StickerSet as messages_StickerSet
 from pyrogram.errors import ChannelInvalid, ChannelPrivate, FloodWait, PeerIdInvalid
 
-from .etc import wait_flood
+from .etc import t2s, wait_flood
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -108,6 +111,29 @@ def get_messages(client: Client, cid: int, mids: Iterable[int]) -> List[Message]
                 wait_flood(e)
     except Exception as e:
         logger.warning(f"Get messages error: {e}", exc_info=True)
+
+    return result
+
+
+def get_sticker_title(client: Client, short_name: str) -> Optional[str]:
+    # Get sticker set's title
+    result = None
+    try:
+        sticker_set = InputStickerSetShortName(short_name=short_name)
+        flood_wait = True
+        while flood_wait:
+            flood_wait = False
+            try:
+                the_set = client.send(GetStickerSet(stickerset=sticker_set))
+                if isinstance(the_set, messages_StickerSet):
+                    inner_set = the_set.set
+                    if isinstance(inner_set, StickerSet):
+                        result = t2s(inner_set.title)
+            except FloodWait as e:
+                flood_wait = True
+                wait_flood(e)
+    except Exception as e:
+        logger.warning(f"Get sticker title error: {e}", exc_info=True)
 
     return result
 
