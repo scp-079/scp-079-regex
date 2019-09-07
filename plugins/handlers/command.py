@@ -120,7 +120,7 @@ def count_words(client: Client, message: Message) -> bool:
             receivers.sort()
             share_data(
                 client=client,
-                receivers=receivers,
+                receivers=["WATCH"],
                 action="update",
                 action_type="count",
                 data="ask"
