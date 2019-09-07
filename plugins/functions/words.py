@@ -313,7 +313,7 @@ def words_count(word_type: str, data: Any) -> bool:
                     logger.warning(words_dict[word]["today"])
                     logger.warning(data[word])
 
-                    words_dict += data[word]
+                    words_dict[word]["today"] += data[word]
 
                     logger.warning(words_dict[word]["today"])
                     logger.warning(words_dict[word]["total"])
