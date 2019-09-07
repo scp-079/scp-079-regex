@@ -304,26 +304,25 @@ def words_count(word_type: str, data: Any) -> bool:
     if glovar.locks["regex"].acquire():
         try:
             if data:
+                words_dict = deepcopy(eval(f"glovar.{word_type}_words"))
                 data_set = set(data)
-                logger.warning(data_set)
-                word_set = set(eval(f"glovar.{word_type}_words"))
-                logger.warning(word_set)
+                word_set = set(words_dict)
                 the_set = data_set & word_set
-                logger.warning(the_set)
                 for word in the_set:
                     logger.warning(word)
-                    logger.warning(eval(f"glovar.{word_type}_words")[word]["today"])
+                    logger.warning(words_dict[word]["today"])
                     logger.warning(data[word])
 
-                    globals()[f"glovar.{word_type}_words"][word]["today"] += data[word]
+                    words_dict += data[word]
 
-                    logger.warning(eval(f"glovar.{word_type}_words")[word]["today"])
-                    logger.warning(eval(f"glovar.{word_type}_words")[word]["total"])
+                    logger.warning(words_dict[word]["today"])
+                    logger.warning(words_dict[word]["total"])
 
-                    eval(f"glovar.{word_type}_words")[word]["total"] += data[word]
+                    words_dict[word]["total"] += data[word]
 
-                    total = eval(f"glovar.{word_type}_words")[word]["total"]
-                    logger.warning(eval(f"glovar.{word_type}_words")[word]["total"])
+                    total = words_dict[word]["total"]
+
+                    logger.warning(total)
                     time = get_now() - eval(f"glovar.{word_type}_words")[word]["time"]
                     eval(f"glovar.{word_type}_words")[word]["average"] = total / (time / 86400)
 
