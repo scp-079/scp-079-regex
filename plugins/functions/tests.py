@@ -42,7 +42,7 @@ def name_test(client: Client, message: Message) -> bool:
             mid = message.message_id
             result = ""
             # Can add more test to the "for in" list
-            for word_type in ["ad", "con", "iml", "nm", "wb"]:
+            for word_type in ["ad", "con", "iml", "nm", "wb", "test"]:
                 if is_regex_text(word_type, text):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if similar("test", w, text)]
                     result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
@@ -74,7 +74,7 @@ def sticker_test(client: Client, message: Message) -> bool:
             sticker_name = message.sticker.set_name
             result += f"贴纸名称：{code(sticker_name)}\n\n"
 
-            for word_type in ["sti"]:
+            for word_type in ["sti", "test"]:
                 if is_regex_text(word_type, sticker_name):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
                               if similar("test", w, sticker_name)]
@@ -85,7 +85,7 @@ def sticker_test(client: Client, message: Message) -> bool:
             sticker_title = get_sticker_title(client, sticker_name)
             result += f"贴纸标题：{code(sticker_title)}\n\n"
 
-            for word_type in ["ad", "con", "ban", "sti"]:
+            for word_type in ["ad", "con", "ban", "sti", "test"]:
                 if is_regex_text(word_type, sticker_title):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
                               if similar("test", w, sticker_title)]
