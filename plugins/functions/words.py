@@ -323,9 +323,10 @@ def words_count(word_type: str, data: Any) -> bool:
                     total = words_dict[word]["total"]
 
                     logger.warning(total)
-                    time = get_now() - eval(f"glovar.{word_type}_words")[word]["time"]
-                    eval(f"glovar.{word_type}_words")[word]["average"] = total / (time / 86400)
+                    time = get_now() - words_dict[word]["time"]
+                    words_dict[word]["average"] = total / (time / 86400)
 
+                exec(f"glovar.{word_type}_words = words_dict")
                 save(f"{word_type}_words")
 
                 return True
