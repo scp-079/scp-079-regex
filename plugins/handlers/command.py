@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from copy import deepcopy
 
 from pyrogram import Client, Filters, Message
 
@@ -24,6 +25,7 @@ from .. import glovar
 from ..functions.channel import share_data, share_regex_update
 from ..functions.etc import bold, code, general_link, get_callback_data, get_command_context, get_command_type, get_text
 from ..functions.etc import message_link, thread, user_mention
+from ..functions.file import save
 from ..functions.filters import from_user, regex_group, test_group
 from ..functions.telegram import edit_message_text, get_messages, send_message
 from ..functions.words import get_admin, get_desc, word_add, words_ask, words_list, words_list_page, word_remove
@@ -271,6 +273,48 @@ def remove_word(client: Client, message: Message) -> bool:
             return True
         except Exception as e:
             logger.warning(f"Remove word error: {e}", exc_info=True)
+        finally:
+            glovar.locks["regex"].release()
+
+    return False
+
+
+@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
+                   & Filters.command(["reset"], glovar.prefix))
+def reset_words(client: Client, message: Message) -> bool:
+    # Push words
+    if glovar.locks["regex"].acquire():
+        try:
+            cid = message.chat.id
+            mid = message.message_id
+            uid = message.from_user.id
+            text = (f"管理：{user_mention(uid)}\n"
+                    f"操作：{code('清除计数')}\n")
+            command_type = get_command_type(message)
+            if command_type and command_type in ["all"] + list(glovar.names):
+                if command_type == "all":
+                    type_list = list(glovar.names)
+                else:
+                    type_list = [command_type]
+
+                for word_type in type_list:
+                    for word in list(eval(f"glovar.{word_type}_words")):
+                        eval(f"glovar.{word_type}_words")[word] = deepcopy(glovar.default_word_status)
+
+                    save(f"{word_type}_words")
+
+                text += (f"类别：{code((lambda t: glovar.names[t] if t != 'all' else '全部')(command_type))}\n"
+                         f"状态：{code('已清除')}\n")
+            else:
+                text += (f"类别：{code(command_type or '未知')}\n"
+                         f"状态：{code('未清除')}\n"
+                         f"原因：{code('格式有误')}\n")
+
+            thread(send_message, (client, cid, text, mid))
+
+            return True
+        except Exception as e:
+            logger.warning(f"Reset words error: {e}", exc_info=True)
         finally:
             glovar.locks["regex"].release()
 

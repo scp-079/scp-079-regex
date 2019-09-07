@@ -74,7 +74,7 @@ def process_data(client: Client, message: Message) -> bool:
             # but this is to ensure that the permissions are clear,
             # so it is intentionally written like this
             if glovar.sender in receivers:
-                if sender in {"WATCH"}:
+                if sender in {"CLEAN", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"}:
 
                     if action == "update":
 
