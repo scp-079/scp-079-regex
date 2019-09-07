@@ -123,7 +123,7 @@ sender: str = "REGEX"
 
 should_hide: bool = False
 
-version: str = "0.3.4"
+version: str = "0.3.5"
 
 # Generate commands lists
 add_commands: list = ["add", "ad"]
