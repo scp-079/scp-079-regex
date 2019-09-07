@@ -107,7 +107,17 @@ def text_test(client: Client, message: Message) -> bool:
 
             mid = message.message_id
             result_list = [""]
-            for word_type in glovar.names:
+
+            # ad con iml
+            # ban bio nm del
+            # wb wd bad
+            # etc
+            order_list = ["ad", "con", "iml", "ban", "bio", "nm", "del", "wb", "wd", "bad"]
+            order_set = set(order_list)
+            type_set = set(glovar.names)
+            type_list = order_list + list(type_set - order_set)
+
+            for word_type in type_list:
                 if len(result_list[-1]) > 2000:
                     result_list.append("")
 
