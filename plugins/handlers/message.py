@@ -76,7 +76,7 @@ def process_data(client: Client, message: Message) -> bool:
             if glovar.sender in receivers:
                 if sender in {"CLEAN", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"}:
 
-                    if action == "update":
+                    if action == "regex":
 
                         if action_type == "count":
                             receive_count(client, message, data)

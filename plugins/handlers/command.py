@@ -123,7 +123,7 @@ def count_words(client: Client, message: Message) -> bool:
             share_data(
                 client=client,
                 receivers=receivers,
-                action="update",
+                action="regex",
                 action_type="count",
                 data="ask"
             )
