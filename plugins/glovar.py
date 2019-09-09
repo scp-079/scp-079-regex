@@ -18,7 +18,6 @@
 
 import logging
 import pickle
-import re
 from configparser import RawConfigParser
 from os import mkdir
 from os.path import exists
@@ -26,8 +25,6 @@ from shutil import rmtree
 from threading import Lock
 from time import time
 from typing import Dict, List, Union
-
-from .functions.etc import random_str
 
 # Enable logging
 logging.basicConfig(
@@ -218,20 +215,8 @@ for word_type in names:
 #     }
 # }
 
-# TEMP BEGIN
-# Init compiled variable
-compiled: dict = {}
-# pattern = "|".join(type_words)
-# compiled = {
-#     "type": re.compile(pattern, re.I | re.M | re.S)
-# }
-
-for word_type in names:
-    compiled[word_type] = re.compile(fr"预留{names[f'{word_type}']}词组 {random_str(16)}", re.I | re.M | re.S)
-# TEMP END
-
 # Load data
-file_list = [f"{word_type}_words" for word_type in names] + ["compiled"]    # TEMP
+file_list = [f"{word_type}_words" for word_type in names] + ["compiled"]
 for file in file_list:
     try:
         try:

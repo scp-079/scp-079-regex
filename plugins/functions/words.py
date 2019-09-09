@@ -42,8 +42,6 @@ def add_word(word_type: str, word: str) -> bool:
     try:
         eval(f"glovar.{word_type}_words")[word] = deepcopy(glovar.default_word_status)
         save_thread(f"{word_type}_words")
-        # TEMP
-        re_compile(word_type)
 
         return True
     except Exception as e:
@@ -100,31 +98,10 @@ def remove_word(word_type: str, words: List[str]) -> bool:
             eval(f"glovar.{word_type}_words").pop(word, {})
 
         save_thread(f"{word_type}_words")
-        # TEMP
-        re_compile(word_type)
 
         return True
     except Exception as e:
         logger.warning(f"Remove word error: {e}", exc_info=True)
-
-    return False
-
-
-def re_compile(word_type: str) -> bool:
-    # Re compile the regex
-    try:
-        text = '|'.join(list(eval(f"glovar.{word_type}_words")))
-        if text != "":
-            glovar.compiled[word_type] = re.compile(text, re.I | re.S | re.M)
-        else:
-            glovar.compiled[word_type] = re.compile(fr"预留{glovar.names[f'{word_type}']}词组 {random_str(16)}",
-                                                    re.I | re.M | re.S)
-
-        save("compiled")
-
-        return True
-    except Exception as e:
-        logger.warning(f"Re compile error: {e}")
 
     return False
 
