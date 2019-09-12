@@ -23,8 +23,9 @@ from pyrogram import Client, Filters, Message
 
 from .. import glovar
 from ..functions.channel import share_data, share_regex_update
-from ..functions.etc import bold, code, general_link, get_callback_data, get_command_context, get_command_type, get_text
-from ..functions.etc import message_link, thread, user_mention
+from ..functions.etc import bold, code, code_block, general_link, get_callback_data, get_command_context
+from ..functions.etc import get_command_type, get_filename, get_forward_name, get_text, message_link
+from ..functions.etc import thread, user_mention
 from ..functions.file import save
 from ..functions.filters import from_user, regex_group, test_group
 from ..functions.telegram import edit_message_text, get_messages, send_message
@@ -425,6 +426,37 @@ def search_words(client: Client, message: Message) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Search words error: {e}", exc_info=True)
+
+    return False
+
+
+@Client.on_message(Filters.incoming & Filters.group & test_group & from_user
+                   & Filters.command(["t2s"], glovar.prefix))
+def text_t2s(client: Client, message: Message) -> bool:
+    # Transfer text
+    try:
+        cid = message.chat.id
+        aid = message.from_user.id
+        mid = message.message_id
+        text = f"管理员：{user_mention(aid)}\n\n"
+        if message.reply_to_message:
+            message_text = get_forward_name(message.reply_to_message) + "\n\n"
+            message_text += get_filename(message.reply_to_message) + "\n\n"
+            message_text += get_text(message.reply_to_message) + "\n\n"
+            message_text = message_text.strip()
+            if message_text:
+                text += f"繁转简：" + "-" * 24 + "\n\n"
+                text += code_block(message_text) + "\n"
+            else:
+                text += f"结果：{code('无文本可转换')}\n"
+        else:
+            text = f"结果：{code('用法有误')}\n"
+
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Text t2s error: {e}", exc_info=True)
 
     return False
 
