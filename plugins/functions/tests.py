@@ -23,7 +23,7 @@ from copy import deepcopy
 from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import code, get_forward_name, get_int, get_text, thread, user_mention
+from .etc import code, get_filename, get_forward_name, get_int, get_text, thread, user_mention
 from .filters import is_regex_text
 from .telegram import get_sticker_title, send_message
 from .words import similar
@@ -105,7 +105,7 @@ def sticker_test(client: Client, message: Message) -> bool:
 def text_test(client: Client, message: Message) -> bool:
     # Test message text or caption
     try:
-        text = get_text(message)
+        text = get_filename(message) + get_text(message)
         except_pattern = ("^版本：|"
                           "^#(bug|done|fixed|todo)|"
                           "^{|"
