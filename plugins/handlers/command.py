@@ -440,13 +440,23 @@ def text_t2s(client: Client, message: Message) -> bool:
         mid = message.message_id
         text = f"管理员：{user_mention(aid)}\n\n"
         if message.reply_to_message:
-            message_text = get_forward_name(message.reply_to_message) + "\n\n"
-            message_text += get_filename(message.reply_to_message) + "\n\n"
-            message_text += get_text(message.reply_to_message) + "\n\n"
-            message_text = message_text.strip()
+            result = ""
+            forward_name = get_forward_name(message.reply_to_message)
+            if forward_name:
+                result += forward_name + "\n\n"
+
+            file_name = get_filename(message.reply_to_message)
+            if file_name:
+                result += file_name + "\n\n"
+
+            message_text = get_text(message.reply_to_message)
             if message_text:
+                result += message_text + "\n\n"
+
+            result = result.strip()
+            if result:
                 text += f"繁转简：" + "-" * 24 + "\n\n"
-                text += code_block(message_text) + "\n"
+                text += code_block(result) + "\n"
             else:
                 text += f"结果：{code('无文本可转换')}\n"
         else:
