@@ -354,7 +354,7 @@ def get_now() -> int:
 
 
 def get_text(message: Message) -> str:
-    # Get message's text, including link and mentioned user's name
+    # Get message's text, including links and buttons
     text = ""
     try:
         the_text = message.text or message.caption
