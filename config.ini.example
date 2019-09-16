@@ -20,6 +20,7 @@ prefix = /!
 
 [channels]
 critical_channel_id = [DATA EXPUNGED]
+debug_channel_id = [DATA EXPUNGED]
 exchange_channel_id = [DATA EXPUNGED]
 hide_channel_id = [DATA EXPUNGED]
 regex_group_id = [DATA EXPUNGED]
@@ -27,6 +28,8 @@ test_group_id = [DATA EXPUNGED]
 
 [custom]
 per_page = 10
+project_link = [DATA EXPUNGED]
+project_name = [DATA EXPUNGED]
 
 [encrypt]
 key = [DATA EXPUNGED]
