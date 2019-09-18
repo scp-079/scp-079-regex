@@ -108,7 +108,6 @@ def text_test(client: Client, message: Message) -> bool:
         text = get_filename(message) + get_text(message)
         except_pattern = ("^版本：|"
                           "^#(bug|done|fixed|todo)|"
-                          "^{|"
                           "^消息结构：")
         if text and not re.search(except_pattern, text, re.I | re.M | re.S):
             cid = message.chat.id
