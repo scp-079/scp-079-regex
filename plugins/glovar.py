@@ -229,7 +229,7 @@ for word_type in names:
 # }
 
 # Load data
-file_list = [f"{word_type}_words" for word_type in names] + ["compiled"]
+file_list = [f"{word_type}_words" for word_type in names]
 for file in file_list:
     try:
         try:
