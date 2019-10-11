@@ -67,7 +67,6 @@ names: Dict[str, str] = {
     "bio": "简介封禁",
     "con": "联系方式",
     "del": "自动删除",
-    "eme": "应急模式",
     "iml": "IM 链接",
     "nm": "名称封禁",
     "rm": "RM 笑话",
@@ -88,18 +87,17 @@ receivers: Dict[str, List[str]] = {
     "ava": ["NOSPAM"],
     "bad": ["NOSPAM"],
     "ban": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "bio": ["NOSPAM"],
+    "bio": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "con": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "del": ["CLEAN", "LANG", "LONG", "NOSPAM", "WATCH"],
-    "eme": ["NOSPAM"],
-    "iml": ["CLEAN", "NOSPAM", "WATCH"],
-    "nm": ["NOSPAM", "WATCH"],
+    "del": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "iml": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "nm": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "rm": ["TIP"],
     "sho": ["CLEAN", "NOSPAM", "WATCH"],
-    "spc": ["CLEAN", "LANG", "LONG", "NOSPAM", "WATCH"],
-    "spe": ["CLEAN", "LANG", "LONG", "NOSPAM", "WATCH"],
-    "sti": ["NOSPAM"],
-    "tgl": ["CLEAN", "WATCH"],
+    "spc": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "spe": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "sti": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "tgl": ["CLEAN", "NOPORN", "NOSPAM", "WATCH"],
     "tgp": ["CLEAN", "WATCH"],
     "wb": ["CAPTCHA", "CLEAN", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "wd": ["NOSPAM", "WATCH"],
@@ -155,7 +153,7 @@ regex_group_id: int = 0
 test_group_id: int = 0
 
 # [custom]
-per_page: int = 15
+per_page: int = 0
 project_link: str = ""
 project_name: str = ""
 
