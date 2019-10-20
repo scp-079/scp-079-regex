@@ -405,6 +405,17 @@ def italic(text: Any) -> str:
     return ""
 
 
+def lang(text: str) -> str:
+    # Get the text
+    result = ""
+    try:
+        result = glovar.lang.get(text, text)
+    except Exception as e:
+        logger.warning(f"Lang error: {e}", exc_info=True)
+
+    return result
+
+
 def message_link(message: Message) -> str:
     # Get a message link in a channel
     text = ""
