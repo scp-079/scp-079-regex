@@ -234,12 +234,12 @@ def push_words(client: Client, message: Message) -> bool:
             text = (f"管理：{user_mention(uid)}\n"
                     f"操作：{code('手动推送')}\n")
             command_type = get_command_type(message)
-            if command_type and command_type in glovar.names:
+            if command_type and command_type in glovar.regex:
                 share_regex_update(client, command_type)
-                text += (f"类别：{code(glovar.names[command_type])}\n"
+                text += (f"类别：{code(glovar.regex[command_type])}\n"
                          f"状态：{code('已推送')}\n")
             elif command_type == "all":
-                for word_type in glovar.names:
+                for word_type in glovar.regex:
                     thread(share_regex_update, (client, word_type))
 
                 text += (f"类别：{code('全部')}\n"
@@ -292,9 +292,9 @@ def reset_words(client: Client, message: Message) -> bool:
             text = (f"管理：{user_mention(uid)}\n"
                     f"操作：{code('清除计数')}\n")
             command_type = get_command_type(message)
-            if command_type and command_type in ["all"] + list(glovar.names):
+            if command_type and command_type in ["all"] + list(glovar.regex):
                 if command_type == "all":
-                    type_list = list(glovar.names)
+                    type_list = list(glovar.regex)
                 else:
                     type_list = [command_type]
 
@@ -304,7 +304,7 @@ def reset_words(client: Client, message: Message) -> bool:
 
                     save(f"{word_type}_words")
 
-                text += (f"类别：{code((lambda t: glovar.names[t] if t != 'all' else '全部')(command_type))}\n"
+                text += (f"类别：{code((lambda t: glovar.regex[t] if t != 'all' else '全部')(command_type))}\n"
                          f"状态：{code('已清除')}\n")
             else:
                 text += (f"类别：{code(command_type or '未知')}\n"
@@ -337,7 +337,7 @@ def same_words(client: Client, message: Message) -> bool:
             new_word_type_list = new_command_list[1:]
             # Check new command's format
             if (len(new_command_list) > 1
-                    and all([new_word_type in glovar.names for new_word_type in new_word_type_list])):
+                    and all([new_word_type in glovar.regex for new_word_type in new_word_type_list])):
                 if message.reply_to_message:
                     old_message = message.reply_to_message
                     aid = old_message.from_user.id

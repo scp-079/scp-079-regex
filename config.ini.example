@@ -27,9 +27,12 @@ regex_group_id = [DATA EXPUNGED]
 test_group_id = [DATA EXPUNGED]
 
 [custom]
+backup = [DATA EXPUNGED]
+date_reset = [DATA EXPUNGED]
 per_page = 10
 project_link = [DATA EXPUNGED]
 project_name = [DATA EXPUNGED]
+zh_cn = [DATA EXPUNGED]
 
 [encrypt]
 key = [DATA EXPUNGED]

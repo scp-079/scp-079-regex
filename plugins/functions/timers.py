@@ -57,7 +57,7 @@ def reset_count() -> bool:
     # Reset the daily usage
     if glovar.locks["regex"].acquire():
         try:
-            for word_type in glovar.names:
+            for word_type in glovar.regex:
                 for word in list(eval(f"glovar.{word_type}_words")):
                     eval(f"glovar.{word_type}_words")[word]["today"] = 0
                     save(f"{word_type}_words")

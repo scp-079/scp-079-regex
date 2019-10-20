@@ -45,7 +45,7 @@ def name_test(client: Client, message: Message) -> bool:
             for word_type in ["ad", "con", "iml", "nm", "wb", "test"]:
                 if is_regex_text(word_type, text):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if similar("test", w, text)]
-                    result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
+                    result += "\t" * 4 + f"{glovar.regex[word_type]}：" + "-" * 16 + "\n\n"
                     for w in w_list:
                         result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -78,7 +78,7 @@ def sticker_test(client: Client, message: Message) -> bool:
                 if is_regex_text(word_type, sticker_name):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
                               if similar("test", w, sticker_name)]
-                    result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
+                    result += "\t" * 4 + f"{glovar.regex[word_type]}：" + "-" * 16 + "\n\n"
                     for w in w_list:
                         result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -89,7 +89,7 @@ def sticker_test(client: Client, message: Message) -> bool:
                 if is_regex_text(word_type, sticker_title):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
                               if similar("test", w, sticker_title)]
-                    result += "\t" * 4 + f"{glovar.names[word_type]}：" + "-" * 16 + "\n\n"
+                    result += "\t" * 4 + f"{glovar.regex[word_type]}：" + "-" * 16 + "\n\n"
                     for w in w_list:
                         result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -125,7 +125,7 @@ def text_test(client: Client, message: Message) -> bool:
             # etc
             order_list = ["ad", "con", "iml", "ban", "bio", "nm", "del", "wb", "wd", "bad"]
             order_set = set(order_list)
-            type_set = set(glovar.names)
+            type_set = set(glovar.regex)
             type_list = order_list + list(type_set - order_set)
 
             for word_type in type_list:
@@ -134,7 +134,7 @@ def text_test(client: Client, message: Message) -> bool:
 
                 if is_regex_text(word_type, text):
                     w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if similar("test", w, text)]
-                    result_list[-1] += f"{glovar.names[word_type]}：" + "-" * 24 + "\n\n"
+                    result_list[-1] += f"{glovar.regex[word_type]}：" + "-" * 24 + "\n\n"
                     for w in w_list:
                         result_list[-1] += "\t" * 4 + f"{code(w)}\n\n"
 

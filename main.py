@@ -35,13 +35,17 @@ app = Client(
     session_name="bot",
     bot_token=glovar.bot_token
 )
+app.start()
 
 # Timer
-scheduler = BackgroundScheduler()
-scheduler.add_job(update_status, "cron", [app], minute=30)
+scheduler = BackgroundScheduler(job_defaults={"misfire_grace_time": 60})
+scheduler.add_job(update_status, "cron", [app, "awake"], minute=30)
 scheduler.add_job(backup_files, "cron", [app], hour=20)
 scheduler.add_job(reset_count, "cron", hour=20, minute=30)
 scheduler.start()
 
-# Run
-app.run()
+# Hold
+app.idle()
+
+# Stop
+app.stop()

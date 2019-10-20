@@ -30,6 +30,8 @@ from opencc import convert
 from pyrogram import InlineKeyboardButton, InlineKeyboardMarkup, Message, User
 from pyrogram.errors import FloodWait
 
+from .. import glovar
+
 # Enable logging
 logger = logging.getLogger(__name__)
 
@@ -37,9 +39,9 @@ logger = logging.getLogger(__name__)
 def bold(text: Any) -> str:
     # Get a bold text
     try:
-        text = str(text)
-        if text.strip():
-            return f"<b>{escape(str(text))}</b>"
+        text = str(text).strip()
+        if text:
+            return f"<b>{escape(text)}</b>"
     except Exception as e:
         logger.warning(f"Bold error: {e}", exc_info=True)
 
@@ -65,9 +67,9 @@ def button_data(action: str, action_type: str = None, data: Union[int, str] = No
 def code(text: Any) -> str:
     # Get a code text
     try:
-        text = str(text)
-        if text.strip():
-            return f"<code>{escape(str(text))}</code>"
+        text = str(text).strip()
+        if text:
+            return f"<code>{escape(text)}</code>"
     except Exception as e:
         logger.warning(f"Code error: {e}", exc_info=True)
 
@@ -77,9 +79,9 @@ def code(text: Any) -> str:
 def code_block(text: Any) -> str:
     # Get a code block text
     try:
-        text = str(text)
-        if text.strip():
-            return f"<pre>{escape(str(text))}</pre>"
+        text = str(text).rstrip()
+        if text:
+            return f"<pre>{escape(text)}</pre>"
     except Exception as e:
         logger.warning(f"Code block error: {e}", exc_info=True)
 
@@ -118,10 +120,13 @@ def delay(secs: int, target: Callable, args: list) -> bool:
 
 
 def general_link(text: Union[int, str], link: str) -> str:
-    # Get a general markdown link
+    # Get a general link
     result = ""
     try:
-        result = f'<a href="{link}">{escape(str(text))}</a>'
+        text = str(text).strip()
+        link = link.strip()
+        if text and link:
+            result = f'<a href="{link}">{escape(text)}</a>'
     except Exception as e:
         logger.warning(f"General link error: {e}", exc_info=True)
 
@@ -214,7 +219,7 @@ def get_filename(message: Message) -> str:
                 text += message.audio.file_name
 
         if text:
-            text = t2s(text)
+            text = t2t(text)
     except Exception as e:
         logger.warning(f"Get filename error: {e}", exc_info=True)
 
@@ -235,7 +240,7 @@ def get_forward_name(message: Message) -> str:
             text = chat.title
 
         if text:
-            text = t2s(text)
+            text = t2t(text)
     except Exception as e:
         logger.warning(f"Get forward name error: {e}", exc_info=True)
 
@@ -252,7 +257,7 @@ def get_full_name(user: User) -> str:
                 text += f" {user.last_name}"
 
         if text:
-            text = t2s(text)
+            text = t2t(text)
     except Exception as e:
         logger.warning(f"Get full name error: {e}", exc_info=True)
 
@@ -381,7 +386,7 @@ def get_text(message: Message) -> str:
                                     text += f"\n{button.url}"
 
         if text:
-            text = t2s(text)
+            text = t2t(text)
     except Exception as e:
         logger.warning(f"Get text error: {e}", exc_info=True)
 
@@ -423,7 +428,7 @@ def random_str(i: int) -> str:
     return text
 
 
-def t2s(text: str) -> str:
+def t2t(text: str) -> str:
     # Convert Traditional Chinese to Simplified Chinese
     try:
         text = convert(text, config="t2s.json")

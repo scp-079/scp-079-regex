@@ -22,63 +22,196 @@ from configparser import RawConfigParser
 from os import mkdir
 from os.path import exists
 from shutil import rmtree
+from string import ascii_lowercase
 from threading import Lock
 from time import time
 from typing import Dict, List, Union
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.WARNING,
-    filename='log',
-    filemode='w'
+    filename="log",
+    filemode="w"
 )
 logger = logging.getLogger(__name__)
 
+# Read data from config.ini
+
+# [basic]
+bot_token: str = ""
+prefix: List[str] = []
+prefix_str: str = "/!"
+
+# [channels]
+critical_channel_id: int = 0
+debug_channel_id: int = 0
+exchange_channel_id: int = 0
+hide_channel_id: int = 0
+regex_group_id: int = 0
+test_group_id: int = 0
+
+# [custom]
+backup: Union[bool, str] = ""
+date_reset: str = ""
+per_page: int = 0
+project_link: str = ""
+project_name: str = ""
+zh_cn: Union[bool, str] = ""
+
+# [encrypt]
+key: Union[str, bytes] = ""
+password: str = ""
+
+try:
+    config = RawConfigParser()
+    config.read("config.ini")
+    # [basic]
+    bot_token = config["basic"].get("bot_token", bot_token)
+    prefix = list(config["basic"].get("prefix", prefix_str))
+    # [channels]
+    critical_channel_id = int(config["channels"].get("critical_channel_id", critical_channel_id))
+    debug_channel_id = int(config["channels"].get("debug_channel_id", debug_channel_id))
+    exchange_channel_id = int(config["channels"].get("exchange_channel_id", exchange_channel_id))
+    hide_channel_id = int(config["channels"].get("hide_channel_id", hide_channel_id))
+    test_group_id = int(config["channels"].get("test_group_id", test_group_id))
+    regex_group_id = int(config["channels"].get("regex_group_id", regex_group_id))
+    # [custom]
+    backup = config["custom"].get("backup", backup)
+    backup = eval(backup)
+    date_reset = config["custom"].get("date_reset", date_reset)
+    per_page = int(config["custom"].get("per_page", per_page))
+    project_link = config["custom"].get("project_link", project_link)
+    project_name = config["custom"].get("project_name", project_name)
+    zh_cn = config["custom"].get("zh_cn", zh_cn)
+    zh_cn = eval(zh_cn)
+    # [encrypt]
+    key = config["encrypt"].get("key", key)
+    key = key.encode("utf-8")
+    password = config["encrypt"].get("password", password)
+except Exception as e:
+    logger.warning(f"Read data from config.ini error: {e}", exc_info=True)
+
+# Check
+if (bot_token in {"", "[DATA EXPUNGED]"}
+        or prefix == []
+        or critical_channel_id == 0
+        or debug_channel_id == 0
+        or exchange_channel_id == 0
+        or hide_channel_id == 0
+        or test_group_id == 0
+        or regex_group_id == 0
+        or backup not in {False, True}
+        or date_reset in {"", "[DATA EXPUNGED]"}
+        or project_link in {"", "[DATA EXPUNGED]"}
+        or project_name in {"", "[DATA EXPUNGED]"}
+        or zh_cn not in {False, True}
+        or key in {b"", b"[DATA EXPUNGED]", "", "[DATA EXPUNGED]"}
+        or password in {"", "[DATA EXPUNGED]"}):
+    logger.critical("No proper settings")
+    raise SystemExit("No proper settings")
+
+# Languages
+lang: Dict[str, str] = {
+    # Admin
+    "admin": (zh_cn and "管理员") or "Admin",
+    "admin_group": (zh_cn and "群管理") or "Group Admin",
+    "admin_project": (zh_cn and "项目管理员") or "Project Admin",
+    # Basic
+    "action": (zh_cn and "执行操作") or "Action",
+    "colon": (zh_cn and "：") or ": ",
+    "comma": (zh_cn and "，") or ", ",
+    "page": (zh_cn and "第 {} 页") or "Page {}",
+    "reason": (zh_cn and "原因") or "Reason",
+    "reset": (zh_cn and "重置数据") or "Reset Data",
+    "result": (zh_cn and "结果") or "Result",
+    "rollback": (zh_cn and "数据回滚") or "Rollback",
+    "see": (zh_cn and "查看") or "See",
+    "status_failed": (zh_cn and "未执行") or "Failed",
+    "status_succeed": (zh_cn and "成功执行") or "Succeed",
+    "version": (zh_cn and "版本") or "Version",
+    # Command
+    "command_lack": (zh_cn and "命令参数缺失") or "Lack of Parameter",
+    "command_para": (zh_cn and "命令参数有误") or "Incorrect Command Parameter",
+    "command_type": (zh_cn and "命令类别有误") or "Incorrect Command Type",
+    "command_usage": (zh_cn and "用法有误") or "Incorrect Usage",
+    # Emergency
+    "issue": (zh_cn and "发现状况") or "Issue",
+    "exchange_invalid": (zh_cn and "数据交换频道失效") or "Exchange Channel Invalid",
+    "auto_fix": (zh_cn and "自动处理") or "Auto Fix",
+    "protocol_1": (zh_cn and "启动 1 号协议") or "Initiate Protocol 1",
+    "transfer_channel": (zh_cn and "频道转移") or "Transfer Channel",
+    "emergency_channel": (zh_cn and "应急频道") or "Emergency Channel",
+    # Record
+    "project": (zh_cn and "项目编号") or "Project",
+    "project_origin": (zh_cn and "原始项目") or "Original Project",
+    "status": (zh_cn and "状态") or "Status",
+    "user_id": (zh_cn and "用户 ID") or "User ID",
+    "level": (zh_cn and "操作等级") or "Level",
+    "rule": (zh_cn and "规则") or "Rule",
+    "message_type": (zh_cn and "消息类别") or "Message Type",
+    "message_game": (zh_cn and "游戏标识") or "Game Short Name",
+    "message_lang": (zh_cn and "消息语言") or "Message Language",
+    "message_len": (zh_cn and "消息长度") or "Message Length",
+    "message_freq": (zh_cn and "消息频率") or "Message Frequency",
+    "user_score": (zh_cn and "用户得分") or "User Score",
+    "user_bio": (zh_cn and "用户简介") or "User Bio",
+    "user_name": (zh_cn and "用户昵称") or "User Name",
+    "from_name": (zh_cn and "来源名称") or "Forward Name",
+    "more": (zh_cn and "附加信息") or "Extra Info",
+    # Regex
+    "ad": (zh_cn and "广告用语") or "Ad",
+    "aff": (zh_cn and "推广链接") or "AFF Link",
+    "ava": (zh_cn and "头像分析") or "Avatar",
+    "bad": (zh_cn and "敏感检测") or "Bad",
+    "ban": (zh_cn and "自动封禁") or "Ban",
+    "bio": (zh_cn and "简介检查") or "Bio",
+    "con": (zh_cn and "联系方式") or "Contact",
+    "del": (zh_cn and "自动删除") or "Delete",
+    "iml": (zh_cn and "IM 链接") or "IM Link",
+    "pho": (zh_cn and "电话号码") or "Phone Number",
+    "rm": (zh_cn and "RM 笑话") or "RM Joke",
+    "nm": (zh_cn and "名称封禁") or "Name",
+    "sho": (zh_cn and "短链接") or "Short Link",
+    "spc": (zh_cn and "特殊中文") or "Special Chinese",
+    "spe": (zh_cn and "特殊英文") or "Special English",
+    "sti": (zh_cn and "贴纸删除") or "Sticker",
+    "tgl": (zh_cn and "TG 链接") or "TG Link",
+    "tgp": (zh_cn and "TG 代理") or "TG Proxy",
+    "wb": (zh_cn and "追踪封禁") or "Watch Ban",
+    "wd": (zh_cn and "追踪删除") or "Watch Delete",
+    "test": (zh_cn and "测试用例") or "Test",
+    "ad_": (zh_cn and "广告 {} 组") or "Ad {}",
+    # Special
+    # Test
+    # Unit
+    "messages": (zh_cn and "条") or "message(s)"
+}
+for c in ascii_lowercase:
+    lang[f"ad{c}"] = lang.get("ad_", "ad{}").format(c.upper())
+
 # Init
 
-ask_words: Dict[str, Dict[str, Union[str, List]]] = {}
-# ask_words = {
-#     "random": {
-#         "new": "regex",
-#         "old": ["regex1", "regex2"],
-#         "type": "type"
-#     }
-# }
+add_commands: List[str] = ["add"]
+list_commands: List[str] = ["list", "ls"]
+remove_commands: List[str] = ["rm", "remove"]
+same_commands: List[str] = ["copy", "same"]
+search_commands: List[str] = ["find", "s", "search"]
+all_commands: List[str] = add_commands + list_commands + remove_commands + same_commands + search_commands
+all_commands += ["comment", "count", "findall", "group", "groupdict", "groups",
+                 "l", "long", "print", "push", "reset", "t2t", "version", "mention"]
 
 default_word_status: Dict[str, Union[float, int]] = {
     "time": int(time()),
     "average": 0.0,
     "today": 0,
-    "total": 0
+    "total": 0,
+    "who": 0
 }
 
 locks: Dict[str, Lock] = {
     "regex": Lock(),
     "test": Lock()
-}
-
-names: Dict[str, str] = {
-    "ad": "广告用语",
-    "aff": "推广链接",
-    "ava": "头像分析",
-    "bad": "敏感检测",
-    "ban": "自动封禁",
-    "bio": "简介封禁",
-    "con": "联系方式",
-    "del": "自动删除",
-    "iml": "IM 链接",
-    "nm": "名称封禁",
-    "rm": "RM 笑话",
-    "sho": "短链接",
-    "spc": "特殊中文",
-    "spe": "特殊英文",
-    "sti": "贴纸删除",
-    "tgl": "TG 链接",
-    "tgp": "TG 代理",
-    "wb": "追踪封禁",
-    "wd": "追踪删除",
-    "test": "测试用例"
 }
 
 receivers: Dict[str, List[str]] = {
@@ -103,6 +236,33 @@ receivers: Dict[str, List[str]] = {
     "wd": ["NOSPAM", "WATCH"],
     "test": []
 }
+for c in ascii_lowercase:
+    receivers[f"ad{c}"] = receivers["ad"]
+
+regex: Dict[str, bool] = {
+    "ad": True,
+    "aff": True,
+    "ava": True,
+    "bad": True,
+    "ban": True,
+    "bio": True,
+    "con": True,
+    "del": True,
+    "iml": True,
+    "nm": True,
+    "rm": True,
+    "sho": True,
+    "spc": True,
+    "spe": True,
+    "sti": True,
+    "tgl": True,
+    "tgp": True,
+    "wb": True,
+    "wd": True,
+    "test": False
+}
+for c in ascii_lowercase:
+    regex[f"ad{c}"] = True
 
 result_search: Dict[str, Dict[str, Union[str, Dict[str, List[str]]]]] = {}
 # result_search = {
@@ -119,87 +279,7 @@ sender: str = "REGEX"
 
 should_hide: bool = False
 
-version: str = "0.3.6"
-
-# Generate commands lists
-add_commands: list = ["add", "ad"]
-list_commands: list = ["list", "ls"]
-remove_commands: list = ["remove", "rm"]
-same_commands: list = ["same", "copy", "c"]
-search_commands: list = ["search", "s", "find"]
-all_commands: list = add_commands + list_commands + remove_commands + same_commands + search_commands + ["count",
-                                                                                                         "l",
-                                                                                                         "long",
-                                                                                                         "print",
-                                                                                                         "push",
-                                                                                                         "reset",
-                                                                                                         "t2s",
-                                                                                                         "version",
-                                                                                                         "mention"]
-
-# Read data from config.ini
-
-# [basic]
-bot_token: str = ""
-prefix: List[str] = []
-prefix_str: str = "/!"
-
-# [channels]
-critical_channel_id: int = 0
-debug_channel_id: int = 0
-exchange_channel_id: int = 0
-hide_channel_id: int = 0
-regex_group_id: int = 0
-test_group_id: int = 0
-
-# [custom]
-per_page: int = 0
-project_link: str = ""
-project_name: str = ""
-
-# [encrypt]
-key: Union[str, bytes] = ""
-password: str = ""
-
-try:
-    config = RawConfigParser()
-    config.read("config.ini")
-    # [basic]
-    bot_token = config["basic"].get("bot_token", bot_token)
-    prefix = list(config["basic"].get("prefix", prefix_str))
-    # [channels]
-    critical_channel_id = int(config["channels"].get("critical_channel_id", critical_channel_id))
-    debug_channel_id = int(config["channels"].get("debug_channel_id", debug_channel_id))
-    exchange_channel_id = int(config["channels"].get("exchange_channel_id", exchange_channel_id))
-    hide_channel_id = int(config["channels"].get("hide_channel_id", hide_channel_id))
-    test_group_id = int(config["channels"].get("test_group_id", test_group_id))
-    regex_group_id = int(config["channels"].get("regex_group_id", regex_group_id))
-    # [custom]
-    per_page = int(config["custom"].get("per_page", per_page))
-    project_link = config["custom"].get("project_link", project_link)
-    project_name = config["custom"].get("project_name", project_name)
-    # [encrypt]
-    key = config["encrypt"].get("key", key)
-    key = key.encode("utf-8")
-    password = config["encrypt"].get("password", password)
-except Exception as e:
-    logger.warning(f"Read data from config.ini error: {e}", exc_info=True)
-
-# Check
-if (bot_token in {"", "[DATA EXPUNGED]"}
-        or prefix == []
-        or critical_channel_id == 0
-        or debug_channel_id == 0
-        or exchange_channel_id == 0
-        or hide_channel_id == 0
-        or test_group_id == 0
-        or regex_group_id == 0
-        or project_link in {"", "[DATA EXPUNGED]"}
-        or project_name in {"", "[DATA EXPUNGED]"}
-        or key in {b"", b"[DATA EXPUNGED]"}
-        or password in {"", "[DATA EXPUNGED]"}):
-    logger.critical("No proper settings")
-    raise SystemExit("No proper settings")
+version: str = "0.3.7"
 
 # Load data from pickle
 
@@ -213,8 +293,23 @@ for path in ["data", "tmp"]:
     if not exists(path):
         mkdir(path)
 
-# Init words variables
-for word_type in names:
+# Init data variables
+
+ask_words: Dict[str, Dict[str, Union[bool, int, str, List[str]]]] = {}
+# ask_words = {
+#     "random": {
+#         "lock": False,
+#         "time": 1512345678,
+#         "mid": 123,
+#         "new": "regex",
+#         "old": ["regex1", "regex2"],
+#         "type": "type"
+#     }
+# }
+
+# Init word variables
+
+for word_type in regex:
     locals()[f"{word_type}_words"]: Dict[str, Dict[str, Union[float, int]]] = {}
 
 # type_words = {
@@ -222,12 +317,14 @@ for word_type in names:
 #         "time": 15112345678,
 #         "average": 1.1,
 #         "today": 3,
-#         "total": 20
+#         "total": 20,
+#         "who": 12345678
 #     }
 # }
 
 # Load data
-file_list = [f"{word_type}_words" for word_type in names]
+file_list: List[str] = ["ask_words"]
+file_list += [f"{f}_words" for f in regex]
 for file in file_list:
     try:
         try:
@@ -244,6 +341,23 @@ for file in file_list:
     except Exception as e:
         logger.critical(f"Load data {file} backup error: {e}", exc_info=True)
         raise SystemExit("[DATA CORRUPTION]")
+
+# Generate special characters dictionary
+for special in ["spc", "spe"]:
+    locals()[f"{special}_dict"]: Dict[str, str] = {}
+    for rule in locals()[f"{special}_words"]:
+        # Check keys
+        if "[" not in rule:
+            continue
+
+        # Check value
+        if "?#" not in rule:
+            continue
+
+        keys = rule.split("]")[0][1:]
+        value = rule.split("?#")[1][1]
+        for k in keys:
+            locals()[f"{special}_dict"][k] = value
 
 # Start program
 copyright_text = (f"SCP-079-{sender} v{version}, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
