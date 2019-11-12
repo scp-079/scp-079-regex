@@ -201,6 +201,7 @@ lang: Dict[str, str] = {
     "reason_not_specific": (zh_cn and "不具有特殊性") or "Not specific",
     "reason_wait": (zh_cn and "等待确认") or "Wait for Confirmation",
     "type": (zh_cn and "类别") or "Type",
+    "valid_types": (zh_cn and "可选类别") or "Valid Types",
     "word": (zh_cn and "词组") or "Word",
     # Test
     "message_print": (zh_cn and "消息结构") or "Print the Message",

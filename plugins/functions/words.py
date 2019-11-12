@@ -312,9 +312,9 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
                          f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
         else:
             end_text = f"\n".join([f"{code(name)}    {italic(lang(name))}" for name in glovar.regex])
-            text += (f"结果{lang('colon')}{code('无法显示')}\n"
-                     f"原因{lang('colon')}{code('格式有误')}\n"
-                     f"可选{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n"
+                     f"{lang('valid_types')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
     except Exception as e:
         logger.warning(f"Word list error: {e}", exc_info=True)
 
