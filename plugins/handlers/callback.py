@@ -22,9 +22,9 @@ from json import loads
 from pyrogram import Client, CallbackQuery
 
 from .. import glovar
-from ..functions.etc import thread, user_mention
+from ..functions.etc import thread, mention_id
 from ..functions.filters import regex_group
-from .. functions.words import get_admin, get_desc, words_ask, words_list_page, words_search_page
+from ..functions.words import get_admin, get_desc, words_ask, words_list_page, words_search_page
 from ..functions.telegram import answer_callback, edit_message_text
 
 # Enable logging
@@ -49,7 +49,7 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
             if action == "ask":
                 if glovar.locks["regex"].acquire():
                     try:
-                        text = (f"管理：{user_mention(aid)}\n"
+                        text = (f"管理：{mention_id(aid)}\n"
                                 f"{words_ask(client, action_type, data)}")
                         edit_message_text(client, cid, mid, text)
                     finally:

@@ -19,14 +19,15 @@
 import logging
 import re
 from copy import deepcopy
+from string import ascii_lowercase
 
 from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import code, get_filename, get_forward_name, get_int, get_text, thread, user_mention
+from .etc import code, get_filename, get_forward_name, get_int, get_text, lang, mention_id, thread
 from .filters import is_regex_text
 from .telegram import get_sticker_title, send_message
-from .words import similar
+from .words import is_similar
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -36,25 +37,32 @@ def name_test(client: Client, message: Message) -> bool:
     # Test user's or channel's name
     try:
         text = get_forward_name(message)
-        if text:
-            cid = message.chat.id
-            aid = message.from_user.id
-            mid = message.message_id
-            result = ""
-            # Can add more test to the "for in" list
-            for word_type in ["ad", "con", "iml", "nm", "wb", "test"]:
-                if is_regex_text(word_type, text):
-                    w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if similar("test", w, text)]
-                    result += "\t" * 4 + f"{glovar.regex[word_type]}：" + "-" * 16 + "\n\n"
-                    for w in w_list:
-                        result += "\t" * 8 + f"{code(w)}\n\n"
 
-            if result:
-                result = (f"管理员：{user_mention(aid)}\n\n"
-                          f"来源名称：{code(text)}\n\n") + result
-                thread(send_message, (client, cid, result, mid))
-
+        if not text:
             return True
+
+        cid = message.chat.id
+        aid = message.from_user.id
+        mid = message.message_id
+        result = ""
+
+        for word_type in ["ad", "con", "iml", "nm", "wb", "test"]:
+            if not is_regex_text(word_type, text):
+                continue
+
+            w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if is_similar("test", w, text)]
+            result += "\t" * 4 + f"{lang(word_type)}：" + "-" * 16 + "\n\n"
+            for w in w_list:
+                result += "\t" * 8 + f"{code(w)}\n\n"
+
+        if not result:
+            return True
+
+        result = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n\n"
+                  f"{lang('from_name')}{lang('colon')}{code(text)}\n\n") + result
+        thread(send_message, (client, cid, result, mid))
+
+        return True
     except Exception as e:
         logger.warning(f"Name test error: {e}", exc_info=True)
 
@@ -64,38 +72,44 @@ def name_test(client: Client, message: Message) -> bool:
 def sticker_test(client: Client, message: Message) -> bool:
     # Test sticker set name
     try:
-        if message.sticker and message.sticker.set_name:
-            cid = message.chat.id
-            aid = message.from_user.id
-            mid = message.message_id
-            result = ""
-
-            result += f"管理员：{user_mention(aid)}\n\n"
-            sticker_name = message.sticker.set_name
-            result += f"贴纸名称：{code(sticker_name)}\n\n"
-
-            for word_type in ["sti", "test"]:
-                if is_regex_text(word_type, sticker_name):
-                    w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
-                              if similar("test", w, sticker_name)]
-                    result += "\t" * 4 + f"{glovar.regex[word_type]}：" + "-" * 16 + "\n\n"
-                    for w in w_list:
-                        result += "\t" * 8 + f"{code(w)}\n\n"
-
-            sticker_title = get_sticker_title(client, sticker_name)
-            result += f"贴纸标题：{code(sticker_title)}\n\n"
-
-            for word_type in ["ad", "con", "ban", "sti", "test"]:
-                if is_regex_text(word_type, sticker_title):
-                    w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
-                              if similar("test", w, sticker_title)]
-                    result += "\t" * 4 + f"{glovar.regex[word_type]}：" + "-" * 16 + "\n\n"
-                    for w in w_list:
-                        result += "\t" * 8 + f"{code(w)}\n\n"
-
-            thread(send_message, (client, cid, result, mid))
-
+        if not message.sticker or not message.sticker.set_name:
             return True
+
+        cid = message.chat.id
+        aid = message.from_user.id
+        mid = message.message_id
+        result = ""
+
+        result += f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n\n"
+        sticker_name = message.sticker.set_name
+        result += f"{lang('sticker_name')}{lang('colon')}{code(sticker_name)}\n\n"
+
+        for word_type in ["sti", "test"]:
+            if not is_regex_text(word_type, sticker_name):
+                continue
+
+            w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
+                      if is_similar("test", w, sticker_name)]
+            result += "\t" * 4 + f"{lang(word_type)}：" + "-" * 16 + "\n\n"
+            for w in w_list:
+                result += "\t" * 8 + f"{code(w)}\n\n"
+
+        sticker_title = get_sticker_title(client, sticker_name)
+        result += f"{lang('sticker_title')}{lang('colon')}{code(sticker_title)}\n\n"
+
+        for word_type in ["ad", "con", "ban", "sti", "test"]:
+            if not is_regex_text(word_type, sticker_title):
+                continue
+
+            w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
+                      if is_similar("test", w, sticker_title)]
+            result += "\t" * 4 + f"{lang(word_type)}：" + "-" * 16 + "\n\n"
+            for w in w_list:
+                result += "\t" * 8 + f"{code(w)}\n\n"
+
+        thread(send_message, (client, cid, result, mid))
+
+        return True
     except Exception as e:
         logger.warning(f"Sticker test error: {e}", exc_info=True)
 
@@ -105,45 +119,51 @@ def sticker_test(client: Client, message: Message) -> bool:
 def text_test(client: Client, message: Message) -> bool:
     # Test message text or caption
     try:
-        text = get_filename(message) + get_text(message)
-        except_pattern = ("^版本：|"
-                          "^#(bug|done|fixed|todo)|"
-                          "^消息结构：")
-        if text and not re.search(except_pattern, text, re.I | re.M | re.S):
-            cid = message.chat.id
-            if re.search("^管理员：[0-9]", text):
-                aid = get_int(text.split("\n\n")[0].split("：")[1])
-            else:
-                aid = message.from_user.id
+        origin_text = get_text(message)
+        if re.search(f"^{lang('admin')}{lang('colon')}[0-9]", origin_text):
+            aid = get_int(origin_text.split("\n\n")[0].split(lang('colon'))[1])
+        else:
+            aid = message.from_user.id
 
-            mid = message.message_id
-            result_list = [""]
+        except_pattern = (f"^#(bug|done|fixed|todo)|"
+                          f"^{lang('version')}{lang('colon')}|"
+                          f"^{lang('message_print')}{lang('colon')}")
 
-            # ad con iml
-            # ban bio nm del
-            # wb wd bad
-            # etc
-            order_list = ["ad", "con", "iml", "ban", "bio", "nm", "del", "wb", "wd", "bad"]
-            order_set = set(order_list)
-            type_set = set(glovar.regex)
-            type_list = order_list + list(type_set - order_set)
+        text = get_filename(message, True) + get_text(message, True)
 
-            for word_type in type_list:
-                if len(result_list[-1]) > 2000:
-                    result_list.append("")
-
-                if is_regex_text(word_type, text):
-                    w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if similar("test", w, text)]
-                    result_list[-1] += f"{glovar.regex[word_type]}：" + "-" * 24 + "\n\n"
-                    for w in w_list:
-                        result_list[-1] += "\t" * 4 + f"{code(w)}\n\n"
-
-            for result in result_list:
-                if result:
-                    result = f"管理员：{user_mention(aid)}\n\n" + result
-                    send_message(client, cid, result, mid)
-
+        if not text or re.search(except_pattern, origin_text, re.I | re.M | re.S):
             return True
+
+        result_list = [""]
+
+        # Make test result in this order
+        # ad adx
+        # con iml
+        # ban bio nm del
+        # wb wd bad
+        # etc
+        order_list = ["ad"] + [f"ad{c}" for c in ascii_lowercase]
+        order_list += ["con", "iml", "ban", "bio", "nm", "del", "wb", "wd", "bad"]
+        order_set = set(order_list)
+        type_set = set(glovar.regex)
+        type_list = order_list + list(type_set - order_set)
+
+        for word_type in type_list:
+            if len(result_list[-1]) > 2000:
+                result_list.append("")
+
+            if is_regex_text(word_type, text):
+                w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if is_similar("test", w, text)]
+                result_list[-1] += f"{lang(word_type)}：" + "-" * 24 + "\n\n"
+                for w in w_list:
+                    result_list[-1] += "\t" * 4 + f"{code(w)}\n\n"
+
+        for result in result_list:
+            if result:
+                result = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n\n" + result
+                send_message(client, glovar.test_group_id, result, message.message_id)
+
+        return True
     except Exception as e:
         logger.warning(f"Text test error: {e}", exc_info=True)
 

@@ -23,15 +23,16 @@ from pyrogram import Client, InlineKeyboardMarkup, Message
 from pyrogram.api.functions.messages import GetStickerSet
 from pyrogram.api.types import InputStickerSetShortName, StickerSet
 from pyrogram.api.types.messages import StickerSet as messages_StickerSet
-from pyrogram.errors import ChannelInvalid, ChannelPrivate, FloodWait, PeerIdInvalid
+from pyrogram.errors import ButtonDataInvalid, ChannelInvalid, ChannelPrivate, FloodWait, PeerIdInvalid, QueryIdInvalid
 
+from .. import glovar
 from .etc import t2t, wait_flood
 
 # Enable logging
 logger = logging.getLogger(__name__)
 
 
-def answer_callback(client: Client, query_id: str, text: str) -> Optional[bool]:
+def answer_callback(client: Client, callback_query_id: str, text: str, show_alert: bool = False) -> Optional[bool]:
     # Answer the callback
     result = None
     try:
@@ -40,19 +41,22 @@ def answer_callback(client: Client, query_id: str, text: str) -> Optional[bool]:
             flood_wait = False
             try:
                 result = client.answer_callback_query(
-                    callback_query_id=query_id,
-                    text=text
+                    callback_query_id=callback_query_id,
+                    text=text,
+                    show_alert=show_alert
                 )
             except FloodWait as e:
                 flood_wait = True
                 wait_flood(e)
+            except QueryIdInvalid:
+                return False
     except Exception as e:
-        logger.warning(f"Answer query to {query_id} error: {e}", exc_info=True)
+        logger.warning(f"Answer query to {callback_query_id} error: {e}", exc_info=True)
 
     return result
 
 
-def download_media(client: Client, file_id: str, file_path: str):
+def download_media(client: Client, file_id: str, file_ref: str, file_path: str):
     # Download a media file
     result = None
     try:
@@ -60,7 +64,7 @@ def download_media(client: Client, file_id: str, file_path: str):
         while flood_wait:
             flood_wait = False
             try:
-                result = client.download_media(message=file_id, file_name=file_path)
+                result = client.download_media(message=file_id, file_ref=file_ref, file_name=file_path)
             except FloodWait as e:
                 flood_wait = True
                 wait_flood(e)
@@ -75,24 +79,28 @@ def edit_message_text(client: Client, cid: int, mid: int, text: str,
     # Edit the message's text
     result = None
     try:
-        if text.strip():
-            flood_wait = True
-            while flood_wait:
-                flood_wait = False
-                try:
-                    result = client.edit_message_text(
-                        chat_id=cid,
-                        message_id=mid,
-                        text=text,
-                        parse_mode="html",
-                        disable_web_page_preview=True,
-                        reply_markup=markup
-                    )
-                except FloodWait as e:
-                    flood_wait = True
-                    wait_flood(e)
+        if not text.strip():
+            return None
+
+        flood_wait = True
+        while flood_wait:
+            flood_wait = False
+            try:
+                result = client.edit_message_text(
+                    chat_id=cid,
+                    message_id=mid,
+                    text=text,
+                    parse_mode="html",
+                    disable_web_page_preview=True,
+                    reply_markup=markup
+                )
+            except FloodWait as e:
+                flood_wait = True
+                wait_flood(e)
+            except ButtonDataInvalid:
+                logger.warning(f"Edit message {mid} text in {cid} - invalid markup: {markup}")
     except Exception as e:
-        logger.warning(f"Edit message in {cid} error: {e}", exc_info=True)
+        logger.warning(f"Edit message {mid} in {cid} error: {e}", exc_info=True)
 
     return result
 
@@ -115,10 +123,14 @@ def get_messages(client: Client, cid: int, mids: Iterable[int]) -> List[Message]
     return result
 
 
-def get_sticker_title(client: Client, short_name: str) -> Optional[str]:
+def get_sticker_title(client: Client, short_name: str, normal: bool = False, cache: bool = True) -> Optional[str]:
     # Get sticker set's title
     result = None
     try:
+        result = glovar.sticker_titles.get(short_name)
+        if result and cache:
+            return glovar.sticker_titles[short_name]
+
         sticker_set = InputStickerSetShortName(short_name=short_name)
         flood_wait = True
         while flood_wait:
@@ -128,17 +140,19 @@ def get_sticker_title(client: Client, short_name: str) -> Optional[str]:
                 if isinstance(the_set, messages_StickerSet):
                     inner_set = the_set.set
                     if isinstance(inner_set, StickerSet):
-                        result = t2t(inner_set.title)
+                        result = t2t(inner_set.title, normal)
             except FloodWait as e:
                 flood_wait = True
                 wait_flood(e)
+
+        glovar.sticker_titles[short_name] = result
     except Exception as e:
-        logger.warning(f"Get sticker title error: {e}", exc_info=True)
+        logger.warning(f"Get sticker {short_name} title error: {e}", exc_info=True)
 
     return result
 
 
-def send_document(client: Client, cid: int, file: str, text: str = None, mid: int = None,
+def send_document(client: Client, cid: int, document: str, file_ref: str = None, caption: str = "", mid: int = None,
                   markup: InlineKeyboardMarkup = None) -> Optional[Union[bool, Message]]:
     # Send a document to a chat
     result = None
@@ -149,8 +163,9 @@ def send_document(client: Client, cid: int, file: str, text: str = None, mid: in
             try:
                 result = client.send_document(
                     chat_id=cid,
-                    document=file,
-                    caption=text,
+                    document=document,
+                    file_ref=file_ref,
+                    caption=caption,
                     parse_mode="html",
                     reply_to_message_id=mid,
                     reply_markup=markup
@@ -160,8 +175,10 @@ def send_document(client: Client, cid: int, file: str, text: str = None, mid: in
                 wait_flood(e)
             except (PeerIdInvalid, ChannelInvalid, ChannelPrivate):
                 return False
+            except ButtonDataInvalid:
+                logger.warning(f"Send document {document} to {cid} - invalid markup: {markup}")
     except Exception as e:
-        logger.warning(f"Send document to {cid} error: {e}", exec_info=True)
+        logger.warning(f"Send document {document} to {cid} error: {e}", exec_info=True)
 
     return result
 
@@ -171,24 +188,28 @@ def send_message(client: Client, cid: int, text: str, mid: int = None,
     # Send a message to a chat
     result = None
     try:
-        if text.strip():
-            flood_wait = True
-            while flood_wait:
-                flood_wait = False
-                try:
-                    result = client.send_message(
-                        chat_id=cid,
-                        text=text,
-                        parse_mode="html",
-                        disable_web_page_preview=True,
-                        reply_to_message_id=mid,
-                        reply_markup=markup
-                    )
-                except FloodWait as e:
-                    flood_wait = True
-                    wait_flood(e)
-                except (PeerIdInvalid, ChannelInvalid, ChannelPrivate):
-                    return False
+        if not text.strip():
+            return None
+
+        flood_wait = True
+        while flood_wait:
+            flood_wait = False
+            try:
+                result = client.send_message(
+                    chat_id=cid,
+                    text=text,
+                    parse_mode="html",
+                    disable_web_page_preview=True,
+                    reply_to_message_id=mid,
+                    reply_markup=markup
+                )
+            except FloodWait as e:
+                flood_wait = True
+                wait_flood(e)
+            except (PeerIdInvalid, ChannelInvalid, ChannelPrivate):
+                return False
+            except ButtonDataInvalid:
+                logger.warning(f"Send message to {cid} - invalid markup: {markup}")
     except Exception as e:
         logger.warning(f"Send message to {cid} error: {e}", exc_info=True)
 

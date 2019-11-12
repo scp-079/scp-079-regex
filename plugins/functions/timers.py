@@ -33,18 +33,20 @@ def backup_files(client: Client) -> bool:
     # Backup data files to BACKUP
     try:
         for file in glovar.file_list:
-            try:
-                share_data(
-                    client=client,
-                    receivers=["BACKUP"],
-                    action="backup",
-                    action_type="pickle",
-                    data=file,
-                    file=f"data/{file}"
-                )
-                sleep(5)
-            except Exception as e:
-                logger.warning(f"Send backup file {file} error: {e}", exc_info=True)
+            # Check
+            if not eval(f"glovar.{file}"):
+                continue
+
+            # Share
+            share_data(
+                client=client,
+                receivers=["BACKUP"],
+                action="backup",
+                action_type="data",
+                data=file,
+                file=f"data/{file}"
+            )
+            sleep(5)
 
         return True
     except Exception as e:
@@ -55,23 +57,23 @@ def backup_files(client: Client) -> bool:
 
 def reset_count() -> bool:
     # Reset the daily usage
-    if glovar.locks["regex"].acquire():
-        try:
-            for word_type in glovar.regex:
-                for word in list(eval(f"glovar.{word_type}_words")):
-                    eval(f"glovar.{word_type}_words")[word]["today"] = 0
-                    save(f"{word_type}_words")
+    glovar.locks["regex"].acquire()
+    try:
+        for word_type in glovar.regex:
+            for word in list(eval(f"glovar.{word_type}_words")):
+                eval(f"glovar.{word_type}_words")[word]["today"] = 0
+                save(f"{word_type}_words")
 
-            return True
-        except Exception as e:
-            logger.warning(f"Reset count error: {e}", exc_info=True)
-        finally:
-            glovar.locks["regex"].release()
+        return True
+    except Exception as e:
+        logger.warning(f"Reset count error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 
 
-def update_status(client: Client) -> bool:
+def update_status(client: Client, the_type: str) -> bool:
     # Update running status to BACKUP
     try:
         share_data(
@@ -79,11 +81,14 @@ def update_status(client: Client) -> bool:
             receivers=["BACKUP"],
             action="backup",
             action_type="status",
-            data="awake"
+            data={
+                "type": the_type,
+                "backup": glovar.backup
+            }
         )
 
         return True
     except Exception as e:
-        logger.warning(f"Update status error: {e}")
+        logger.warning(f"Update status error: {e}", exc_info=True)
 
     return False

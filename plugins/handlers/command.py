@@ -24,8 +24,8 @@ from pyrogram import Client, Filters, Message
 from .. import glovar
 from ..functions.channel import share_data, share_regex_update
 from ..functions.etc import bold, code, code_block, general_link, get_callback_data, get_command_context
-from ..functions.etc import get_command_type, get_filename, get_forward_name, get_text, message_link
-from ..functions.etc import thread, user_mention
+from ..functions.etc import get_command_type, get_filename, get_forward_name, get_text, lang, message_link
+from ..functions.etc import thread, mention_id
 from ..functions.file import save
 from ..functions.filters import from_user, regex_group, test_group
 from ..functions.telegram import edit_message_text, get_messages, send_message
@@ -65,7 +65,7 @@ def ask_word(client: Client, message: Message) -> bool:
             cid = message.chat.id
             mid = message.message_id
             uid = message.from_user.id
-            text = f"管理：{user_mention(uid)}\n"
+            text = f"管理：{mention_id(uid)}\n"
             command_list = list(filter(None, message.command))
             if len(command_list) == 2 and command_list[1] in {"new", "replace", "cancel"}:
                 command_type = command_list[1]
@@ -77,7 +77,7 @@ def ask_word(client: Client, message: Message) -> bool:
                         if r_message.from_user.is_self and callback_data_list and callback_data_list[0]["a"] == "ask":
                             r_mid = r_message.message_id
                             ask_key = callback_data_list[0]["d"]
-                            ask_text = (f"管理：{user_mention(aid)}\n"
+                            ask_text = (f"管理：{mention_id(aid)}\n"
                                         f"{words_ask(client, command_type, ask_key)}")
                             thread(edit_message_text, (client, cid, r_mid, ask_text))
                             text += (f"状态：{code('已操作')}\n"
@@ -128,7 +128,7 @@ def count_words(client: Client, message: Message) -> bool:
                 action_type="count",
                 data="ask"
             )
-            text = (f"管理：{user_mention(uid)}\n"
+            text = (f"管理：{mention_id(uid)}\n"
                     f"操作：{code('更新计数')}\n"
                     f"状态：{code('已请求')}\n")
             thread(send_message, (client, cid, text, mid))
@@ -167,7 +167,7 @@ def page_word(client: Client, message: Message) -> bool:
         cid = message.chat.id
         mid = message.message_id
         uid = message.from_user.id
-        text = f"管理：{user_mention(uid)}\n"
+        text = f"管理：{mention_id(uid)}\n"
         command_type = get_command_type(message)
         if command_type and command_type in {"previous", "next"}:
             if message.reply_to_message:
@@ -231,12 +231,12 @@ def push_words(client: Client, message: Message) -> bool:
             cid = message.chat.id
             mid = message.message_id
             uid = message.from_user.id
-            text = (f"管理：{user_mention(uid)}\n"
+            text = (f"管理：{mention_id(uid)}\n"
                     f"操作：{code('手动推送')}\n")
             command_type = get_command_type(message)
             if command_type and command_type in glovar.regex:
                 share_regex_update(client, command_type)
-                text += (f"类别：{code(glovar.regex[command_type])}\n"
+                text += (f"类别：{code(lang(command_type))}\n"
                          f"状态：{code('已推送')}\n")
             elif command_type == "all":
                 for word_type in glovar.regex:
@@ -245,7 +245,7 @@ def push_words(client: Client, message: Message) -> bool:
                 text += (f"类别：{code('全部')}\n"
                          f"状态：{code('已推送')}\n")
             else:
-                text += (f"类别：{code(command_type or '未知')}\n"
+                text += (f"类别：{code(lang(command_type))}\n"
                          f"状态：{code('未推送')}\n"
                          f"原因：{code('格式有误')}\n")
 
@@ -289,7 +289,7 @@ def reset_words(client: Client, message: Message) -> bool:
             cid = message.chat.id
             mid = message.message_id
             uid = message.from_user.id
-            text = (f"管理：{user_mention(uid)}\n"
+            text = (f"管理：{mention_id(uid)}\n"
                     f"操作：{code('清除计数')}\n")
             command_type = get_command_type(message)
             if command_type and command_type in ["all"] + list(glovar.regex):
@@ -331,7 +331,7 @@ def same_words(client: Client, message: Message) -> bool:
             cid = message.chat.id
             mid = message.message_id
             uid = message.from_user.id
-            text = f"管理：{user_mention(uid)}\n"
+            text = f"管理：{mention_id(uid)}\n"
             # Get this new command's list
             new_command_list = list(filter(None, message.command))
             new_word_type_list = new_command_list[1:]
@@ -438,7 +438,7 @@ def text_t2s(client: Client, message: Message) -> bool:
         cid = message.chat.id
         aid = message.from_user.id
         mid = message.message_id
-        text = f"管理员：{user_mention(aid)}\n\n"
+        text = f"管理员：{mention_id(aid)}\n\n"
         if message.reply_to_message:
             result = ""
             forward_name = get_forward_name(message.reply_to_message)
@@ -479,7 +479,7 @@ def version(client: Client, message: Message) -> bool:
         cid = message.chat.id
         aid = message.from_user.id
         mid = message.message_id
-        text = (f"管理员：{user_mention(aid)}\n\n"
+        text = (f"管理员：{mention_id(aid)}\n\n"
                 f"版本：{bold(glovar.version)}\n")
         thread(send_message, (client, cid, text, mid))
 

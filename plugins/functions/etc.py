@@ -24,6 +24,7 @@ from string import ascii_letters, digits
 from threading import Thread, Timer
 from time import sleep, time
 from typing import Any, Callable, List, Optional, Union
+from unicodedata import normalize
 
 from cryptography.fernet import Fernet
 from opencc import convert
@@ -94,6 +95,7 @@ def crypt_str(operation: str, text: str, key: str) -> str:
     try:
         f = Fernet(key)
         text = text.encode("utf-8")
+
         if operation == "decrypt":
             result = f.decrypt(text)
         else:
@@ -112,6 +114,7 @@ def delay(secs: int, target: Callable, args: list) -> bool:
         t = Timer(secs, target, args)
         t.daemon = True
         t.start()
+
         return True
     except Exception as e:
         logger.warning(f"Delay error: {e}", exc_info=True)
@@ -156,17 +159,21 @@ def get_callback_data(message: Message) -> List[dict]:
     # Get a message's inline button's callback data
     callback_data_list = []
     try:
-        if message.reply_markup and isinstance(message.reply_markup, InlineKeyboardMarkup):
-            reply_markup = message.reply_markup
-            if reply_markup.inline_keyboard:
-                inline_keyboard = reply_markup.inline_keyboard
-                if inline_keyboard:
-                    for button_row in inline_keyboard:
-                        for button in button_row:
-                            if button.callback_data:
-                                callback_data = button.callback_data
-                                callback_data = loads(callback_data)
-                                callback_data_list.append(callback_data)
+        reply_markup = message.reply_markup
+
+        if (not reply_markup
+                or not isinstance(reply_markup, InlineKeyboardMarkup)
+                or not reply_markup.inline_keyboard):
+            return []
+
+        for button_row in reply_markup.inline_keyboard:
+            for button in button_row:
+                if not button.callback_data:
+                    continue
+
+                callback_data = button.callback_data
+                callback_data = loads(callback_data)
+                callback_data_list.append(callback_data)
     except Exception as e:
         logger.warning(f"Get callback data error: {e}", exc_info=True)
 
@@ -180,14 +187,18 @@ def get_command_context(message: Message) -> (str, str):
     try:
         text = get_text(message)
         command_list = text.split(" ")
-        if len(list(filter(None, command_list))) > 1:
-            i = 1
-            command_type = command_list[i]
-            while command_type == "" and i < len(command_list):
-                i += 1
-                command_type = command_list[i]
 
-            command_context = text[1 + len(command_list[0]) + i + len(command_type):].strip()
+        if len(list(filter(None, command_list))) <= 1:
+            return "", ""
+
+        i = 1
+        command_type = command_list[i]
+
+        while command_type == "" and i < len(command_list):
+            i += 1
+            command_type = command_list[i]
+
+        command_context = text[1 + len(command_list[0]) + i + len(command_type):].strip()
     except Exception as e:
         logger.warning(f"Get command context error: {e}", exc_info=True)
 
@@ -207,7 +218,7 @@ def get_command_type(message: Message) -> str:
     return result
 
 
-def get_filename(message: Message) -> str:
+def get_filename(message: Message, normal: bool = False) -> str:
     # Get file's filename
     text = ""
     try:
@@ -219,20 +230,20 @@ def get_filename(message: Message) -> str:
                 text += message.audio.file_name
 
         if text:
-            text = t2t(text)
+            text = t2t(text, normal)
     except Exception as e:
         logger.warning(f"Get filename error: {e}", exc_info=True)
 
     return text
 
 
-def get_forward_name(message: Message) -> str:
+def get_forward_name(message: Message, normal: bool = False) -> str:
     # Get forwarded message's origin sender's name
     text = ""
     try:
         if message.forward_from:
             user = message.forward_from
-            text = get_full_name(user)
+            text = get_full_name(user, normal)
         elif message.forward_sender_name:
             text = message.forward_sender_name
         elif message.forward_from_chat:
@@ -240,24 +251,26 @@ def get_forward_name(message: Message) -> str:
             text = chat.title
 
         if text:
-            text = t2t(text)
+            text = t2t(text, normal)
     except Exception as e:
         logger.warning(f"Get forward name error: {e}", exc_info=True)
 
     return text
 
 
-def get_full_name(user: User) -> str:
+def get_full_name(user: User, normal: bool = False) -> str:
     # Get user's full name
     text = ""
     try:
-        if user and not user.is_deleted:
-            text = user.first_name
-            if user.last_name:
-                text += f" {user.last_name}"
+        if not user or user.is_deleted:
+            return ""
 
-        if text:
-            text = t2t(text)
+        text = user.first_name
+        if user.last_name:
+            text += f" {user.last_name}"
+
+        if text and normal:
+            text = t2t(text, normal)
     except Exception as e:
         logger.warning(f"Get full name error: {e}", exc_info=True)
 
@@ -275,72 +288,78 @@ def get_int(text: str) -> Optional[int]:
     return result
 
 
-def get_list_page(the_list: list, action: str, action_type: str, per_page: int,
-                  page: int) -> (list, InlineKeyboardMarkup):
+def get_list_page(the_list: list, action: str, action_type: str, page: int) -> (list, InlineKeyboardMarkup):
     # Generate a list for elements and markup buttons
     markup = None
     try:
-        # Get page count
+        per_page = glovar.per_page
         quo = int(len(the_list) / per_page)
-        if quo != 0:
-            page_count = quo + 1
-            if len(the_list) % per_page == 0:
-                page_count = page_count - 1
 
-            if page != page_count:
-                the_list = the_list[(page - 1) * per_page:page * per_page]
-            else:
-                the_list = the_list[(page - 1) * per_page:len(the_list)]
-            if page_count > 1:
-                if page == 1:
-                    markup = InlineKeyboardMarkup(
-                        [
-                            [
-                                InlineKeyboardButton(
-                                    f"第 {page} 页",
-                                    callback_data=button_data("none")
-                                ),
-                                InlineKeyboardButton(
-                                    ">>",
-                                    callback_data=button_data(action, action_type, page + 1)
-                                )
-                            ]
-                        ]
-                    )
-                elif page == page_count:
-                    markup = InlineKeyboardMarkup(
-                        [
-                            [
-                                InlineKeyboardButton(
-                                    "<<",
-                                    callback_data=button_data(action, action_type, page - 1)
-                                ),
-                                InlineKeyboardButton(
-                                    f"第 {page} 页",
-                                    callback_data=button_data("none")
-                                )
-                            ]
-                        ]
-                    )
-                else:
-                    markup = InlineKeyboardMarkup(
-                        [
-                            [
-                                InlineKeyboardButton(
-                                    "<<",
-                                    callback_data=button_data(action, action_type, page - 1)
-                                ),
-                                InlineKeyboardButton(
-                                    f"第 {page} 页",
-                                    callback_data=button_data("none")
-                                ),
-                                InlineKeyboardButton(
-                                    '>>',
-                                    callback_data=button_data(action, action_type, page + 1)
-                                )
-                            ]
-                        ]
-                    )
+        if quo == 0:
+            return the_list, None
+
+        page_count = quo + 1
+
+        if len(the_list) % per_page == 0:
+            page_count = page_count - 1
+
+        if page != page_count:
+            the_list = the_list[(page - 1) * per_page:page * per_page]
+        else:
+            the_list = the_list[(page - 1) * per_page:len(the_list)]
+
+        if page_count == 1:
+            return the_list, markup
+
+        if page == 1:
+            markup = InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(
+                            text=lang("page").format(page),
+                            callback_data=button_data("none")
+                        ),
+                        InlineKeyboardButton(
+                            text=">>",
+                            callback_data=button_data(action, action_type, page + 1)
+                        )
+                    ]
+                ]
+            )
+        elif page == page_count:
+            markup = InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(
+                            text="<<",
+                            callback_data=button_data(action, action_type, page - 1)
+                        ),
+                        InlineKeyboardButton(
+                            text=lang("page").format(page),
+                            callback_data=button_data("none")
+                        )
+                    ]
+                ]
+            )
+        else:
+            markup = InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(
+                            text="<<",
+                            callback_data=button_data(action, action_type, page - 1)
+                        ),
+                        InlineKeyboardButton(
+                            text=lang("page").format(page),
+                            callback_data=button_data("none")
+                        ),
+                        InlineKeyboardButton(
+                            text=">>",
+                            callback_data=button_data(action, action_type, page + 1)
+                        )
+                    ]
+                ]
+            )
     except Exception as e:
         logger.warning(f"Get list page error: {e}", exc_info=True)
 
@@ -358,35 +377,41 @@ def get_now() -> int:
     return result
 
 
-def get_text(message: Message) -> str:
+def get_text(message: Message, normal: bool = False, printable: bool = True) -> str:
     # Get message's text, including links and buttons
     text = ""
     try:
+        if not message:
+            return ""
+
         the_text = message.text or message.caption
         if the_text:
             text += the_text
             entities = message.entities or message.caption_entities
             if entities:
                 for en in entities:
-                    if en.url:
-                        text += f"\n{en.url}"
+                    if not en.url:
+                        continue
 
-        if message.reply_markup and isinstance(message.reply_markup, InlineKeyboardMarkup):
-            reply_markup = message.reply_markup
-            if reply_markup.inline_keyboard:
-                inline_keyboard = reply_markup.inline_keyboard
-                if inline_keyboard:
-                    for button_row in inline_keyboard:
-                        for button in button_row:
-                            if button:
-                                if button.text:
-                                    text += f"\n{button.text}"
+                    text += f"\n{en.url}"
 
-                                if button.url:
-                                    text += f"\n{button.url}"
+        reply_markup = message.reply_markup
+        if (reply_markup
+                and isinstance(reply_markup, InlineKeyboardMarkup)
+                and reply_markup.inline_keyboard):
+            for button_row in reply_markup.inline_keyboard:
+                for button in button_row:
+                    if not button:
+                        continue
+
+                    if button.text:
+                        text += f"\n{button.text}"
+
+                    if button.url:
+                        text += f"\n{button.url}"
 
         if text:
-            text = t2t(text)
+            text = t2t(text, normal, printable)
     except Exception as e:
         logger.warning(f"Get text error: {e}", exc_info=True)
 
@@ -396,9 +421,9 @@ def get_text(message: Message) -> str:
 def italic(text: Any) -> str:
     # Get italic text
     try:
-        text = str(text)
+        text = str(text).strip()
         if text:
-            return f"<i>{escape(str(text))}</i>"
+            return f"<i>{escape(text)}</i>"
     except Exception as e:
         logger.warning(f"Italic error: {e}", exc_info=True)
 
@@ -412,6 +437,17 @@ def lang(text: str) -> str:
         result = glovar.lang.get(text, text)
     except Exception as e:
         logger.warning(f"Lang error: {e}", exc_info=True)
+
+    return result
+
+
+def mention_id(uid: int) -> str:
+    # Get a ID mention string
+    result = ""
+    try:
+        result = general_link(f"{uid}", f"tg://user?id={uid}")
+    except Exception as e:
+        logger.warning(f"Mention id error: {e}", exc_info=True)
 
     return result
 
@@ -439,12 +475,25 @@ def random_str(i: int) -> str:
     return text
 
 
-def t2t(text: str) -> str:
-    # Convert Traditional Chinese to Simplified Chinese
+def t2t(text: str, normal: bool, printable: bool = True) -> str:
+    # Convert the string, text to text
     try:
-        text = convert(text, config="t2s.json")
+        if not text:
+            return ""
+
+        if normal:
+            for special in ["spc", "spe"]:
+                text = "".join(eval(f"glovar.{special}_dict").get(t, t) for t in text)
+
+            text = normalize("NFKC", text)
+
+        if printable:
+            text = "".join(t for t in text if t.isprintable() or t in {"\n", "\r", "\t"})
+
+        if glovar.zh_cn:
+            text = convert(text, config="t2s.json")
     except Exception as e:
-        logger.warning(f"T2S error: {e}", exc_info=True)
+        logger.warning(f"T2T error: {e}", exc_info=True)
 
     return text
 
@@ -461,17 +510,6 @@ def thread(target: Callable, args: tuple) -> bool:
         logger.warning(f"Thread error: {e}", exc_info=True)
 
     return False
-
-
-def user_mention(uid: int) -> str:
-    # Get a mention text
-    text = ""
-    try:
-        text = general_link(f"{uid}", f"tg://user?id={uid}")
-    except Exception as e:
-        logger.warning(f"User mention error: {e}", exc_info=True)
-
-    return text
 
 
 def wait_flood(e: FloodWait) -> bool:

@@ -18,26 +18,31 @@
 
 import logging
 import re
-from typing import Union
+from typing import Match, Optional, Union
 
 from pyrogram import CallbackQuery, Filters, Message
+from xeger import Xeger
 
 from .. import glovar
 
 # Enable logging
 logger = logging.getLogger(__name__)
 
+# Xeger config
+xg = Xeger(limit=32)
+
 
 def is_exchange_channel(_, message: Message) -> bool:
     # Check if the message is sent from the exchange channel
     try:
-        if message.chat:
-            cid = message.chat.id
-            if glovar.should_hide:
-                if cid == glovar.hide_channel_id:
-                    return True
-            elif cid == glovar.exchange_channel_id:
-                return True
+        if not message.chat:
+            return False
+
+        cid = message.chat.id
+        if glovar.should_hide:
+            return cid == glovar.hide_channel_id
+        else:
+            return cid == glovar.exchange_channel_id
     except Exception as e:
         logger.warning(f"Is exchange channel error: {e}", exc_info=True)
 
@@ -58,23 +63,32 @@ def is_from_user(_, message: Message) -> bool:
 def is_hide_channel(_, message: Message) -> bool:
     # Check if the message is sent from the hide channel
     try:
-        if message.chat:
-            cid = message.chat.id
-            if cid == glovar.hide_channel_id:
-                return True
+        if not message.chat:
+            return False
+
+        cid = message.chat.id
+        if cid == glovar.hide_channel_id:
+            return True
     except Exception as e:
         logger.warning(f"Is hide channel error: {e}", exc_info=True)
 
     return False
 
 
-def is_test_group(_, message: Message) -> bool:
+def is_test_group(_, update: Union[CallbackQuery, Message]) -> bool:
     # Check if the message is sent from the test group
     try:
-        if message.chat:
-            cid = message.chat.id
-            if cid == glovar.test_group_id:
-                return True
+        if isinstance(update, CallbackQuery):
+            message = update.message
+        else:
+            message = update
+
+        if not message.chat:
+            return False
+
+        cid = message.chat.id
+        if cid == glovar.test_group_id:
+            return True
     except Exception as e:
         logger.warning(f"Is test group error: {e}", exc_info=True)
 
@@ -82,17 +96,19 @@ def is_test_group(_, message: Message) -> bool:
 
 
 def is_regex_group(_, update: Union[CallbackQuery, Message]) -> bool:
-    # Check if the message is sent from regex manage group
+    # Check if the message is sent from regex group
     try:
         if isinstance(update, CallbackQuery):
             message = update.message
         else:
             message = update
 
-        if message.chat:
-            cid = message.chat.id
-            if cid == glovar.regex_group_id:
-                return True
+        if not message.chat:
+            return False
+
+        cid = message.chat.id
+        if cid == glovar.regex_group_id:
+            return True
     except Exception as e:
         logger.warning(f"Is regex group error: {e}", exc_info=True)
 
@@ -125,9 +141,9 @@ regex_group = Filters.create(
 )
 
 
-def is_regex_text(word_type: str, text: str, again: bool = False) -> bool:
+def is_regex_text(word_type: str, text: str, ocr: bool = False, again: bool = False) -> Optional[Match]:
     # Check if the text hit the regex rules
-    result = False
+    result = None
     try:
         if text:
             if not again:
@@ -135,17 +151,61 @@ def is_regex_text(word_type: str, text: str, again: bool = False) -> bool:
             elif " " in text:
                 text = re.sub(r"\s", "", text)
             else:
-                return False
+                return None
         else:
-            return False
+            return None
 
-        for word in list(eval(f"glovar.{word_type}_words")):
-            if re.search(word, text, re.I | re.S | re.M):
-                return True
+        words = list(eval(f"glovar.{word_type}_words"))
+        for word in words:
+            if ocr and "(?# nocr)" in word:
+                continue
+
+            result = re.search(word, text, re.I | re.S | re.M)
+
+            # Return
+            if result:
+                return result
 
         # Try again
-        return is_regex_text(word_type, text, True)
+        return is_regex_text(word_type, text, ocr, True)
     except Exception as e:
         logger.warning(f"Is regex text error: {e}", exc_info=True)
 
     return result
+
+
+def is_similar(mode: str, a: str, b: str) -> bool:
+    # Get regex match result
+    try:
+        if mode == "find":
+            if not re.search(a, b, re.I | re.M | re.S):
+                return False
+
+        if mode == "loose":
+            if not (re.search(a, b, re.I | re.M | re.S)
+                    or re.search(b, a, re.I | re.M | re.S)
+                    or re.search(a, xg.xeger(b), re.I | re.M | re.S)
+                    or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
+                return False
+
+        if mode == "strict":
+            i = 0
+            while i < 3:
+                if not (re.search(a, xg.xeger(b), re.I | re.M | re.S)
+                        or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
+                    return False
+
+                i += 1
+
+        if mode == "test":
+            b = re.sub(r"\s{2,}", " ", b)
+            if not re.search(a, b, re.I | re.M | re.S):
+                b = re.sub(r"\s", "", b)
+                if not re.search(a, b, re.I | re.M | re.S):
+                    return False
+
+        return True
+    except Exception as e:
+        logger.warning(f"Is similar error: {e}", exc_info=True)
+
+    return False

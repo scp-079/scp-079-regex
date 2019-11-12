@@ -121,14 +121,16 @@ lang: Dict[str, str] = {
     "action": (zh_cn and "执行操作") or "Action",
     "colon": (zh_cn and "：") or ": ",
     "comma": (zh_cn and "，") or ", ",
+    "error": (zh_cn and "错误") or "Error",
     "page": (zh_cn and "第 {} 页") or "Page {}",
     "reason": (zh_cn and "原因") or "Reason",
     "reset": (zh_cn and "重置数据") or "Reset Data",
     "result": (zh_cn and "结果") or "Result",
     "rollback": (zh_cn and "数据回滚") or "Rollback",
     "see": (zh_cn and "查看") or "See",
+    "status_error": (zh_cn and "出现错误") or "Error Occurred",
     "status_failed": (zh_cn and "未执行") or "Failed",
-    "status_succeed": (zh_cn and "成功执行") or "Succeed",
+    "status_succeeded": (zh_cn and "成功执行") or "Succeeded",
     "version": (zh_cn and "版本") or "Version",
     # Command
     "command_lack": (zh_cn and "命令参数缺失") or "Lack of Parameter",
@@ -158,6 +160,7 @@ lang: Dict[str, str] = {
     "user_bio": (zh_cn and "用户简介") or "User Bio",
     "user_name": (zh_cn and "用户昵称") or "User Name",
     "from_name": (zh_cn and "来源名称") or "Forward Name",
+    "contact": (zh_cn and "联系方式") or "Contact Info",
     "more": (zh_cn and "附加信息") or "Extra Info",
     # Regex
     "ad": (zh_cn and "广告用语") or "Ad",
@@ -183,9 +186,28 @@ lang: Dict[str, str] = {
     "test": (zh_cn and "测试用例") or "Test",
     "ad_": (zh_cn and "广告 {} 组") or "Ad {}",
     # Special
+    "action_add": (zh_cn and "添加规则") or "Add Rule",
+    "action_list": (zh_cn and "查看列表") or "Show the List",
+    "all": (zh_cn and "全部") or "All",
+    "ask_new": (zh_cn and "另增新词") or "Add as New",
+    "ask_replace": (zh_cn and "替换全部") or "Replace All",
+    "cancel": (zh_cn and "取消") or "Cancel",
+    "duplicated": (zh_cn and "重复") or "Duplicated",
+    "expired": (zh_cn and "会话已失效") or "Session Expired",
+    "order": (zh_cn and "顺序") or "Order",
+    "order_asc": (zh_cn and "升序") or "Ascending",
+    "order_desc": (zh_cn and "降序") or "Descending",
+    "reason_existed": (zh_cn and "已存在") or "Existed",
+    "reason_not_specific": (zh_cn and "不具有特殊性") or "Not specific",
+    "reason_wait": (zh_cn and "等待确认") or "Wait for Confirmation",
+    "type": (zh_cn and "类别") or "Type",
+    "word": (zh_cn and "词组") or "Word",
     # Test
+    "message_print": (zh_cn and "消息结构") or "Print the Message",
+    "sticker_name": (zh_cn and "贴纸名称") or "Sticker Name",
+    "sticker_title": (zh_cn and "贴纸标题") or "Sticker Title",
     # Unit
-    "messages": (zh_cn and "条") or "message(s)"
+    "rules": (zh_cn and "条") or "rule(s)"
 }
 for c in ascii_lowercase:
     lang[f"ad{c}"] = lang.get("ad_", "ad{}").format(c.upper())
@@ -198,8 +220,24 @@ remove_commands: List[str] = ["rm", "remove"]
 same_commands: List[str] = ["copy", "same"]
 search_commands: List[str] = ["find", "s", "search"]
 all_commands: List[str] = add_commands + list_commands + remove_commands + same_commands + search_commands
-all_commands += ["comment", "count", "findall", "group", "groupdict", "groups",
-                 "l", "long", "print", "push", "reset", "t2t", "version", "mention"]
+all_commands += [
+    "check",
+    "comment",
+    "count",
+    "findall",
+    "group",
+    "groupdict",
+    "groups",
+    "id",
+    "l",
+    "long",
+    "mention",
+    "print",
+    "push",
+    "reset",
+    "t2t",
+    "version"
+]
 
 default_word_status: Dict[str, Union[float, int]] = {
     "time": int(time()),
@@ -210,21 +248,22 @@ default_word_status: Dict[str, Union[float, int]] = {
 }
 
 locks: Dict[str, Lock] = {
+    "receive": Lock(),
     "regex": Lock(),
     "test": Lock()
 }
 
 receivers: Dict[str, List[str]] = {
-    "ad": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "aff": ["CLEAN", "WATCH"],
+    "ad": ["CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "aff": ["CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "ava": ["NOSPAM"],
     "bad": ["NOSPAM"],
-    "ban": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "bio": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "con": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "ban": ["CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "bio": ["CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "con": ["CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "del": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "iml": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "nm": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "iml": ["CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "nm": ["CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "rm": ["TIP"],
     "sho": ["CLEAN", "NOSPAM", "WATCH"],
     "spc": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
@@ -279,7 +318,12 @@ sender: str = "REGEX"
 
 should_hide: bool = False
 
-version: str = "0.3.7"
+sticker_titles: Dict[str, str] = {}
+# sticker_titles = {
+#     "short_name": "sticker_title"
+# }
+
+version: str = "0.4.0"
 
 # Load data from pickle
 
@@ -300,6 +344,7 @@ ask_words: Dict[str, Dict[str, Union[bool, int, str, List[str]]]] = {}
 #     "random": {
 #         "lock": False,
 #         "time": 1512345678,
+#         "admin": 12345678,
 #         "mid": 123,
 #         "new": "regex",
 #         "old": ["regex1", "regex2"],
