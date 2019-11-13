@@ -182,7 +182,7 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
                 glovar.ask_words[key]["old"].append(old)
 
         if glovar.ask_words[key]["old"]:
-            end_text = "\n\n".join([code(w) for w in glovar.ask_words[key]["old"]])
+            end_text = "\n\n".join(code(w) for w in glovar.ask_words[key]["old"])
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
                      f"{lang('word')}{lang('colon')}{code(word)}\n"
@@ -245,7 +245,7 @@ def words_ask(client: Client, operation: str, key: str) -> (str, Set[int]):
 
         text += (f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
                  f"{lang('word')}{lang('colon')}{code(new_word)}\n")
-        end_text = "\n\n".join([code(w) for w in glovar.ask_words[key]["old"]])
+        end_text = "\n\n".join(code(w) for w in glovar.ask_words[key]["old"])
 
         # If admin decide to add new word
         if operation == "new":
@@ -311,7 +311,7 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
                          f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                          f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
         else:
-            end_text = f"\n".join([f"{code(name)}    {italic(lang(name))}" for name in glovar.regex])
+            end_text = f"\n".join(f"{code(name)}    {italic(lang(name))}" for name in glovar.regex)
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n"
                      f"{lang('valid_types')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
@@ -321,52 +321,78 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
     return text, markup
 
 
-def words_list_page(uid: int, word_type: str, page: int, desc: bool) -> (str, InlineKeyboardMarkup):
+def words_list_page(aid: int, word_type: str, page: int, desc: bool) -> (str, InlineKeyboardMarkup):
     # Generate a words list page
-    text = f"管理：{mention_id(uid)}\n"
-    words = eval(f"glovar.{word_type}_words")
-    keys = list(words.keys())
-    keys.sort()
-    w_list = sorted(keys, key=lambda k: words[k]["average"], reverse=desc)
-    w_list, markup = get_list_page(w_list, "list", word_type, page)
-    text += (f"类别：{code(lang(word_type))}\n"
-             f"顺序：{code((lambda x: '降序' if x else '升序')(desc))}\n"
-             f"查询：{code('全部')}\n"
-             f"结果：" + "-" * 24 + "\n\n" +
-             f"\n\n".join([(f"{code(w)}\n{italic(round(words[w]['average'], 1))} "
-                            f"{code('/')} {italic(words[w]['today'])} "
-                            f"{code('/')} {italic(words[w]['total'])}")
-                           for w in w_list]))
+    text = ""
+    markup = None
+    try:
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_list'))}\n")
+
+        # Get words
+        words = eval(f"glovar.{word_type}_words")
+        keys = list(words.keys())
+        keys.sort()
+        w_list = sorted(keys, key=lambda k: words[k]["average"], reverse=desc)
+
+        # Get the list and generate the markup
+        w_list, markup = get_list_page(w_list, "list", word_type, page)
+
+        # Generate the text
+        end_text = f"\n\n".join((f"{code(w)}\n{italic(round(words[w]['average'], 1))} "
+                                 f"{code('/')} {italic(words[w]['today'])} "
+                                 f"{code('/')} {italic(words[w]['total'])}")
+                                for w in w_list)
+        order_text = (lambda x: lang("order_desc") if x else lang("order_asc"))(desc)
+        text += (f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+                 f"{lang('order')}{lang('colon')}{code(order_text)}\n"
+                 f"{lang('query')}{lang('colon')}{code(lang('all'))}\n"
+                 f"{lang('result')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
+    except Exception as e:
+        logger.warning(f"Words list page error: {e}", exc_info=True)
 
     return text, markup
 
 
-def word_remove(client: Client, message: Message) -> str:
+def word_remove(client: Client, message: Message) -> (str, Set[int]):
     # Remove a word
-    uid = message.from_user.id
-    text = word_remove_try(client, message)
-    if text:
-        return text
-    elif message.reply_to_message:
-        aid = message.reply_to_message.from_user.id
-        if uid == aid:
-            r_text = word_remove_try(client, message.reply_to_message)
-            if r_text:
-                return r_text
-        else:
-            text = (f"管理：{mention_id(uid)}\n"
-                    f"状态：{code('未移除')}\n"
-                    f"原因：{code('权限错误')}")
-            return text
+    text = ""
+    cc_list = set()
+    try:
+        # Basic data
+        uid = message.from_user.id
 
-    text = (f"管理：{mention_id(uid)}\n"
-            f"状态：{code('未移除')}\n"
-            f"原因：{code('格式有误')}")
+        # Get the report text
+        text, cc_list = word_remove_try(client, message)
 
-    return text
+        if text:
+            return text, cc_list
+
+        if message.reply_to_message:
+            aid = message.reply_to_message.from_user.id
+            if uid == aid:
+                r_text, cc_list = word_remove_try(client, message.reply_to_message)
+                if r_text:
+                    return r_text, cc_list
+            else:
+                text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+                        f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n"
+                        f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                        f"{lang('reason')}{lang('colon')}{code(lang('command_permission'))}\n")
+                return text, cc_list
+
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n"
+                f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+    except Exception as e:
+        logger.warning(f"Word remove error: {e}", exc_info=True)
+
+    return text, cc_list
 
 
-def word_remove_try(client: Client, message: Message) -> Optional[str]:
+def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
     # Try to remove a word
     uid = message.from_user.id
     text = f"管理：{mention_id(uid)}\n"
@@ -393,7 +419,7 @@ def word_remove_try(client: Client, message: Message) -> Optional[str]:
     else:
         text = None
 
-    return text
+    return text, cc_list
 
 
 def words_search(message: Message) -> (str, InlineKeyboardMarkup):

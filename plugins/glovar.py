@@ -135,6 +135,8 @@ lang: Dict[str, str] = {
     # Command
     "command_lack": (zh_cn and "命令参数缺失") or "Lack of Parameter",
     "command_para": (zh_cn and "命令参数有误") or "Incorrect Command Parameter",
+    "command_permission": (zh_cn and "权限有误") or "Permission Error",
+    "command_reply": (zh_cn and "来源有误") or "Reply to Message Error",
     "command_type": (zh_cn and "命令类别有误") or "Incorrect Command Type",
     "command_usage": (zh_cn and "用法有误") or "Incorrect Usage",
     # Emergency
@@ -188,6 +190,7 @@ lang: Dict[str, str] = {
     # Special
     "action_add": (zh_cn and "添加规则") or "Add Rule",
     "action_list": (zh_cn and "查看列表") or "Show the List",
+    "action_remove": (zh_cn and "删除规则") or "Remove Rule",
     "all": (zh_cn and "全部") or "All",
     "ask_new": (zh_cn and "另增新词") or "Add as New",
     "ask_replace": (zh_cn and "替换全部") or "Replace All",
@@ -197,6 +200,7 @@ lang: Dict[str, str] = {
     "order": (zh_cn and "顺序") or "Order",
     "order_asc": (zh_cn and "升序") or "Ascending",
     "order_desc": (zh_cn and "降序") or "Descending",
+    "query": (zh_cn and "查询") or "Query",
     "reason_existed": (zh_cn and "已存在") or "Existed",
     "reason_not_specific": (zh_cn and "不具有特殊性") or "Not specific",
     "reason_wait": (zh_cn and "等待确认") or "Wait for Confirmation",
