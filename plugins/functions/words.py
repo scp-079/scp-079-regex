@@ -451,19 +451,33 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
             word = format_word(word)
             if eval(f"glovar.{word_type}_words").get(word, {}):
                 cc_list = remove_word(word_type, [word], aid)
+
                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
-                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                         f"{lang('word')}{lang('colon')}{code(word)}\n")
+                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+
+                if glovar.comments.get(word_type):
+                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+                text += f"{lang('word')}{lang('colon')}{code(word)}\n"
+
                 share_regex_update(client, word_type)
             else:
                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                         f"{lang('word')}{lang('colon')}{code(word)}\n"
+                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+
+                if glovar.comments.get(word_type):
+                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+                text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                          f"{lang('reason')}{lang('colon')}{code(lang('reason_not_exist'))}\n")
         else:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+            text += f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n"
     except Exception as e:
         logger.warning(f"Word remove try error: {e}", exc_info=True)
 
