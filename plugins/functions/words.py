@@ -133,8 +133,12 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
         word = format_word(word)
         if eval(f"glovar.{word_type}_words").get(word, {}):
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                     f"{lang('word')}{lang('colon')}{code(word)}\n"
+                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('reason_existed'))}\n")
             return text, markup
 
@@ -143,8 +147,12 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
             pattern = re.compile(word, re.I | re.M | re.S)
         except Exception as e:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_error'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                     f"{lang('word')}{lang('colon')}{code(word)}\n"
+                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+            
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+            
+            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                      f"{lang('error')}{lang('colon')}{code(e)}\n")
             return text, markup
 
@@ -156,8 +164,12 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
                      ]:
             if pattern.search(test):
                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                         f"{lang('word')}{lang('colon')}{code(word)}\n"
+                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+
+                if glovar.comments.get(word_type):
+                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+                
+                text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                          f"{lang('reason')}{lang('colon')}{code(lang('reason_not_specific'))}\n")
                 return text, markup
 
@@ -183,9 +195,14 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
 
         if glovar.ask_words[key]["old"]:
             end_text = "\n\n".join(code(w) for w in glovar.ask_words[key]["old"])
+
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                     f"{lang('word')}{lang('colon')}{code(word)}\n"
+                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+            
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+            
+            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('reason_wait'))}\n"
                      f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
 
@@ -219,9 +236,14 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
             glovar.ask_words.pop(key, None)
             add_word(word_type, word, aid)
             share_regex_update(client, word_type)
+
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                     f"{lang('word')}{lang('colon')}{code(word)}\n")
+                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+            
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+            
+            text += f"{lang('word')}{lang('colon')}{code(word)}\n"
     except Exception as e:
         logger.warning(f"Word add error: {e}", exc_info=True)
 
@@ -243,8 +265,13 @@ def words_ask(client: Client, operation: str, key: str) -> (str, Set[int]):
         new_word = glovar.ask_words[key]["new"]
         old_words = glovar.ask_words[key]["old"]
 
-        text += (f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                 f"{lang('word')}{lang('colon')}{code(new_word)}\n")
+        text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+
+        if glovar.comments.get(word_type):
+            text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+        text += f"{lang('word')}{lang('colon')}{code(new_word)}\n"
+
         end_text = "\n\n".join(code(w) for w in glovar.ask_words[key]["old"])
 
         # If admin decide to add new word
@@ -306,8 +333,13 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
                 text, markup = words_list_page(aid, word_type, 1, desc)
             else:
                 order_text = (lambda x: lang("order_desc") if x else lang("order_asc"))(desc)
-                text += (f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                         f"{lang('order')}{lang('colon')}{code(order_text)}\n"
+
+                text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+
+                if glovar.comments.get(word_type):
+                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+                text += (f"{lang('order')}{lang('colon')}{code(order_text)}\n"
                          f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                          f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
         else:
@@ -345,8 +377,13 @@ def words_list_page(aid: int, word_type: str, page: int, desc: bool) -> (str, In
                                  f"{code('/')} {italic(words[w]['total'])}")
                                 for w in w_list)
         order_text = (lambda x: lang("order_desc") if x else lang("order_asc"))(desc)
-        text += (f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                 f"{lang('order')}{lang('colon')}{code(order_text)}\n"
+
+        text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+
+        if glovar.comments.get(word_type):
+            text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+        text += (f"{lang('order')}{lang('colon')}{code(order_text)}\n"
                  f"{lang('query')}{lang('colon')}{code(lang('all'))}\n"
                  f"{lang('result')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
     except Exception as e:
@@ -394,30 +431,41 @@ def word_remove(client: Client, message: Message) -> (str, Set[int]):
 
 def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
     # Try to remove a word
-    uid = message.from_user.id
-    text = f"管理：{mention_id(uid)}\n"
-    # Check if the command format is correct
-    word_type, word = get_command_context(message)
-    if word_type:
+    text = ""
+    cc_list = set()
+    try:
+        # Basic data
+        aid = message.from_user.id
+
+        # Check if the command format is correct
+        word_type, word = get_command_context(message)
+
+        if not word_type:
+            return "", set()
+
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n")
+
         if word and word_type in glovar.regex:
             word = format_word(word)
             if eval(f"glovar.{word_type}_words").get(word, {}):
-                remove_word(word_type, [word])
-                text += (f"状态：{code(f'已移除')}\n"
-                         f"类别：{code(lang(word_type))}\n"
-                         f"词组：{code(word)}")
+                cc_list = remove_word(word_type, [word], aid)
+                text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+                         f"{lang('word')}{lang('colon')}{code(word)}\n")
                 share_regex_update(client, word_type)
             else:
-                text += (f"状态：{code('未移除')}\n"
-                         f"类别：{code(lang(word_type))}\n"
-                         f"词组：{code(word)}\n"
-                         f"原因：{code('不存在')}")
+                text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+                         f"{lang('word')}{lang('colon')}{code(word)}\n"
+                         f"{lang('reason')}{lang('colon')}{code(lang('reason_not_exist'))}\n")
         else:
-            text += (f"类别：{code(lang(word_type))}\n"
-                     f"状态：{code('未移除')}\n"
-                     f"原因：{code('格式有误')}")
-    else:
-        text = None
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+    except Exception as e:
+        logger.warning(f"Word remove try error: {e}", exc_info=True)
 
     return text, cc_list
 

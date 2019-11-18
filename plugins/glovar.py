@@ -195,6 +195,7 @@ lang: Dict[str, str] = {
     "ask_new": (zh_cn and "另增新词") or "Add as New",
     "ask_replace": (zh_cn and "替换全部") or "Replace All",
     "cancel": (zh_cn and "取消") or "Cancel",
+    "comment": (zh_cn and "备注") or "Comment",
     "duplicated": (zh_cn and "重复") or "Duplicated",
     "expired": (zh_cn and "会话已失效") or "Session Expired",
     "order": (zh_cn and "顺序") or "Order",
@@ -202,6 +203,7 @@ lang: Dict[str, str] = {
     "order_desc": (zh_cn and "降序") or "Descending",
     "query": (zh_cn and "查询") or "Query",
     "reason_existed": (zh_cn and "已存在") or "Existed",
+    "reason_not_exist": (zh_cn and "不存在") or "Does Not Exist",
     "reason_not_specific": (zh_cn and "不具有特殊性") or "Not specific",
     "reason_wait": (zh_cn and "等待确认") or "Wait for Confirmation",
     "type": (zh_cn and "类别") or "Type",
@@ -357,6 +359,11 @@ ask_words: Dict[str, Dict[str, Union[bool, int, str, List[str]]]] = {}
 #     }
 # }
 
+comments: Dict[str, str] = {}
+# comments = {
+#     "ada": "ADA"
+# }
+
 # Init word variables
 
 for word_type in regex:
@@ -373,7 +380,7 @@ for word_type in regex:
 # }
 
 # Load data
-file_list: List[str] = ["ask_words"]
+file_list: List[str] = ["ask_words", "comments"]
 file_list += [f"{f}_words" for f in regex]
 for file in file_list:
     try:
