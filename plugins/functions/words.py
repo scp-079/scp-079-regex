@@ -601,6 +601,7 @@ def words_search_page(aid: int, key: str, page: int) -> (str, InlineKeyboardMark
         w_list.sort()
         w_list, markup = get_list_page(w_list, "search", key, page)
 
+        # Get the result text
         if word_type == "all":
             result = glovar.result_search[key]['result']
             end_text = "\n\n".join(f"{code(w)}\n\n"
