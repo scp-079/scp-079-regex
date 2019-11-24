@@ -497,60 +497,68 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
     return text, cc_list
 
 
-def words_search(message: Message) -> (str, InlineKeyboardMarkup):
+def words_search(message: Message, search_type: str) -> (str, InlineKeyboardMarkup):
     # Search words
     text = ""
     markup = None
     try:
         # Basic data
-        uid = message.from_user.id
+        aid = message.from_user.id
 
         # Text prefix
-        text += f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n")
 
         # Check if the command format is correct
         word_type, word = get_command_context(message)
 
         if not word_type:
-            text += (f"结果：{code('无法显示')}\n"
-                     f"原因：{code('格式有误')}")
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
             return text, markup
 
         if not (word and (word_type in list(glovar.regex) + ["all"])
                 or (not word and word_type not in list(glovar.regex) + ["all"])):
-            text += (f"类别：{code(lang(word_type))}\n"
-                     f"结果：{code('无法显示')}\n"
-                     f"原因：{code('格式有误')}")
+            text += (f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
             return text, markup
 
         if not word:
             word = word_type
             word_type = "all"
 
-        search_key = random_str(8)
-        while search_key in glovar.result_search:
-            search_key = random_str(8)
+        # Get the search key
+        key = random_str(8)
+        
+        while key in glovar.result_search:
+            key = random_str(8)
 
-        glovar.result_search[search_key] = {
+        glovar.result_search[key] = {
             "result": {},
             "type": word_type,
             "word": word
         }
+
+        # Get the result
         result = {}
-        if word_type != "all":
-            result = {w: [] for w in list(eval(f"glovar.{word_type}_words"))
-                      if is_similar("loose", w, word)}
-        else:
+
+        if word_type == "all":
             for n in glovar.regex:
-                for w in list(eval(f"glovar.{n}_words")):
-                    if is_similar("loose", w, word):
-                        if result.get(w) is None:
-                            result[w] = []
+                for w in eval(f"glovar.{n}_words"):
+                    if not is_similar(search_type, w, word):
+                        continue
 
-                        result[w].append(n)
+                    if result.get(w) is None:
+                        result[w] = []
 
-        glovar.result_search[search_key]["result"] = result
-        text, markup = words_search_page(uid, search_key, 1)
+                    result[w].append(n)
+        else:
+            result = {w: [] for w in eval(f"glovar.{word_type}_words")
+                      if is_similar(search_type, w, word)}
+
+        glovar.result_search[key]["result"] = result
+        text, markup = words_search_page(aid, key, 1)
     except Exception as e:
         logger.warning(f"Words search error: {e}", exc_info=True)
 
