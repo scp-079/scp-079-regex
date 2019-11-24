@@ -205,6 +205,7 @@ lang: Dict[str, str] = {
     "query": (zh_cn and "查询") or "Query",
     "reason_existed": (zh_cn and "已存在") or "Existed",
     "reason_not_exist": (zh_cn and "不存在") or "Does Not Exist",
+    "reason_not_found": (zh_cn and "没有找到") or "Not Found",
     "reason_not_specific": (zh_cn and "不具有特殊性") or "Not specific",
     "reason_wait": (zh_cn and "等待确认") or "Wait for Confirmation",
     "type": (zh_cn and "类别") or "Type",

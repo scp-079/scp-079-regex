@@ -377,9 +377,10 @@ def words_list_page(aid: int, word_type: str, page: int, desc: bool) -> (str, In
         w_list, markup = get_list_page(w_list, "list", word_type, page)
 
         # Generate the text
-        end_text = f"\n\n".join((f"{code(w)}\n{italic(round(words[w]['average'], 1))} "
-                                 f"{code('/')} {italic(words[w]['today'])} "
-                                 f"{code('/')} {italic(words[w]['total'])}")
+        end_text = f"\n\n".join((f"{code(w)}\n"
+                                 f"{italic(round(words[w]['average'], 1))} {code('/')} "
+                                 f"{italic(words[w]['today'])} {code('/')} "
+                                 f"{italic(words[w]['total'])}")
                                 for w in w_list)
         order_text = (lambda x: lang("order_desc") if x else lang("order_asc"))(desc)
 
@@ -565,40 +566,57 @@ def words_search(message: Message, search_type: str) -> (str, InlineKeyboardMark
     return text, markup
 
 
-def words_search_page(uid: int, key: str, page: int) -> (str, InlineKeyboardMarkup):
+def words_search_page(aid: int, key: str, page: int) -> (str, InlineKeyboardMarkup):
     # Generate searched words page
-    text = f"管理：{mention_id(uid)}\n"
-    if key in glovar.result_search:
+    text = ""
+    markup = None
+    try:
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n")
+
+        if key not in glovar.result_search:
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('expired'))}\n")
+            return text, markup
+
         word_type = glovar.result_search[key]["type"]
         word = glovar.result_search[key]["word"]
-        text += (f"类别：{code(glovar.lang.get(word_type, lang('all')))}\n"
-                 f"查询：{code(word)}\n")
-        markup = None
+
+        text += f"{lang('type')}{lang('colon')}{code(glovar.lang.get(word_type, lang('all')))}\n"
+
+        if glovar.comments.get(word_type):
+            text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+        text += f"{lang('word')}{lang('colon')}{code(word)}\n"
+
         words = glovar.result_search[key]["result"]
-        if words:
-            w_list = list(words)
-            w_list.sort()
-            w_list, markup = get_list_page(w_list, "search", key, glovar.per_page, page)
-            if word_type == "all":
-                end_text = ""
-                for w in w_list:
-                    end_text += (f"{code(w)}\n\n"
-                                 + "\t" * 4
-                                 + italic("，".join([glovar.regex[t]
-                                                    for t in glovar.result_search[key]['result'][w]]))
-                                 + "\n\n")
 
-                end_text = end_text[:-2]
-            else:
-                end_text = "\n\n".join([f"{code(w)}" for w in w_list])
+        if not words:
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('reason_not_found'))}\n")
+            return text, markup
 
-            text += "结果：" + "-" * 24 + f"\n\n{end_text}"
+        w_list = list(words)
+        w_list.sort()
+        w_list, markup = get_list_page(w_list, "search", key, page)
+
+        if word_type == "all":
+            result = glovar.result_search[key]['result']
+            end_text = "\n\n".join(f"{code(w)}\n\n"
+                                   + "\t" * 4
+                                   + italic(lang('comma').join(lang(t) for t in result[w]))
+                                   for w in w_list)
         else:
-            text += (f"结果：{code('无法显示')}\n"
-                     f"原因：{code('没有找到')}")
-    else:
-        text += (f"结果：{code('无法显示')}\n"
-                 f"原因：{code('会话失效')}")
-        markup = None
+            words = eval(f"glovar.{word_type}_words")
+            end_text = "\n\n".join((f"{code(w)}\n"
+                                    f"{italic(round(words[w]['average'], 1))} {code('/')} "
+                                    f"{italic(words[w]['today'])} {code('/')} "
+                                    f"{italic(words[w]['total'])}")
+                                   for w in w_list)
+
+        text += f"{lang('result')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}"
+    except Exception as e:
+        logger.warning(f"Words search page error: {e}", exc_info=True)
 
     return text, markup
