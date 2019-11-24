@@ -35,38 +35,46 @@ logger = logging.getLogger(__name__)
 def answer(client: Client, callback_query: CallbackQuery) -> bool:
     # Answer the callback query
     try:
+        # Basic data
         cid = callback_query.message.chat.id
         uid = callback_query.from_user.id
         aid = get_admin(callback_query.message)
-        # Check permission
-        if uid == aid:
-            # Basic callback data
-            mid = callback_query.message.message_id
-            callback_data = loads(callback_query.data)
-            action = callback_data["a"]
-            action_type = callback_data["t"]
-            data = callback_data["d"]
-            if action == "ask":
-                if glovar.locks["regex"].acquire():
-                    try:
-                        text = (f"管理：{mention_id(aid)}\n"
-                                f"{words_ask(client, action_type, data)}")
-                        edit_message_text(client, cid, mid, text)
-                    finally:
-                        glovar.locks["regex"].release()
-            elif action == "list":
-                word_type = action_type
-                page = data
-                desc = get_desc(callback_query.message)
-                text, markup = words_list_page(uid, word_type, page, desc)
-                edit_message_text(client, cid, mid, text, markup)
-            elif action == "search":
-                key = action_type
-                page = data
-                text, markup = words_search_page(uid, key, page)
-                edit_message_text(client, cid, mid, text, markup)
+        mid = callback_query.message.message_id
+        callback_data = loads(callback_query.data)
+        action = callback_data["a"]
+        action_type = callback_data["t"]
+        data = callback_data["d"]
 
-            thread(answer_callback, (client, callback_query.id, ""))
+        # Check permission
+        if uid != aid:
+            return True
+
+        # Answer the words ask
+        if action == "ask":
+            if glovar.locks["regex"].acquire():
+                try:
+                    text = (f"管理：{mention_id(aid)}\n"
+                            f"{words_ask(client, action_type, data)}")
+                    edit_message_text(client, cid, mid, text)
+                finally:
+                    glovar.locks["regex"].release()
+
+        # List the word
+        elif action == "list":
+            word_type = action_type
+            page = data
+            desc = get_desc(callback_query.message)
+            text, markup = words_list_page(uid, word_type, page, desc)
+            edit_message_text(client, cid, mid, text, markup)
+
+        # Search the word
+        elif action == "search":
+            key = action_type
+            page = data
+            text, markup = words_search_page(uid, key, page)
+            edit_message_text(client, cid, mid, text, markup)
+
+        thread(answer_callback, (client, callback_query.id, ""))
 
         return True
     except Exception as e:

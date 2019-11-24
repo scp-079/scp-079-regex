@@ -319,34 +319,39 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
         text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
                 f"{lang('action')}{lang('colon')}{code(lang('action_list'))}\n")
 
-        # Check command format
         command_list = list(filter(None, get_text(message).split(" ")))
-        if len(command_list) > 1:
-            word_type = command_list[1]
-            desc = True
 
-            if len(command_list) > 2:
-                if command_list[2] == "asc":
-                    desc = False
-
-            if word_type in glovar.regex:
-                text, markup = words_list_page(aid, word_type, 1, desc)
-            else:
-                order_text = (lambda x: lang("order_desc") if x else lang("order_asc"))(desc)
-
-                text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-
-                if glovar.comments.get(word_type):
-                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-
-                text += (f"{lang('order')}{lang('colon')}{code(order_text)}\n"
-                         f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                         f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
-        else:
+        # Check command format
+        if len(command_list) <= 1:
             end_text = f"\n".join(f"{code(name)}    {italic(lang(name))}" for name in glovar.regex)
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n"
                      f"{lang('valid_types')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
+            return text, markup
+
+        word_type = command_list[1]
+        desc = True
+
+        # Get desc value
+        if len(command_list) > 2:
+            if command_list[2] == "asc":
+                desc = False
+
+        # Check the word type
+        if word_type not in glovar.regex:
+            order_text = (lambda x: lang("order_desc") if x else lang("order_asc"))(desc)
+
+            text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+            text += (f"{lang('order')}{lang('colon')}{code(order_text)}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+            return text, markup
+
+        text, markup = words_list_page(aid, word_type, 1, desc)
     except Exception as e:
         logger.warning(f"Word list error: {e}", exc_info=True)
 
@@ -408,16 +413,16 @@ def word_remove(client: Client, message: Message) -> (str, Set[int]):
 
         if message.reply_to_message:
             aid = message.reply_to_message.from_user.id
-            if uid == aid:
-                r_text, cc_list = word_remove_try(client, message.reply_to_message)
-                if r_text:
-                    return r_text, cc_list
-            else:
+            if uid != aid:
                 text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
                         f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n"
                         f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                         f"{lang('reason')}{lang('colon')}{code(lang('command_permission'))}\n")
                 return text, cc_list
+
+            r_text, cc_list = word_remove_try(client, message.reply_to_message)
+            if r_text:
+                return r_text, cc_list
 
         text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
                 f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n"
@@ -447,30 +452,8 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
         text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
                 f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n")
 
-        if word and word_type in glovar.regex:
-            word = format_word(word)
-            if eval(f"glovar.{word_type}_words").get(word, {}):
-                cc_list = remove_word(word_type, [word], aid)
-
-                text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
-                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-
-                if glovar.comments.get(word_type):
-                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-
-                text += f"{lang('word')}{lang('colon')}{code(word)}\n"
-
-                share_regex_update(client, word_type)
-            else:
-                text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-
-                if glovar.comments.get(word_type):
-                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-
-                text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
-                         f"{lang('reason')}{lang('colon')}{code(lang('reason_not_exist'))}\n")
-        else:
+        # Check the word type
+        if not (word and word_type in glovar.regex):
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
 
@@ -478,6 +461,36 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
                 text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
 
             text += f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n"
+
+            return text, cc_list
+
+        # Format the word
+        word = format_word(word)
+
+        # Check if the word exists
+        if not eval(f"glovar.{word_type}_words").get(word, {}):
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('reason_not_exist'))}\n")
+
+            return text, cc_list
+
+        cc_list = remove_word(word_type, [word], aid)
+
+        text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+                 f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+
+        if glovar.comments.get(word_type):
+            text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+        text += f"{lang('word')}{lang('colon')}{code(word)}\n"
+
+        share_regex_update(client, word_type)
     except Exception as e:
         logger.warning(f"Word remove try error: {e}", exc_info=True)
 
@@ -486,49 +499,60 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
 
 def words_search(message: Message) -> (str, InlineKeyboardMarkup):
     # Search words
-    uid = message.from_user.id
-    text = f"管理：{mention_id(uid)}\n"
+    text = ""
     markup = None
-    # Check if the command format is correct
-    word_type, word = get_command_context(message)
-    if word_type:
-        if (word and (word_type in list(glovar.regex) + ["all"])
+    try:
+        # Basic data
+        uid = message.from_user.id
+
+        # Text prefix
+        text += f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+
+        # Check if the command format is correct
+        word_type, word = get_command_context(message)
+
+        if not word_type:
+            text += (f"结果：{code('无法显示')}\n"
+                     f"原因：{code('格式有误')}")
+            return text, markup
+
+        if not (word and (word_type in list(glovar.regex) + ["all"])
                 or (not word and word_type not in list(glovar.regex) + ["all"])):
-            if not word:
-                word = word_type
-                word_type = "all"
-
-            search_key = random_str(8)
-            while search_key in glovar.result_search:
-                search_key = random_str(8)
-
-            glovar.result_search[search_key] = {
-                "result": {},
-                "type": word_type,
-                "word": word
-            }
-            result = {}
-            if word_type != "all":
-                result = {w: [] for w in list(eval(f"glovar.{word_type}_words"))
-                          if is_similar("loose", w, word)}
-            else:
-                for n in glovar.regex:
-                    for w in list(eval(f"glovar.{n}_words")):
-                        if is_similar("loose", w, word):
-                            if result.get(w) is None:
-                                result[w] = []
-
-                            result[w].append(n)
-
-            glovar.result_search[search_key]["result"] = result
-            text, markup = words_search_page(uid, search_key, 1)
-        else:
             text += (f"类别：{code(lang(word_type))}\n"
                      f"结果：{code('无法显示')}\n"
                      f"原因：{code('格式有误')}")
-    else:
-        text += (f"结果：{code('无法显示')}\n"
-                 f"原因：{code('格式有误')}")
+            return text, markup
+
+        if not word:
+            word = word_type
+            word_type = "all"
+
+        search_key = random_str(8)
+        while search_key in glovar.result_search:
+            search_key = random_str(8)
+
+        glovar.result_search[search_key] = {
+            "result": {},
+            "type": word_type,
+            "word": word
+        }
+        result = {}
+        if word_type != "all":
+            result = {w: [] for w in list(eval(f"glovar.{word_type}_words"))
+                      if is_similar("loose", w, word)}
+        else:
+            for n in glovar.regex:
+                for w in list(eval(f"glovar.{n}_words")):
+                    if is_similar("loose", w, word):
+                        if result.get(w) is None:
+                            result[w] = []
+
+                        result[w].append(n)
+
+        glovar.result_search[search_key]["result"] = result
+        text, markup = words_search_page(uid, search_key, 1)
+    except Exception as e:
+        logger.warning(f"Words search error: {e}", exc_info=True)
 
     return text, markup
 

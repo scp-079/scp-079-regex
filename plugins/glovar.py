@@ -191,6 +191,7 @@ lang: Dict[str, str] = {
     "action_add": (zh_cn and "添加规则") or "Add Rule",
     "action_list": (zh_cn and "查看列表") or "Show the List",
     "action_remove": (zh_cn and "删除规则") or "Remove Rule",
+    "action_search": (zh_cn and "查询规则") or "Search Rules",
     "all": (zh_cn and "全部") or "All",
     "ask_new": (zh_cn and "另增新词") or "Add as New",
     "ask_replace": (zh_cn and "替换全部") or "Replace All",
