@@ -392,6 +392,9 @@ def words_list_page(aid: int, word_type: str, page: int, desc: bool) -> (str, In
         if glovar.comments.get(word_type):
             text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
 
+        if not end_text.strip():
+            end_text = lang("reason_none")
+
         text += (f"{lang('order')}{lang('colon')}{code(order_text)}\n"
                  f"{lang('query')}{lang('colon')}{code(lang('all'))}\n"
                  f"{lang('result')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
@@ -511,7 +514,8 @@ def words_search(message: Message, search_type: str) -> (str, InlineKeyboardMark
 
         # Text prefix
         text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
-                f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n")
+                f"{lang('action')}{lang('colon')}{code(lang('action_search'))}\n"
+                f"{lang('mode')}{lang('colon')}{code(lang(search_type))}\n")
 
         # Check if the command format is correct
         word_type, word = get_command_context(message)

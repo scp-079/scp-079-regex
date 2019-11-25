@@ -24,8 +24,8 @@ from pyrogram import Client, Filters, Message
 from .. import glovar
 from ..functions.channel import share_data, share_regex_update
 from ..functions.etc import bold, code, code_block, general_link, get_callback_data, get_command_context
-from ..functions.etc import get_command_type, get_filename, get_forward_name, get_text, lang, message_link
-from ..functions.etc import thread, mention_id
+from ..functions.etc import get_command_type, get_filename, get_forward_name, get_text, lang
+from ..functions.etc import mention_id, message_link, thread
 from ..functions.file import save
 from ..functions.filters import from_user, regex_group, test_group
 from ..functions.telegram import edit_message_text, get_messages, send_message
@@ -430,17 +430,24 @@ def search_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & test_group & from_user
-                   & Filters.command(["t2s"], glovar.prefix))
-def text_t2s(client: Client, message: Message) -> bool:
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["t2t"], glovar.prefix)
+                   & test_group
+                   & from_user)
+def text_t2t(client: Client, message: Message) -> bool:
     # Transfer text
     try:
+        # Basic data
         cid = message.chat.id
         aid = message.from_user.id
         mid = message.message_id
-        text = f"管理员：{mention_id(aid)}\n\n"
+
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('t2t'))}\n")
+
         if message.reply_to_message:
             result = ""
+
             forward_name = get_forward_name(message.reply_to_message)
             if forward_name:
                 result += forward_name + "\n\n"
@@ -454,33 +461,37 @@ def text_t2s(client: Client, message: Message) -> bool:
                 result += message_text + "\n\n"
 
             result = result.strip()
+
             if result:
-                text += f"繁转简：" + "-" * 24 + "\n\n"
+                text += f"{lang('result')}{lang('colon')}" + "-" * 24 + "\n\n"
                 text += code_block(result) + "\n"
             else:
-                text += f"结果：{code('无文本可转换')}\n"
+                text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                         f"{lang('reason')}{lang('colon')}{code(lang('reason_none'))}\n")
         else:
-            text = f"结果：{code('用法有误')}\n"
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
         thread(send_message, (client, cid, text, mid))
 
         return True
     except Exception as e:
-        logger.warning(f"Text t2s error: {e}", exc_info=True)
+        logger.warning(f"Text t2t error: {e}", exc_info=True)
 
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & test_group & from_user
-                   & Filters.command(["version"], glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["version"], glovar.prefix)
+                   & test_group
+                   & from_user)
 def version(client: Client, message: Message) -> bool:
     # Check the program's version
     try:
         cid = message.chat.id
         aid = message.from_user.id
         mid = message.message_id
-        text = (f"管理员：{mention_id(aid)}\n\n"
-                f"版本：{bold(glovar.version)}\n")
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n\n"
+                f"{lang('version')}{lang('colon')}{bold(glovar.version)}\n")
         thread(send_message, (client, cid, text, mid))
 
         return True

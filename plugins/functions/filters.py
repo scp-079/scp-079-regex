@@ -178,17 +178,21 @@ def is_similar(mode: str, a: str, b: str) -> bool:
     # Get regex match result
     try:
         if mode == "find":
-            if not re.search(a, b, re.I | re.M | re.S):
+            if b not in a:
                 return False
 
-        if mode == "loose":
+        elif mode == "loose" or mode == "s":
             if not (re.search(a, b, re.I | re.M | re.S)
                     or re.search(b, a, re.I | re.M | re.S)
                     or re.search(a, xg.xeger(b), re.I | re.M | re.S)
                     or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
                 return False
 
-        if mode == "strict":
+        elif mode == "search":
+            if not re.search(a, b, re.I | re.M | re.S):
+                return False
+
+        elif mode == "strict":
             i = 0
             while i < 3:
                 if not (re.search(a, xg.xeger(b), re.I | re.M | re.S)
@@ -197,7 +201,7 @@ def is_similar(mode: str, a: str, b: str) -> bool:
 
                 i += 1
 
-        if mode == "test":
+        elif mode == "test":
             b = re.sub(r"\s{2,}", " ", b)
             if not re.search(a, b, re.I | re.M | re.S):
                 b = re.sub(r"\s", "", b)
