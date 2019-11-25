@@ -278,24 +278,27 @@ def words_ask(client: Client, operation: str, key: str) -> (str, Set[int]):
         if operation == "new":
             add_word(word_type, new_word, aid)
             share_regex_update(client, word_type)
-            begin_text = f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+            begin_text = (f"{lang('action')}{lang('colon')}{code(lang('ask_new'))}\n"
+                          f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
             text = begin_text + text + f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
 
         # Delete old words
-        if operation == "replace":
+        elif operation == "replace":
             add_word(word_type, new_word, aid)
             cc_list = remove_word(word_type, old_words, aid)
             share_regex_update(client, word_type)
-            begin_text = f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+            begin_text = (f"{lang('action')}{lang('colon')}{code(lang('ask_replace'))}\n"
+                          f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
             text = begin_text + text + f"{lang('replaced')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
 
         # Cancel
-        if operation == "cancel":
-            begin_text = f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+        elif operation == "cancel":
+            begin_text = (f"{lang('action')}{lang('colon')}{code(lang('cancel'))}\n"
+                          f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
             text = begin_text + text + f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
 
         # Timeout
-        if operation == "timeout":
+        elif operation == "timeout":
             begin_text = f"{lang('status')}{lang('colon')}{lang('expired')}\n"
             text = begin_text + text + f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
 

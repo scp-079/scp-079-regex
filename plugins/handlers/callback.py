@@ -22,7 +22,7 @@ from json import loads
 from pyrogram import Client, CallbackQuery
 
 from .. import glovar
-from ..functions.etc import thread, mention_id
+from ..functions.etc import lang, mention_id, thread
 from ..functions.filters import regex_group
 from ..functions.words import get_admin, get_desc, words_ask, words_list_page, words_search_page
 from ..functions.telegram import answer_callback, edit_message_text
@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 @Client.on_callback_query(regex_group)
 def answer(client: Client, callback_query: CallbackQuery) -> bool:
     # Answer the callback query
+    glovar.locks["regex"].acquire()
     try:
         # Basic data
         cid = callback_query.message.chat.id
@@ -51,13 +52,9 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
 
         # Answer the words ask
         if action == "ask":
-            if glovar.locks["regex"].acquire():
-                try:
-                    text = (f"管理：{mention_id(aid)}\n"
-                            f"{words_ask(client, action_type, data)}")
-                    edit_message_text(client, cid, mid, text)
-                finally:
-                    glovar.locks["regex"].release()
+            text = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+            text += words_ask(client, action_type, data)
+            edit_message_text(client, cid, mid, text)
 
         # List the word
         elif action == "list":
@@ -65,19 +62,21 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
             page = data
             desc = get_desc(callback_query.message)
             text, markup = words_list_page(uid, word_type, page, desc)
-            edit_message_text(client, cid, mid, text, markup)
+            thread(edit_message_text, (client, cid, mid, text, markup))
 
         # Search the word
         elif action == "search":
             key = action_type
             page = data
             text, markup = words_search_page(uid, key, page)
-            edit_message_text(client, cid, mid, text, markup)
+            thread(edit_message_text, (client, cid, mid, text, markup))
 
         thread(answer_callback, (client, callback_query.id, ""))
 
         return True
     except Exception as e:
         logger.warning(f"Answer callback error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
