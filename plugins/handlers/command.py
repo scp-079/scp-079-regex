@@ -413,14 +413,18 @@ def same_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
-                   & Filters.command(glovar.search_commands, glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(glovar.search_commands, glovar.prefix)
+                   & regex_group
+                   & from_user)
 def search_words(client: Client, message: Message) -> bool:
     # Search words
     try:
+        # Basic data
         cid = message.chat.id
         mid = message.message_id
-        text, markup = words_search(message)
+
+        # Generate the report message
+        text, markup = words_search(message, message.command[0])
         thread(send_message, (client, cid, text, mid, markup))
 
         return True
