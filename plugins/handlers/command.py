@@ -36,72 +36,77 @@ from ..functions.words import words_search, words_search_page
 logger = logging.getLogger(__name__)
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
-                   & Filters.command(glovar.add_commands, glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(glovar.add_commands, glovar.prefix)
+                   & regex_group
+                   & from_user)
 def add_word(client: Client, message: Message) -> bool:
     # Add a new word
-    if glovar.locks["regex"].acquire():
-        try:
-            cid = message.chat.id
-            mid = message.message_id
-            text, markup = word_add(client, message)
-            thread(send_message, (client, cid, text, mid, markup))
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        mid = message.message_id
 
-            return True
-        except Exception as e:
-            logger.warning(f"Add word error: {e}", exc_info=True)
-        finally:
-            glovar.locks["regex"].release()
+        # Send the report message
+        text, markup = word_add(client, message)
+        thread(send_message, (client, cid, text, mid, markup))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Add word error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
-                   & Filters.command(["ask"], glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["ask"], glovar.prefix)
+                   & regex_group
+                   & from_user)
 def ask_word(client: Client, message: Message) -> bool:
     # Deal with a duplicated word
-    if glovar.locks["regex"].acquire():
-        try:
-            cid = message.chat.id
-            mid = message.message_id
-            uid = message.from_user.id
-            text = f"管理：{mention_id(uid)}\n"
-            command_list = list(filter(None, message.command))
-            if len(command_list) == 2 and command_list[1] in {"new", "replace", "cancel"}:
-                command_type = command_list[1]
-                if message.reply_to_message:
-                    r_message = message.reply_to_message
-                    aid = get_admin(r_message)
-                    if uid == aid:
-                        callback_data_list = get_callback_data(r_message)
-                        if r_message.from_user.is_self and callback_data_list and callback_data_list[0]["a"] == "ask":
-                            r_mid = r_message.message_id
-                            ask_key = callback_data_list[0]["d"]
-                            ask_text = (f"管理：{mention_id(aid)}\n"
-                                        f"{words_ask(client, command_type, ask_key)}")
-                            thread(edit_message_text, (client, cid, r_mid, ask_text))
-                            text += (f"状态：{code('已操作')}\n"
-                                     f"查看：{general_link(r_mid, message_link(r_message))}\n")
-                        else:
-                            text += (f"状态：{code('未操作')}\n"
-                                     f"原因：{code('来源有误')}\n")
-                    else:
-                        text += (f"状态：{code('未操作')}\n"
-                                 f"原因：{code('权限有误')}\n")
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        mid = message.message_id
+        uid = message.from_user.id
+        r_message = message.reply_to_message
+        rid = r_message and r_message.message_id
+
+        # Text prefix
+        text = f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+
+        # Check the command format
+        the_type = get_command_type(message)
+        if the_type in {"new", "replace", "cancel"} and r_message and r_message.from_user.is_self:
+            aid = get_admin(r_message)
+            if uid == aid:
+                callback_data_list = get_callback_data(r_message)
+                if callback_data_list and callback_data_list[0]["a"] == "ask":
+                    key = callback_data_list[0]["d"]
+                    ask_text = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                    ask_text += words_ask(client, the_type, key)
+                    thread(edit_message_text, (client, cid, rid, ask_text))
+                    text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+                             f"{lang('see')}{lang('colon')}{general_link(rid, message_link(r_message))}\n")
                 else:
-                    text += (f"状态：{code('未操作')}\n"
-                             f"原因：{code('用法有误')}\n")
+                    text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                             f"{lang('reason')}{lang('colon')}{code(lang('command_reply'))}\n")
             else:
-                text += (f"状态：{code('未操作')}\n"
-                         f"原因：{code('格式有误')}\n")
+                text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                         f"{lang('reason')}{lang('colon')}{code(lang('command_permission'))}\n")
+        else:
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code('command_usage')}\n")
 
-            thread(send_message, (client, cid, text, mid))
+        thread(send_message, (client, cid, text, mid))
 
-            return True
-        except Exception as e:
-            logger.warning(f"Ask word error: {e}", exc_info=True)
-        finally:
-            glovar.locks["regex"].release()
+        return True
+    except Exception as e:
+        logger.warning(f"Ask word error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 
@@ -423,7 +428,7 @@ def search_words(client: Client, message: Message) -> bool:
         cid = message.chat.id
         mid = message.message_id
 
-        # Generate the report message
+        # Send the report message
         text, markup = words_search(message, message.command[0])
         thread(send_message, (client, cid, text, mid, markup))
 
