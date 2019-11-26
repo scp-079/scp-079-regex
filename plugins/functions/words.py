@@ -99,6 +99,24 @@ def get_admin(message: Message) -> Optional[int]:
     return result
 
 
+def get_comments(regex: str) -> List[str]:
+    # Get comments from the regex
+    result = []
+    try:
+        if not regex:
+            return []
+
+        regex_list = regex.split("(?# ")
+        regex_list = regex_list[1:]
+
+        for comment in regex_list:
+            result.append(comment.split(")")[0].strip())
+    except Exception as e:
+        logger.warning(f"Get commands error: {e}", exc_info=True)
+
+    return result
+
+
 def get_desc(message: Message) -> bool:
     # Get the list message's desc value
     try:
@@ -116,6 +134,24 @@ def get_desc(message: Message) -> bool:
     return True
 
 
+def get_same_types(regex: str) -> List[str]:
+    # Get the same word types from regex
+    try:
+        comments = get_comments(regex)
+
+        for comment in comments:
+            word_list = [c for c in comment.split() if c[-1] not in {"-", "+"}]
+
+            if not all(w in glovar.regex for w in word_list):
+                continue
+
+            return list(set(word_list))
+    except Exception as e:
+        logger.warning(f"Get same types error: {e}", exc_info=True)
+
+    return []
+
+
 def remove_word(word_type: str, words: List[str], aid: int) -> Set[int]:
     # Remove a word
     result = set()
@@ -131,6 +167,31 @@ def remove_word(word_type: str, words: List[str], aid: int) -> Set[int]:
         logger.warning(f"Remove word error: {e}", exc_info=True)
 
     return result
+
+
+def same_word(client: Client, message: Message, command: str, word: str, word_type_list: List[str],
+              aid: int, mid: int) -> bool:
+    # Same word
+    try:
+        cc_list = set()
+
+        for word_type in word_type_list:
+            message.text = f"{command} {word_type} {word}"
+            if command in glovar.add_commands:
+                text, markup = word_add(client, message)
+                thread(send_message, (client, glovar.regex_group_id, text, mid, markup))
+            else:
+                text, cc_list_unit = word_remove(client, message)
+                cc_list = cc_list | cc_list_unit
+                thread(send_message, (client, glovar.regex_group_id, text, mid))
+
+        cc(client, cc_list, aid, mid)
+
+        return True
+    except Exception as e:
+        logger.warning(f"Same word error: {e}", exc_info=True)
+
+    return False
 
 
 def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):

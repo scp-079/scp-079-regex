@@ -30,8 +30,8 @@ from ..functions.file import save
 from ..functions.filters import from_user, regex_group, test_group
 from ..functions.group import get_message
 from ..functions.telegram import edit_message_text, send_message
-from ..functions.words import cc, get_admin, get_desc, word_add, words_ask, words_list, words_list_page, word_remove
-from ..functions.words import words_search, words_search_page
+from ..functions.words import cc, get_admin, get_desc, get_same_types, same_word, word_add, words_ask, words_list
+from ..functions.words import words_list_page, word_remove, words_search, words_search_page
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -46,11 +46,21 @@ def add_word(client: Client, message: Message) -> bool:
     try:
         # Basic data
         cid = message.chat.id
+        aid = message.from_user.id
         mid = message.message_id
 
         # Send the report message
         text, markup = word_add(client, message)
         thread(send_message, (client, cid, text, mid, markup))
+
+        # Auto same
+        word_type, word = get_command_context(message)
+
+        if not word_type or not word:
+            return True
+
+        word_type_list = get_same_types(word)
+        same_word(client, message, "add", word, word_type_list, aid, mid)
 
         return True
     except Exception as e:
@@ -296,7 +306,7 @@ def remove_word(client: Client, message: Message) -> bool:
     try:
         # Basic data
         cid = message.chat.id
-        aid = message.from_user.id
+        uid = message.from_user.id
         mid = message.message_id
 
         # Send the report message
@@ -304,7 +314,31 @@ def remove_word(client: Client, message: Message) -> bool:
         thread(send_message, (client, cid, text, mid))
 
         # CC
-        cc(client, cc_list, aid, mid)
+        cc(client, cc_list, uid, mid)
+
+        # Auto same
+        word_type, word = get_command_context(message)
+
+        if word_type and word:
+            word_type_list = get_same_types(word)
+            same_word(client, message, "remove", word, word_type_list, uid, mid)
+        elif not word_type and not word and message.reply_to_message:
+            r_message = message.reply_to_message
+            aid = r_message.from_user.id
+
+            # Check permission
+            if uid != aid:
+                return True
+
+            old_command_list = list(filter(None, get_text(r_message).split()))
+            old_command = old_command_list[0][1:]
+
+            # Check old command's format
+            if (len(old_command_list) > 2
+                    and old_command in glovar.add_commands):
+                _, word = get_command_context(r_message)
+                word_type_list = get_same_types(word)
+                same_word(client, r_message, "remove", word, word_type_list, aid, mid)
 
         return True
     except Exception as e:
@@ -406,20 +440,7 @@ def same_words(client: Client, message: Message) -> bool:
                 if (len(old_command_list) > 2
                         and old_command in glovar.add_commands + glovar.remove_commands):
                     _, old_word = get_command_context(r_message)
-                    cc_list = set()
-
-                    for new_word_type in new_word_type_list:
-                        r_message.text = f"{old_command} {new_word_type} {old_word}"
-                        if old_command in glovar.add_commands:
-                            text, markup = word_add(client, r_message)
-                            thread(send_message, (client, cid, text, mid, markup))
-                        else:
-                            text, cc_list_unit = word_remove(client, r_message)
-                            cc_list = cc_list | cc_list_unit
-                            thread(send_message, (client, cid, text, mid))
-
-                    cc(client, cc_list, aid, mid)
-
+                    same_word(client, r_message, old_command, old_word, new_word_type_list, aid, mid)
                     return True
 
                 # If origin old message just simply "/rm", bot should check which message it replied to
@@ -440,16 +461,7 @@ def same_words(client: Client, message: Message) -> bool:
                             if (len(old_command_list) > 2
                                     and old_command in glovar.add_commands):
                                 _, old_word = get_command_context(r_message)
-                                cc_list = set()
-
-                                for new_word_type in new_word_type_list:
-                                    r_message.text = f"{old_command} {new_word_type} {old_word}"
-                                    text, cc_list_unit = word_remove(client, r_message)
-                                    cc_list = cc_list | cc_list_unit
-                                    thread(send_message, (client, cid, text, mid))
-
-                                cc(client, cc_list, aid, mid)
-
+                                same_word(client, r_message, "remove", old_word, new_word_type_list, aid, mid)
                                 return True
                             else:
                                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
