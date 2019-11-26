@@ -296,7 +296,7 @@ receivers: Dict[str, List[str]] = {
     "bio": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "con": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "del": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "fil": ["CLEAN", "NOSPAM"],
+    "fil": ["CLEAN", "LANG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "iml": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "pho": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "nm": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
