@@ -144,7 +144,7 @@ def check(client: Client, message: Message) -> bool:
 
         # Text prefix
         text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
-                f"{lang('action')}{lang('colon')}{code(lang('action_who'))}\n")
+                f"{lang('action')}{lang('colon')}{code(lang('action_check'))}\n")
 
         # Proceed
         word_type, word = get_command_context(message)
@@ -163,8 +163,7 @@ def check(client: Client, message: Message) -> bool:
                 count_text = (f"{italic(round(words[word]['average'], 1))} {code('/')} "
                               f"{italic(words[word]['today'])} {code('/')} "
                               f"{italic(words[word]['total'])}")
-                text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
-                         f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+                text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
                          f"{lang('result')}{lang('colon')}{count_text}\n")
             else:
                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"

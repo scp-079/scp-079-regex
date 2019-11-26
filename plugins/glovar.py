@@ -193,6 +193,7 @@ lang: Dict[str, str] = {
     # Special
     "action_add": (zh_cn and "添加规则") or "Add Rule",
     "action_cc": (zh_cn and "抄送") or "CC",
+    "action_check": (zh_cn and "查询数据") or "Check the Count Data",
     "action_comment": (zh_cn and "添加备注") or "Add Comment",
     "action_count": (zh_cn and "请求统计") or "Request Statistics",
     "action_list": (zh_cn and "查看列表") or "Show the List",
