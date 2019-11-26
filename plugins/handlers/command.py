@@ -235,40 +235,53 @@ def page_command(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
-                   & Filters.command(["push"], glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["push"], glovar.prefix)
+                   & regex_group
+                   & from_user)
 def push_words(client: Client, message: Message) -> bool:
     # Push words
-    if glovar.locks["regex"].acquire():
-        try:
-            cid = message.chat.id
-            mid = message.message_id
-            uid = message.from_user.id
-            text = (f"管理：{mention_id(uid)}\n"
-                    f"操作：{code('手动推送')}\n")
-            command_type = get_command_type(message)
-            if command_type and command_type in glovar.regex:
-                share_regex_update(client, command_type)
-                text += (f"类别：{code(lang(command_type))}\n"
-                         f"状态：{code('已推送')}\n")
-            elif command_type == "all":
-                for word_type in glovar.regex:
-                    thread(share_regex_update, (client, word_type))
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        mid = message.message_id
+        uid = message.from_user.id
 
-                text += (f"类别：{code('全部')}\n"
-                         f"状态：{code('已推送')}\n")
-            else:
-                text += (f"类别：{code(lang(command_type))}\n"
-                         f"状态：{code('未推送')}\n"
-                         f"原因：{code('格式有误')}\n")
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_push'))}\n")
 
-            thread(send_message, (client, cid, text, mid))
+        # Proceed
+        command_type = get_command_type(message)
+        if command_type in glovar.regex:
+            share_regex_update(client, command_type)
+            text += f"{lang('type')}{lang('colon')}{code(lang(command_type))}\n"
 
-            return True
-        except Exception as e:
-            logger.warning(f"Push words error: {e}", exc_info=True)
-        finally:
-            glovar.locks["regex"].release()
+            if glovar.comments.get(command_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[command_type])}\n"
+
+            text += f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+        elif command_type == "all":
+            for word_type in glovar.regex:
+                thread(share_regex_update, (client, word_type))
+
+            text += f"{lang('type')}{lang('colon')}{code(lang('all'))}\n"
+
+            if glovar.comments.get(command_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[command_type])}\n"
+
+            text += f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+        else:
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Push words error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 
