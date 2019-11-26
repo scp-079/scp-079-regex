@@ -60,6 +60,7 @@ def add_word(client: Client, message: Message) -> bool:
             return True
 
         word_type_list = get_same_types(word)
+        word_type_list.discard(word_type)
         same_word(client, message, "add", word, word_type_list, aid, mid)
 
         return True
@@ -367,6 +368,7 @@ def remove_word(client: Client, message: Message) -> bool:
 
         if word_type and word:
             word_type_list = get_same_types(word)
+            word_type_list.discard(word_type)
             same_word(client, message, "remove", word, word_type_list, uid, mid)
         elif not word_type and not word and message.reply_to_message:
             r_message = message.reply_to_message
@@ -382,8 +384,9 @@ def remove_word(client: Client, message: Message) -> bool:
             # Check old command's format
             if (len(old_command_list) > 2
                     and old_command in glovar.add_commands):
-                _, word = get_command_context(r_message)
+                word_type, word = get_command_context(r_message)
                 word_type_list = get_same_types(word)
+                word_type_list.discard(word_type)
                 same_word(client, r_message, "remove", word, word_type_list, aid, mid)
 
         return True
@@ -469,7 +472,7 @@ def same_words(client: Client, message: Message) -> bool:
 
         # Get this new command's list
         command_type = get_command_type(message)
-        new_word_type_list = command_type.split()
+        new_word_type_list = set(command_type.split())
 
         # Check new command's format
         if (r_message

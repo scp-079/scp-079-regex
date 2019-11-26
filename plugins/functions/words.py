@@ -134,7 +134,7 @@ def get_desc(message: Message) -> bool:
     return True
 
 
-def get_same_types(regex: str) -> List[str]:
+def get_same_types(regex: str) -> Set[str]:
     # Get the same word types from regex
     try:
         comments = get_comments(regex)
@@ -145,11 +145,11 @@ def get_same_types(regex: str) -> List[str]:
             if not all(w in glovar.regex for w in word_list):
                 continue
 
-            return list(set(word_list))
+            return set(word_list)
     except Exception as e:
         logger.warning(f"Get same types error: {e}", exc_info=True)
 
-    return []
+    return set()
 
 
 def remove_word(word_type: str, words: List[str], aid: int) -> Set[int]:
@@ -169,7 +169,7 @@ def remove_word(word_type: str, words: List[str], aid: int) -> Set[int]:
     return result
 
 
-def same_word(client: Client, message: Message, command: str, word: str, word_type_list: List[str],
+def same_word(client: Client, message: Message, command: str, word: str, word_type_list: Set[str],
               aid: int, mid: int) -> bool:
     # Same word
     try:
