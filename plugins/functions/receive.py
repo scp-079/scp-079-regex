@@ -101,6 +101,7 @@ def receive_file_data(client: Client, message: Message, decrypt: bool = True) ->
 
 def receive_status_ask(client: Client, data: dict) -> bool:
     # Receive version info request
+    glovar.locks["regex"].acquire()
     try:
         # Basic data
         aid = data["admin_id"]
@@ -108,12 +109,11 @@ def receive_status_ask(client: Client, data: dict) -> bool:
 
         status = {}
 
-        with glovar.locks["regex"]:
-            for word_type in glovar.regex:
-                if not glovar.regex[word_type]:
-                    continue
+        for word_type in glovar.regex:
+            if not glovar.regex[word_type]:
+                continue
 
-                status[lang("word_type")] = f"{len(eval(f'{word_type}_words'))} {lang('rules')}"
+            status[lang("word_type")] = f"{len(eval(f'{word_type}_words'))} {lang('rules')}"
 
         file = data_to_file(status)
         share_data(
@@ -131,6 +131,8 @@ def receive_status_ask(client: Client, data: dict) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Receive version ask error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 

@@ -124,6 +124,52 @@ def ask_word(client: Client, message: Message) -> bool:
     return False
 
 
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["comment"], glovar.prefix)
+                   & regex_group
+                   & from_user)
+def comments_words(client: Client, message: Message) -> bool:
+    # Comments words
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        aid = message.from_user.id
+        mid = message.message_id
+
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_comment'))}\n")
+
+        # Proceed
+        word_type, comment = get_command_context(message)
+
+        if word_type and word_type in glovar.regex and comment:
+            glovar.comments[word_type] = comment
+            save("comments")
+
+            text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+            text += f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+        else:
+            text += (f"{lang('type')}{lang('colon')}{code(word_type or lang('unknown'))}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+
+        # Send the report message
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Comments words error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
+
+    return False
+
+
 @Client.on_message(Filters.incoming & Filters.group & Filters.command(["count"], glovar.prefix)
                    & regex_group
                    & from_user)
