@@ -462,9 +462,6 @@ def remove_word(client: Client, message: Message) -> bool:
         text, cc_list = word_remove(client, message)
         thread(send_message, (client, cid, text, mid))
 
-        # CC
-        cc(client, cc_list, uid, mid)
-
         # Auto same
         word_type, word = get_command_context(message)
 
