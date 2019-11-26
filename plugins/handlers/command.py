@@ -47,7 +47,6 @@ def add_word(client: Client, message: Message) -> bool:
     try:
         # Basic data
         cid = message.chat.id
-        aid = message.from_user.id
         mid = message.message_id
 
         # Send the report message
@@ -66,7 +65,7 @@ def add_word(client: Client, message: Message) -> bool:
         if f"{word_type}-" in word_type_list or f"{word_type}+" in word_type_list:
             return True
 
-        same_word(client, message, "add", word, word_type_list, aid, mid)
+        same_word(client, message, "add", word, word_type_list, mid)
 
         return True
     except Exception as e:
@@ -476,7 +475,7 @@ def remove_word(client: Client, message: Message) -> bool:
             if f"{word_type}-" in word_type_list or f"{word_type}+" in word_type_list:
                 return True
 
-            same_word(client, message, "remove", word, word_type_list, uid, mid)
+            same_word(client, message, "remove", word, word_type_list, mid)
         elif not word_type and not word and message.reply_to_message:
             r_message = message.reply_to_message
             aid = r_message.from_user.id
@@ -498,7 +497,7 @@ def remove_word(client: Client, message: Message) -> bool:
                     return True
 
                 word_type_list.discard(word_type)
-                same_word(client, r_message, "remove", word, word_type_list, aid, mid)
+                same_word(client, r_message, "remove", word, word_type_list, mid)
 
         return True
     except Exception as e:
@@ -600,7 +599,7 @@ def same_words(client: Client, message: Message) -> bool:
                 if (len(old_command_list) > 2
                         and old_command in glovar.add_commands + glovar.remove_commands):
                     _, old_word = get_command_context(r_message)
-                    same_word(client, r_message, old_command, old_word, new_word_type_list, aid, mid)
+                    same_word(client, r_message, old_command, old_word, new_word_type_list, mid)
                     return True
 
                 # If origin old message just simply "/rm", bot should check which message it replied to
@@ -621,7 +620,7 @@ def same_words(client: Client, message: Message) -> bool:
                             if (len(old_command_list) > 2
                                     and old_command in glovar.add_commands):
                                 _, old_word = get_command_context(r_message)
-                                same_word(client, r_message, "remove", old_word, new_word_type_list, aid, mid)
+                                same_word(client, r_message, "remove", old_word, new_word_type_list, mid)
                                 return True
                             else:
                                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"

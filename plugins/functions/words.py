@@ -193,12 +193,9 @@ def remove_word(word_type: str, words: List[str], aid: int) -> Set[int]:
     return result
 
 
-def same_word(client: Client, message: Message, command: str, word: str, word_type_list: Set[str],
-              aid: int, mid: int) -> bool:
+def same_word(client: Client, message: Message, command: str, word: str, word_type_list: Set[str], mid: int) -> bool:
     # Same word
     try:
-        cc_list = set()
-
         for word_type in word_type_list:
             message.text = f"{command} {word_type} {word}"
             if command in glovar.add_commands:
@@ -206,10 +203,7 @@ def same_word(client: Client, message: Message, command: str, word: str, word_ty
                 thread(send_message, (client, glovar.regex_group_id, text, mid, markup))
             else:
                 text, cc_list_unit = word_remove(client, message)
-                cc_list = cc_list | cc_list_unit
                 thread(send_message, (client, glovar.regex_group_id, text, mid))
-
-        cc(client, cc_list, aid, mid)
 
         return True
     except Exception as e:
@@ -586,6 +580,10 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
 
         cc_list = remove_word(word_type, [word], aid)
         text += f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+
+        for cc_id in cc_list:
+            text += f"{lang('action_cc')}{lang('colon')}{mention_id(cc_id)}\n"
+
         share_regex_update(client, word_type)
     except Exception as e:
         logger.warning(f"Word remove try error: {e}", exc_info=True)
