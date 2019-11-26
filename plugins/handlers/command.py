@@ -25,7 +25,7 @@ from pyrogram import Client, Filters, Message
 from .. import glovar
 from ..functions.channel import share_data, share_regex_update
 from ..functions.etc import bold, code, code_block, general_link, get_callback_data, get_command_context
-from ..functions.etc import get_command_type, get_filename, get_forward_name, get_text, lang
+from ..functions.etc import get_command_type, get_filename, get_forward_name, get_text, italic, lang
 from ..functions.etc import mention_id, message_link, thread
 from ..functions.file import save
 from ..functions.filters import from_user, regex_group, test_group
@@ -124,6 +124,62 @@ def ask_word(client: Client, message: Message) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Ask word error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
+
+    return False
+
+
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["check"], glovar.prefix)
+                   & regex_group
+                   & from_user)
+def check(client: Client, message: Message) -> bool:
+    # Check the regex's count
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        aid = message.from_user.id
+        mid = message.message_id
+
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_who'))}\n")
+
+        # Proceed
+        word_type, word = get_command_context(message)
+
+        if word_type and word_type in glovar.regex and word:
+            words = eval(f"glovar.{word_type}_words")
+
+            text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+            text += f"{lang('word')}{lang('colon')}{code(word)}\n"
+
+            if word in words:
+                count_text = (f"{italic(round(words[word]['average'], 1))} {code('/')} "
+                              f"{italic(words[word]['today'])} {code('/')} "
+                              f"{italic(words[word]['total'])}")
+                text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
+                         f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+                         f"{lang('result')}{lang('colon')}{count_text}\n")
+            else:
+                text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                         f"{lang('reason')}{lang('colon')}{code(lang('reason_not_exist'))}\n")
+        else:
+            text += (f"{lang('type')}{lang('colon')}{code(word_type or lang('unknown'))}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+
+        # Send the report message
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Check error: {e}", exc_info=True)
     finally:
         glovar.locks["regex"].release()
 
@@ -670,23 +726,21 @@ def who(client: Client, message: Message) -> bool:
         word_type, word = get_command_context(message)
 
         if word_type and word_type in glovar.regex and word:
-            if word in eval(f"glovar.{word_type}_words"):
-                uid = eval(f"glovar.{word_type}_words")[word].get("who", 0)
-                text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+            words = eval(f"glovar.{word_type}_words")
 
-                if glovar.comments.get(word_type):
-                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+            text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
 
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+            text += f"{lang('word')}{lang('colon')}{code(word)}\n"
+
+            if word in words:
+                uid = words[word].get("who", 0)
                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
                          f"{lang('result')}{lang('colon')}{code(uid)}\n")
             else:
                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-
-                if glovar.comments.get(word_type):
-                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-
-                text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                          f"{lang('reason')}{lang('colon')}{code(lang('reason_not_exist'))}\n")
         else:
             text += (f"{lang('type')}{lang('colon')}{code(word_type or lang('unknown'))}\n"

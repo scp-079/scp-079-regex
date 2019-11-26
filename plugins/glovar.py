@@ -351,7 +351,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.4.3"
+version: str = "0.4.4"
 
 # Load data from pickle
 
