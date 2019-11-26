@@ -177,65 +177,60 @@ def list_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
-                   & Filters.command(["page"], glovar.prefix))
-def page_word(client: Client, message: Message) -> bool:
-    # Change words page
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["page"], glovar.prefix)
+                   & regex_group
+                   & from_user)
+def page_command(client: Client, message: Message) -> bool:
+    # Change page
     try:
+        # Basic data
         cid = message.chat.id
-        mid = message.message_id
         uid = message.from_user.id
-        text = f"管理：{mention_id(uid)}\n"
-        command_type = get_command_type(message)
-        if command_type and command_type in {"previous", "next"}:
-            if message.reply_to_message:
-                r_message = message.reply_to_message
-                aid = get_admin(r_message)
-                if uid == aid:
-                    pass
-                    callback_data_list = get_callback_data(r_message)
-                    if (r_message.from_user.is_self
-                            and callback_data_list
-                            and ((command_type == "previous" and callback_data_list[0]["a"] in {"list", "search"})
-                                 or (command_type == "next" and callback_data_list[-1]["a"] in {"list", "search"}))):
-                        r_mid = r_message.message_id
-                        if command_type == "previous":
-                            i = 0
-                        else:
-                            i = -1
+        mid = message.message_id
+        the_type = get_command_type(message)
+        r_message = message.reply_to_message
+        rid = r_message and r_message.message_id
 
-                        action = callback_data_list[i]["a"]
-                        action_type = callback_data_list[i]["t"]
-                        page = callback_data_list[i]["d"]
-                        if action == "list":
-                            word_type = action_type
-                            desc = get_desc(r_message)
-                            page_text, markup = words_list_page(uid, word_type, page, desc)
-                        else:
-                            search_key = action_type
-                            page_text, markup = words_search_page(uid, search_key, page)
+        # Generate the report message's text
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_page'))}\n")
 
-                        thread(edit_message_text, (client, cid, r_mid, page_text, markup))
-                        text += (f"状态：{code('已更新')}\n"
-                                 f"查看：{general_link(r_mid, message_link(r_message))}\n")
+        # Proceed
+        if the_type in {"previous", "next"} and r_message and r_message.from_user.is_self:
+            aid = get_admin(r_message)
+            if uid == aid:
+                callback_data_list = get_callback_data(r_message)
+                i = (lambda x: 0 if x == "previous" else -1)(the_type)
+                if callback_data_list and callback_data_list[i]["a"] in {"list", "search"}:
+                    action = callback_data_list[i]["a"]
+                    action_type = callback_data_list[i]["t"]
+                    page = callback_data_list[i]["d"]
+
+                    if action == "list":
+                        desc = get_desc(r_message)
+                        page_text, markup = words_list_page(uid, action_type, page, desc)
                     else:
-                        text += (f"状态：{code('未更新')}\n"
-                                 f"原因：{code('来源有误')}\n")
+                        key = action_type
+                        page_text, markup = words_search_page(uid, key, page)
+
+                    thread(edit_message_text, (client, cid, rid, page_text, markup))
+                    text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+                             f"{lang('see')}{lang('colon')}{general_link(rid, message_link(r_message))}\n")
                 else:
-                    text += (f"状态：{code('未更新')}\n"
-                             f"原因：{code('权限有误')}\n")
+                    text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                             f"{lang('reason')}{lang('colon')}{code(lang('command_reply'))}\n")
             else:
-                text += (f"状态：{code('未更新')}\n"
-                         f"原因：{code('用法有误')}\n")
+                text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                         f"{lang('reason')}{lang('colon')}{code(lang('command_permission'))}\n")
         else:
-            text += (f"状态：{code('未更新')}\n"
-                     f"原因：{code('格式有误')}\n")
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
         thread(send_message, (client, cid, text, mid))
 
         return True
     except Exception as e:
-        logger.warning(f"Page word error: {e}", exc_info=True)
+        logger.warning(f"Page command error: {e}", exc_info=True)
 
     return False
 
