@@ -140,7 +140,7 @@ def get_same_types(regex: str) -> Set[str]:
         comments = get_comments(regex)
 
         for comment in comments:
-            word_list = [c for c in comment.split() if c[-1] not in {"-", "+"}]
+            word_list = comment.split()
 
             if not all(w in glovar.regex for w in word_list):
                 continue
