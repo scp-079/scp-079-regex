@@ -134,6 +134,30 @@ def get_desc(message: Message) -> bool:
     return True
 
 
+def get_match(mode: str, regex: str, text: str) -> str:
+    # Get match result
+    try:
+        if mode == "findall":
+            match = re.findall(regex, text, re.I | re.M | re.S)
+            return str(match)
+        else:
+            match = re.search(regex, text, re.I | re.M | re.S)
+
+            if not match:
+                return "None"
+
+            if mode == "group":
+                return str(match.group())
+            elif mode == "groupdict":
+                return str(match.groupdict())
+            elif mode == "groups":
+                return str(match.groups())
+    except Exception as e:
+        logger.warning(f"Get match error: {e}", exc_info=True)
+
+    return "None"
+
+
 def get_same_types(regex: str) -> Set[str]:
     # Get the same word types from regex
     try:

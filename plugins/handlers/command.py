@@ -31,8 +31,8 @@ from ..functions.file import save
 from ..functions.filters import from_user, regex_group, test_group
 from ..functions.group import get_message
 from ..functions.telegram import edit_message_text, send_message
-from ..functions.words import cc, get_admin, get_desc, get_same_types, same_word, word_add, words_ask, words_list
-from ..functions.words import words_list_page, word_remove, words_search, words_search_page
+from ..functions.words import cc, get_admin, get_desc, get_match, get_same_types, same_word, word_add, words_ask
+from ..functions.words import words_list, words_list_page, word_remove, words_search, words_search_page
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -297,6 +297,45 @@ def list_words(client: Client, message: Message) -> bool:
         return True
     except Exception as e:
         logger.warning(f"List words error: {e}", exc_info=True)
+
+    return False
+
+
+@Client.on_message(Filters.incoming & Filters.group
+                   & Filters.command(["findall", "group", "groupdict", "groups"], glovar.prefix)
+                   & test_group
+                   & from_user)
+def match(client: Client, message: Message) -> bool:
+    # Transfer text
+    try:
+        # Basic data
+        cid = message.chat.id
+        aid = message.from_user.id
+        mid = message.message_id
+        r_message = message.reply_to_message
+
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_match'))}\n"
+                f"{lang('mode')}{lang('colon')}{code(message.command[0])}\n")
+
+        # Check command format
+        word = get_command_type(r_message)
+
+        # Proceed
+        if r_message and word:
+            result = get_match(message.command[0], word, get_text(r_message))
+            text += f"{lang('result')}{lang('colon')}" + "-" * 24 + "\n\n"
+            text += code_block(result) + "\n"
+        else:
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Text t2t error: {e}", exc_info=True)
 
     return False
 
