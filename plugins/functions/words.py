@@ -316,16 +316,26 @@ def words_ask(client: Client, operation: str, key: str) -> (str, Set[int]):
     text = ""
     cc_list = set()
     try:
+        # Check the data
         if not glovar.ask_words.get(key, {}):
             text += (f"{lang('status')}{lang('colon')}{lang('status_failed')}\n"
                      f"{lang('reason')}{lang('colon')}{lang('expired')}\n")
             return text, cc_list
 
+        # Check lock
+        if glovar.ask_words[key]["lock"]:
+            return "", set()
+
+        # Lock the session
+        glovar.ask_words[key]["lock"] = True
+
+        # Read data
         aid = glovar.ask_words[key]["admin"]
         word_type = glovar.ask_words[key]["type"]
         new_word = glovar.ask_words[key]["new"]
         old_words = glovar.ask_words[key]["old"]
 
+        # Word type info text
         text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
 
         if glovar.comments.get(word_type):
@@ -333,6 +343,7 @@ def words_ask(client: Client, operation: str, key: str) -> (str, Set[int]):
 
         text += f"{lang('word')}{lang('colon')}{code(new_word)}\n"
 
+        # Waiting words info text
         end_text = "\n\n".join(code(w) for w in glovar.ask_words[key]["old"])
 
         # If admin decide to add new word
@@ -367,7 +378,6 @@ def words_ask(client: Client, operation: str, key: str) -> (str, Set[int]):
                     f"{lang('status')}{lang('colon')}{code(lang('expired'))}\n"
                     f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
 
-        glovar.ask_words.pop(key, None)
         save("ask_words")
     except Exception as e:
         logger.warning(f"Words ask error: {e}", exc_info=True)

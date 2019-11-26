@@ -61,6 +61,10 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
         if action == "ask":
             text = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
             result_text, cc_list = words_ask(client, action_type, data)
+
+            if not result_text:
+                return True
+
             text += result_text
             edit_message_text(client, cid, mid, text)
             cc(client, cc_list, aid, mid)

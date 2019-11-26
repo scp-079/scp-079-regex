@@ -104,6 +104,10 @@ def ask_word(client: Client, message: Message) -> bool:
                     key = callback_data_list[0]["d"]
                     ask_text = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
                     result_text, cc_list = words_ask(client, the_type, key)
+
+                    if not result_text:
+                        return True
+
                     ask_text += result_text
                     thread(edit_message_text, (client, cid, rid, ask_text))
                     cc(client, cc_list, aid, rid)

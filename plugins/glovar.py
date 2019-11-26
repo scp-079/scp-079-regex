@@ -54,6 +54,7 @@ test_group_id: int = 0
 # [custom]
 backup: Union[bool, str] = ""
 date_reset: str = ""
+limit_temp: int = 0
 per_page: int = 0
 project_link: str = ""
 project_name: str = ""
@@ -80,6 +81,7 @@ try:
     backup = config["custom"].get("backup", backup)
     backup = eval(backup)
     date_reset = config["custom"].get("date_reset", date_reset)
+    limit_temp = config["custom"].get("limit_temp", limit_temp)
     per_page = int(config["custom"].get("per_page", per_page))
     project_link = config["custom"].get("project_link", project_link)
     project_name = config["custom"].get("project_name", project_name)
@@ -103,6 +105,8 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or regex_group_id == 0
         or backup not in {False, True}
         or date_reset in {"", "[DATA EXPUNGED]"}
+        or limit_temp == 0
+        or per_page == 0
         or project_link in {"", "[DATA EXPUNGED]"}
         or project_name in {"", "[DATA EXPUNGED]"}
         or zh_cn not in {False, True}
@@ -272,6 +276,7 @@ default_word_status: Dict[str, Union[float, int]] = {
     "average": 0.0,
     "today": 0,
     "total": 0,
+    "temp": 0,
     "who": 0
 }
 
@@ -353,7 +358,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.4.4"
+version: str = "0.4.5"
 
 # Load data from pickle
 
@@ -398,6 +403,7 @@ for word_type in regex:
 #         "average": 1.1,
 #         "today": 3,
 #         "total": 20,
+#         "temp": 0,
 #         "who": 12345678
 #     }
 # }

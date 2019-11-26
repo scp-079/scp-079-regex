@@ -23,7 +23,9 @@ from pyrogram import Client
 
 from .. import glovar
 from .channel import share_data
+from .etc import get_now
 from .file import save
+from .words import words_ask
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -55,14 +57,57 @@ def backup_files(client: Client) -> bool:
     return False
 
 
+def interval_hour_01(client: Client) -> bool:
+    # Execute every hour
+    try:
+        # Basic data
+        now = get_now()
+
+        # Clear old action sessions
+        for key in list(glovar.ask_words):
+            session = glovar.ask_words[key]
+            time = session["time"]
+
+            if now - time < 3600:
+                continue
+
+            lock = session["lock"]
+
+            if not lock:
+                words_ask(client, "timeout", key)
+
+            glovar.ask_words.pop(key, {})
+
+        save("ask_words")
+
+        return True
+    except Exception as e:
+        logger.warning(f"Interval hour 01 error: {e}", exc_info=True)
+
+    return False
+
+
 def reset_count() -> bool:
     # Reset the daily usage
     glovar.locks["regex"].acquire()
     try:
         for word_type in glovar.regex:
             for word in list(eval(f"glovar.{word_type}_words")):
+                today = eval(f"glovar.{word_type}_words")[word]["today"]
                 eval(f"glovar.{word_type}_words")[word]["today"] = 0
-                save(f"{word_type}_words")
+
+                if "(?# temp)" not in word:
+                    continue
+
+                if today == 0:
+                    eval(f"glovar.{word_type}_words")[word]["temp"] += 1
+                else:
+                    eval(f"glovar.{word_type}_words")[word]["temp"] = 0
+
+                if eval(f"glovar.{word_type}_words")[word]["temp"] >= glovar.limit_temp:
+                    eval(f"glovar.{word_type}_words").pop(word)
+
+            save(f"{word_type}_words")
 
         return True
     except Exception as e:
