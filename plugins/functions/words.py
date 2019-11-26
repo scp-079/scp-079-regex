@@ -588,7 +588,7 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
     return text, cc_list
 
 
-def words_search(message: Message, search_type: str) -> (str, InlineKeyboardMarkup):
+def words_search(message: Message, mode: str) -> (str, InlineKeyboardMarkup):
     # Search words
     text = ""
     markup = None
@@ -599,7 +599,7 @@ def words_search(message: Message, search_type: str) -> (str, InlineKeyboardMark
         # Text prefix
         text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
                 f"{lang('action')}{lang('colon')}{code(lang('action_search'))}\n"
-                f"{lang('mode')}{lang('colon')}{code(lang(search_type))}\n")
+                f"{lang('mode')}{lang('colon')}{code(lang(mode))}\n")
 
         # Check if the command format is correct
         word_type, word = get_command_context(message)
@@ -629,7 +629,8 @@ def words_search(message: Message, search_type: str) -> (str, InlineKeyboardMark
         glovar.result_search[key] = {
             "result": {},
             "type": word_type,
-            "word": word
+            "word": word,
+            "mode": mode
         }
 
         # Get the result
@@ -638,7 +639,7 @@ def words_search(message: Message, search_type: str) -> (str, InlineKeyboardMark
         if word_type == "all":
             for n in glovar.regex:
                 for w in eval(f"glovar.{n}_words"):
-                    if not is_similar(search_type, w, word):
+                    if not is_similar(mode, w, word):
                         continue
 
                     if result.get(w) is None:
@@ -647,7 +648,7 @@ def words_search(message: Message, search_type: str) -> (str, InlineKeyboardMark
                     result[w].append(n)
         else:
             result = {w: [] for w in eval(f"glovar.{word_type}_words")
-                      if is_similar(search_type, w, word)}
+                      if is_similar(mode, w, word)}
 
         glovar.result_search[key]["result"] = result
         text, markup = words_search_page(aid, key, 1)
@@ -664,7 +665,7 @@ def words_search_page(aid: int, key: str, page: int) -> (str, InlineKeyboardMark
     try:
         # Text prefix
         text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
-                f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n")
+                f"{lang('action')}{lang('colon')}{code(lang('action_search'))}\n")
 
         if key not in glovar.result_search:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
@@ -673,7 +674,9 @@ def words_search_page(aid: int, key: str, page: int) -> (str, InlineKeyboardMark
 
         word_type = glovar.result_search[key]["type"]
         word = glovar.result_search[key]["word"]
+        mode = glovar.result_search[key]["mode"]
 
+        text += f"{lang('mode')}{lang('colon')}{code(lang(mode))}\n"
         text += f"{lang('type')}{lang('colon')}{code(glovar.lang.get(word_type, lang('all')))}\n"
 
         if glovar.comments.get(word_type):
