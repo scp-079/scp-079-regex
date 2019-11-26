@@ -138,12 +138,12 @@ def text_test(client: Client, message: Message) -> bool:
 
         # Make test result in this order
         # ad adx
-        # con iml
-        # ban bio nm del
+        # con iml pho
+        # ban bio nm fil del
         # wb wd bad
         # etc
         order_list = ["ad"] + [f"ad{c}" for c in ascii_lowercase]
-        order_list += ["con", "iml", "ban", "bio", "nm", "del", "wb", "wd", "bad"]
+        order_list += ["con", "iml", "pho", "ban", "bio", "nm", "fil", "del", "wb", "wd", "bad"]
         order_set = set(order_list)
         type_set = set(glovar.regex)
         type_list = order_list + list(type_set - order_set)
