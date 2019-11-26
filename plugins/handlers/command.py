@@ -319,11 +319,9 @@ def match(client: Client, message: Message) -> bool:
                 f"{lang('action')}{lang('colon')}{code(lang('action_match'))}\n"
                 f"{lang('mode')}{lang('colon')}{code(message.command[0])}\n")
 
-        # Check command format
-        word = get_command_type(r_message)
-
         # Proceed
-        if r_message and word:
+        if r_message and get_command_type(r_message):
+            word = get_command_type(r_message)
             result = get_match(message.command[0], word, get_text(r_message))
             text += f"{lang('result')}{lang('colon')}" + "-" * 24 + "\n\n"
             text += code_block(result) + "\n"
