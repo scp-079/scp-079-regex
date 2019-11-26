@@ -213,16 +213,18 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
             return text, markup
 
+        # Word type and word info text
+        text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+
+        if glovar.comments.get(word_type):
+            text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+        text += f"{lang('word')}{lang('colon')}{code(word)}\n"
+
         # Check if the word already exits
         word = format_word(word)
         if eval(f"glovar.{word_type}_words").get(word, {}):
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-
-            if glovar.comments.get(word_type):
-                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-
-            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('reason_existed'))}\n")
             return text, markup
 
@@ -231,12 +233,6 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
             pattern = re.compile(word, re.I | re.M | re.S)
         except Exception as e:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_error'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-            
-            if glovar.comments.get(word_type):
-                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-            
-            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                      f"{lang('error')}{lang('colon')}{code(e)}\n")
             return text, markup
 
@@ -248,12 +244,6 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
                      ]:
             if pattern.search(test):
                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                         f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-
-                if glovar.comments.get(word_type):
-                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-                
-                text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                          f"{lang('reason')}{lang('colon')}{code(lang('reason_not_specific'))}\n")
                 return text, markup
 
@@ -279,14 +269,7 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
 
         if glovar.ask_words[key]["old"]:
             end_text = "\n\n".join(code(w) for w in glovar.ask_words[key]["old"])
-
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-            
-            if glovar.comments.get(word_type):
-                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-            
-            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('reason_wait'))}\n"
                      f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
 
@@ -320,14 +303,8 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
             glovar.ask_words.pop(key, None)
             add_word(word_type, word, aid)
             share_regex_update(client, word_type)
-
-            text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-            
-            if glovar.comments.get(word_type):
-                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-            
-            text += f"{lang('word')}{lang('colon')}{code(word)}\n"
+            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
     except Exception as e:
         logger.warning(f"Word add error: {e}", exc_info=True)
 
@@ -362,29 +339,33 @@ def words_ask(client: Client, operation: str, key: str) -> (str, Set[int]):
         if operation == "new":
             add_word(word_type, new_word, aid)
             share_regex_update(client, word_type)
-            begin_text = (f"{lang('action')}{lang('colon')}{code(lang('ask_new'))}\n"
-                          f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
-            text = begin_text + text + f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
+            text = (f"{lang('action')}{lang('colon')}{code(lang('ask_new'))}\n"
+                    f"{text}"
+                    f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+                    f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
 
         # Delete old words
         elif operation == "replace":
             add_word(word_type, new_word, aid)
             cc_list = remove_word(word_type, old_words, aid)
             share_regex_update(client, word_type)
-            begin_text = (f"{lang('action')}{lang('colon')}{code(lang('ask_replace'))}\n"
-                          f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
-            text = begin_text + text + f"{lang('replaced')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
+            text = (f"{lang('action')}{lang('colon')}{code(lang('ask_replace'))}\n"
+                    f"{text}"
+                    f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+                    f"{lang('replaced')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
 
         # Cancel
         elif operation == "cancel":
-            begin_text = (f"{lang('action')}{lang('colon')}{code(lang('cancel'))}\n"
-                          f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
-            text = begin_text + text + f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
+            text = (f"{lang('action')}{lang('colon')}{code(lang('action_cancel'))}\n"
+                    f"{text}"
+                    f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+                    f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
 
         # Timeout
         elif operation == "timeout":
-            begin_text = f"{lang('status')}{lang('colon')}{lang('expired')}\n"
-            text = begin_text + text + f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
+            text = (f"{text}"
+                    f"{lang('status')}{lang('colon')}{code(lang('expired'))}\n"
+                    f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
 
         glovar.ask_words.pop(key, None)
         save("ask_words")
@@ -543,17 +524,21 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
         text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
                 f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n")
 
+        # Word type info text
+        text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+
+        if glovar.comments.get(word_type):
+            text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
         # Check the word type
         if not (word and word_type in glovar.regex):
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-
-            if glovar.comments.get(word_type):
-                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-
-            text += f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
             return text, cc_list
+
+        # Word info text
+        text += f"{lang('word')}{lang('colon')}{code(word)}\n"
 
         # Format the word
         word = format_word(word)
@@ -561,26 +546,13 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
         # Check if the word exists
         if not eval(f"glovar.{word_type}_words").get(word, {}):
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
-                     f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-
-            if glovar.comments.get(word_type):
-                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-
-            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('reason_not_exist'))}\n")
 
             return text, cc_list
 
         cc_list = remove_word(word_type, [word], aid)
-
-        text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
-                 f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
-
-        if glovar.comments.get(word_type):
-            text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
-
-        text += f"{lang('word')}{lang('colon')}{code(word)}\n"
-
+        text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
+                 f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
         share_regex_update(client, word_type)
     except Exception as e:
         logger.warning(f"Word remove try error: {e}", exc_info=True)
