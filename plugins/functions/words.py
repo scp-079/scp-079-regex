@@ -321,8 +321,7 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
             glovar.ask_words.pop(key, None)
             add_word(word_type, word, aid)
             share_regex_update(client, word_type)
-            text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
-                     f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
+            text += f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
     except Exception as e:
         logger.warning(f"Word add error: {e}", exc_info=True)
 
