@@ -111,8 +111,9 @@ def ask_word(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
-                   & Filters.command(["count"], glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["count"], glovar.prefix)
+                   & regex_group
+                   & from_user)
 def count_words(client: Client, message: Message) -> bool:
     # Count words
     glovar.locks["regex"].acquire()
@@ -155,13 +156,17 @@ def count_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
-                   & Filters.command(glovar.list_commands, glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(glovar.list_commands, glovar.prefix)
+                   & regex_group
+                   & from_user)
 def list_words(client: Client, message: Message) -> bool:
     # List words
     try:
+        # Basic data
         cid = message.chat.id
         mid = message.message_id
+
+        # Send the report message
         text, markup = words_list(message)
         thread(send_message, (client, cid, text, mid, markup))
 
