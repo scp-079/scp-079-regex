@@ -477,7 +477,7 @@ def words_list_page(aid: int, word_type: str, page: int, desc: bool) -> (str, In
             text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
 
         if not end_text.strip():
-            end_text = lang("reason_none")
+            end_text = code(lang("reason_none"))
 
         text += (f"{lang('order')}{lang('colon')}{code(order_text)}\n"
                  f"{lang('query')}{lang('colon')}{code(lang('all'))}\n"
