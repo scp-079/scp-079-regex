@@ -55,6 +55,7 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
         now = get_now()
         if now - date > 86400:
             thread(edit_message_reply_markup, (client, cid, mid, None))
+            return True
 
         # Answer the words ask
         if action == "ask":
