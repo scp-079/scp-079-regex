@@ -201,6 +201,7 @@ lang: Dict[str, str] = {
     "action_reset": (zh_cn and "重置计数") or "Reset Count",
     "action_same": (zh_cn and "复制命令") or "Copy Command",
     "action_search": (zh_cn and "查询规则") or "Search Rules",
+    "action_who": (zh_cn and "查询添加者") or "Find the Adder",
     "all": (zh_cn and "全部") or "All",
     "ask_new": (zh_cn and "另增新词") or "Add as New",
     "ask_replace": (zh_cn and "替换全部") or "Replace All",
@@ -253,7 +254,6 @@ all_commands += [
     "group",
     "groupdict",
     "groups",
-    "id",
     "l",
     "long",
     "mention",
@@ -261,7 +261,8 @@ all_commands += [
     "push",
     "reset",
     "t2t",
-    "version"
+    "version",
+    "who"
 ]
 
 default_word_status: Dict[str, Union[float, int]] = {
@@ -350,7 +351,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.4.2"
+version: str = "0.4.3"
 
 # Load data from pickle
 
