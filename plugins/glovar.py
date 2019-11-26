@@ -192,6 +192,7 @@ lang: Dict[str, str] = {
     "ad_": (zh_cn and "广告 {} 组") or "Ad {}",
     # Special
     "action_add": (zh_cn and "添加规则") or "Add Rule",
+    "action_cc": (zh_cn and "抄送") or "CC",
     "action_count": (zh_cn and "请求统计") or "Request Statistics",
     "action_list": (zh_cn and "查看列表") or "Show the List",
     "action_push": (zh_cn and "手动推送") or "Push Manually",

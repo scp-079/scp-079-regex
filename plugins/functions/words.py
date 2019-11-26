@@ -26,9 +26,10 @@ from pyrogram import Client, InlineKeyboardMarkup, InlineKeyboardButton, Message
 from .. import glovar
 from .channel import share_regex_update
 from .etc import code, button_data, get_command_context, get_int, get_list_page, get_now, get_text, italic, lang
-from .etc import mention_id, random_str
+from .etc import mention_id, random_str, thread
 from .file import save, save_thread
 from .filters import is_similar
+from .telegram import send_message
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -44,6 +45,28 @@ def add_word(word_type: str, word: str, aid: int) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Add word error: {e}", exc_info=True)
+
+    return False
+
+
+def cc(client: Client, cc_list: Set[int], aid: int, mid: int) -> bool:
+    # CC
+    try:
+        if not cc_list:
+            return True
+
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_cc'))}\n")
+
+        for cc_id in cc_list:
+            text += f"{lang('admin')}{lang('colon')}{mention_id(cc_id)}\n"
+
+        thread(send_message, (client, glovar.regex_group_id, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"CC error: {e}", exc_info=True)
 
     return False
 
@@ -103,7 +126,7 @@ def remove_word(word_type: str, words: List[str], aid: int) -> Set[int]:
 
         save_thread(f"{word_type}_words")
         result.discard(aid)
-        result = {cc for cc in list(result) if cc}
+        result = {cc_id for cc_id in list(result) if cc_id}
     except Exception as e:
         logger.warning(f"Remove word error: {e}", exc_info=True)
 

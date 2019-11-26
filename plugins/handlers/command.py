@@ -29,7 +29,7 @@ from ..functions.etc import mention_id, message_link, thread
 from ..functions.file import save
 from ..functions.filters import from_user, regex_group, test_group
 from ..functions.telegram import edit_message_text, get_messages, send_message
-from ..functions.words import get_admin, get_desc, word_add, words_ask, words_list, words_list_page, word_remove
+from ..functions.words import cc, get_admin, get_desc, word_add, words_ask, words_list, words_list_page, word_remove
 from ..functions.words import words_search, words_search_page
 
 # Enable logging
@@ -86,8 +86,10 @@ def ask_word(client: Client, message: Message) -> bool:
                 if callback_data_list and callback_data_list[0]["a"] == "ask":
                     key = callback_data_list[0]["d"]
                     ask_text = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
-                    ask_text += words_ask(client, the_type, key)
+                    result_text, cc_list = words_ask(client, the_type, key)
+                    ask_text += result_text
                     thread(edit_message_text, (client, cid, rid, ask_text))
+                    cc(client, cc_list, aid, rid)
                     text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
                              f"{lang('see')}{lang('colon')}{general_link(rid, message_link(r_message))}\n")
                 else:
@@ -290,18 +292,25 @@ def push_words(client: Client, message: Message) -> bool:
                    & Filters.command(glovar.remove_commands, glovar.prefix))
 def remove_word(client: Client, message: Message) -> bool:
     # Remove a word
-    if glovar.locks["regex"].acquire():
-        try:
-            cid = message.chat.id
-            mid = message.message_id
-            text = word_remove(client, message)
-            thread(send_message, (client, cid, text, mid))
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        aid = message.from_user.id
+        mid = message.message_id
 
-            return True
-        except Exception as e:
-            logger.warning(f"Remove word error: {e}", exc_info=True)
-        finally:
-            glovar.locks["regex"].release()
+        # Send the report message
+        text, cc_list = word_remove(client, message)
+        thread(send_message, (client, cid, text, mid))
+
+        # CC
+        cc(client, cc_list, aid, mid)
+
+        return True
+    except Exception as e:
+        logger.warning(f"Remove word error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 
@@ -444,6 +453,7 @@ def same_words(client: Client, message: Message) -> bool:
                    & from_user)
 def search_words(client: Client, message: Message) -> bool:
     # Search words
+    glovar.locks["regex"].acquire()
     try:
         # Basic data
         cid = message.chat.id
@@ -456,6 +466,8 @@ def search_words(client: Client, message: Message) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Search words error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 

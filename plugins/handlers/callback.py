@@ -24,7 +24,7 @@ from pyrogram import Client, CallbackQuery
 from .. import glovar
 from ..functions.etc import lang, mention_id, thread
 from ..functions.filters import regex_group
-from ..functions.words import get_admin, get_desc, words_ask, words_list_page, words_search_page
+from ..functions.words import cc, get_admin, get_desc, words_ask, words_list_page, words_search_page
 from ..functions.telegram import answer_callback, edit_message_text
 
 # Enable logging
@@ -53,8 +53,10 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
         # Answer the words ask
         if action == "ask":
             text = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
-            text += words_ask(client, action_type, data)
+            result_text, cc_list = words_ask(client, action_type, data)
+            text += result_text
             edit_message_text(client, cid, mid, text)
+            cc(client, cc_list, aid, mid)
 
         # List the word
         elif action == "list":
