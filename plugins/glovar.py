@@ -197,6 +197,7 @@ lang: Dict[str, str] = {
     "action_list": (zh_cn and "查看列表") or "Show the List",
     "action_push": (zh_cn and "手动推送") or "Push Manually",
     "action_remove": (zh_cn and "删除规则") or "Remove Rule",
+    "action_reset": (zh_cn and "重置计数") or "Reset Count",
     "action_search": (zh_cn and "查询规则") or "Search Rules",
     "all": (zh_cn and "全部") or "All",
     "ask_new": (zh_cn and "另增新词") or "Add as New",
@@ -219,6 +220,7 @@ lang: Dict[str, str] = {
     "search": (zh_cn and "正则搜索") or "REGEX Search",
     "t2t": (zh_cn and "文字转换") or "Text Transfer",
     "type": (zh_cn and "类别") or "Type",
+    "unknown": (zh_cn and "未知") or "Unknown",
     "valid_types": (zh_cn and "可选类别") or "Valid Types",
     "word": (zh_cn and "词组") or "Word",
     # Test

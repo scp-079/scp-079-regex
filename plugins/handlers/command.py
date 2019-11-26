@@ -257,6 +257,7 @@ def push_words(client: Client, message: Message) -> bool:
         command_type = get_command_type(message)
         if command_type in glovar.regex:
             share_regex_update(client, command_type)
+
             text += f"{lang('type')}{lang('colon')}{code(lang(command_type))}\n"
 
             if glovar.comments.get(command_type):
@@ -267,14 +268,11 @@ def push_words(client: Client, message: Message) -> bool:
             for word_type in glovar.regex:
                 thread(share_regex_update, (client, word_type))
 
-            text += f"{lang('type')}{lang('colon')}{code(lang('all'))}\n"
-
-            if glovar.comments.get(command_type):
-                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[command_type])}\n"
-
-            text += f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+            text += (f"{lang('type')}{lang('colon')}{code(lang('all'))}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
         else:
-            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+            text += (f"{lang('type')}{lang('colon')}{code(command_type or lang('unknown'))}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
         thread(send_message, (client, cid, text, mid))
@@ -288,8 +286,9 @@ def push_words(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
-                   & Filters.command(glovar.remove_commands, glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(glovar.remove_commands, glovar.prefix)
+                   & regex_group
+                   & from_user)
 def remove_word(client: Client, message: Message) -> bool:
     # Remove a word
     glovar.locks["regex"].acquire()
@@ -315,44 +314,57 @@ def remove_word(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message(Filters.incoming & Filters.group & regex_group & from_user
-                   & Filters.command(["reset"], glovar.prefix))
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["reset"], glovar.prefix)
+                   & regex_group
+                   & from_user)
 def reset_words(client: Client, message: Message) -> bool:
     # Push words
-    if glovar.locks["regex"].acquire():
-        try:
-            cid = message.chat.id
-            mid = message.message_id
-            uid = message.from_user.id
-            text = (f"管理：{mention_id(uid)}\n"
-                    f"操作：{code('清除计数')}\n")
-            command_type = get_command_type(message)
-            if command_type and command_type in ["all"] + list(glovar.regex):
-                if command_type == "all":
-                    type_list = list(glovar.regex)
-                else:
-                    type_list = [command_type]
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        uid = message.from_user.id
+        mid = message.message_id
 
-                for word_type in type_list:
-                    for word in list(eval(f"glovar.{word_type}_words")):
-                        eval(f"glovar.{word_type}_words")[word] = deepcopy(glovar.default_word_status)
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_reset'))}\n")
 
-                    save(f"{word_type}_words")
+        # Proceed
+        command_type = get_command_type(message)
+        if command_type in glovar.regex:
+            for word in list(eval(f"glovar.{command_type}_words")):
+                eval(f"glovar.{command_type}_words")[word] = deepcopy(glovar.default_word_status)
 
-                text += (f"类别：{code((lambda t: glovar.regex[t] if t != 'all' else '全部')(command_type))}\n"
-                         f"状态：{code('已清除')}\n")
-            else:
-                text += (f"类别：{code(command_type or '未知')}\n"
-                         f"状态：{code('未清除')}\n"
-                         f"原因：{code('格式有误')}\n")
+            save(f"{command_type}_words")
 
-            thread(send_message, (client, cid, text, mid))
+            text += f"{lang('type')}{lang('colon')}{code(lang(command_type))}\n"
 
-            return True
-        except Exception as e:
-            logger.warning(f"Reset words error: {e}", exc_info=True)
-        finally:
-            glovar.locks["regex"].release()
+            if glovar.comments.get(command_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[command_type])}\n"
+
+            text += f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
+        elif command_type == "all":
+            for word_type in glovar.regex:
+                for word in list(eval(f"glovar.{word_type}_words")):
+                    eval(f"glovar.{word_type}_words")[word] = deepcopy(glovar.default_word_status)
+
+                save(f"{word_type}_words")
+
+            text += (f"{lang('type')}{lang('colon')}{code(lang('all'))}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
+        else:
+            text += (f"{lang('type')}{lang('colon')}{code(command_type or lang('unknown'))}\n"
+                     f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Reset words error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 
