@@ -585,8 +585,7 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
             return text, cc_list
 
         cc_list = remove_word(word_type, [word], aid)
-        text += (f"{lang('word')}{lang('colon')}{code(word)}\n"
-                 f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
+        text += f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
         share_regex_update(client, word_type)
     except Exception as e:
         logger.warning(f"Word remove try error: {e}", exc_info=True)
