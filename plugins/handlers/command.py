@@ -18,6 +18,7 @@
 
 import logging
 from copy import deepcopy
+from string import ascii_lowercase
 
 from pyrogram import Client, Filters, Message
 
@@ -148,7 +149,7 @@ def comments_words(client: Client, message: Message) -> bool:
         # Proceed
         word_type, comment = get_command_context(message)
 
-        if word_type and word_type in glovar.regex and comment:
+        if word_type and word_type in {f"ad{c}" for c in ascii_lowercase} and comment:
             glovar.comments[word_type] = comment
             save("comments")
 
