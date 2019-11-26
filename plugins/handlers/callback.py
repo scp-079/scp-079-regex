@@ -22,10 +22,10 @@ from json import loads
 from pyrogram import Client, CallbackQuery
 
 from .. import glovar
-from ..functions.etc import lang, mention_id, thread
+from ..functions.etc import get_now, lang, mention_id, thread
 from ..functions.filters import regex_group
 from ..functions.words import cc, get_admin, get_desc, words_ask, words_list_page, words_search_page
-from ..functions.telegram import answer_callback, edit_message_text
+from ..functions.telegram import answer_callback, edit_message_reply_markup, edit_message_text
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -49,6 +49,12 @@ def answer(client: Client, callback_query: CallbackQuery) -> bool:
         # Check permission
         if uid != aid:
             return True
+
+        # Check the date
+        date = callback_query.message.date
+        now = get_now()
+        if now - date > 86400:
+            thread(edit_message_reply_markup, (client, cid, mid, None))
 
         # Answer the words ask
         if action == "ask":
