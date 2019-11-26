@@ -115,34 +115,42 @@ def ask_word(client: Client, message: Message) -> bool:
                    & Filters.command(["count"], glovar.prefix))
 def count_words(client: Client, message: Message) -> bool:
     # Count words
-    if glovar.locks["regex"].acquire():
-        try:
-            cid = message.chat.id
-            mid = message.message_id
-            uid = message.from_user.id
-            receivers = []
-            for word_type in glovar.receivers:
-                receivers += glovar.receivers[word_type]
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        mid = message.message_id
+        uid = message.from_user.id
 
-            receivers = list(set(receivers))
-            receivers.sort()
-            share_data(
-                client=client,
-                receivers=receivers,
-                action="regex",
-                action_type="count",
-                data="ask"
-            )
-            text = (f"管理：{mention_id(uid)}\n"
-                    f"操作：{code('更新计数')}\n"
-                    f"状态：{code('已请求')}\n")
-            thread(send_message, (client, cid, text, mid))
+        # Choose receivers
+        receivers = []
 
-            return True
-        except Exception as e:
-            logger.warning(f"Count words error: {e}", exc_info=True)
-        finally:
-            glovar.locks["regex"].release()
+        for word_type in glovar.receivers:
+            receivers += glovar.receivers[word_type]
+
+        receivers = list(set(receivers))
+        receivers.sort()
+
+        # Send command
+        share_data(
+            client=client,
+            receivers=receivers,
+            action="regex",
+            action_type="count",
+            data="ask"
+        )
+
+        # Send the report message
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_count'))}\n"
+                f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Count words error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 
