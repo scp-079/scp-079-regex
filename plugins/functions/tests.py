@@ -129,7 +129,7 @@ def text_test(client: Client, message: Message) -> bool:
                           f"^{lang('version')}{lang('colon')}|"
                           f"^{lang('message_print')}{lang('colon')}")
 
-        text = get_filename(message, True) + get_text(message, True)
+        text = get_filename(message) + get_text(message)
 
         if not text or re.search(except_pattern, origin_text, re.I | re.M | re.S):
             return True
