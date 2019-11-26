@@ -189,8 +189,8 @@ def is_similar(mode: str, a: str, b: str) -> bool:
                 return False
 
         elif mode == "search":
-            if not (re.search(a, b, re.I | re.M | re.S)
-                    or re.search(a, xg.xeger(b), re.I | re.M | re.S)):
+            if not (re.search(b, a, re.I | re.M | re.S)
+                    or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
                 return False
 
         elif mode == "strict":
