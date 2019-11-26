@@ -113,7 +113,7 @@ def receive_status_ask(client: Client, data: dict) -> bool:
             if not glovar.regex[word_type]:
                 continue
 
-            status[lang("word_type")] = f"{len(eval(f'{word_type}_words'))} {lang('rules')}"
+            status[lang("word_type")] = f"{len(eval(f'glovar.{word_type}_words'))} {lang('rules')}"
 
         file = data_to_file(status)
         share_data(
