@@ -219,6 +219,7 @@ lang: Dict[str, str] = {
     "reason_not_found": (zh_cn and "没有找到") or "Not Found",
     "reason_not_specific": (zh_cn and "不具有特殊性") or "Not specific",
     "reason_wait": (zh_cn and "等待确认") or "Wait for Confirmation",
+    "replaced": (zh_cn and "替换") or "Replaced",
     "s": (zh_cn and "宽松搜索") or "Loose Search",
     "search": (zh_cn and "正则搜索") or "REGEX Search",
     "t2t": (zh_cn and "文字转换") or "Text Transfer",
