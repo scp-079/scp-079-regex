@@ -421,10 +421,12 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
             end_text = ""
 
             for word_type in glovar.regex:
-                end_text += f"{code(word_type)}    {italic(lang(word_type))}"
+                end_text += f"{code(word_type)}    "
 
                 if glovar.comments.get(word_type):
-                    end_text += f"{italic(lang('comma'))}{italic(glovar.comments[word_type])}"
+                    end_text += italic(f"{lang(word_type)}{lang('comma')}{glovar.comments[word_type]}")
+                else:
+                    end_text += italic(lang(word_type))
 
                 end_text += "\n"
 
