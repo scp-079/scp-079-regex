@@ -96,13 +96,13 @@ def reset_count() -> bool:
                 today = eval(f"glovar.{word_type}_words")[word]["today"]
                 eval(f"glovar.{word_type}_words")[word]["today"] = 0
 
-                if "(?# temp)" not in word:
-                    continue
-
                 if today == 0:
                     eval(f"glovar.{word_type}_words")[word]["temp"] += 1
                 else:
                     eval(f"glovar.{word_type}_words")[word]["temp"] = 0
+
+                if "(?# temp)" not in word:
+                    continue
 
                 if eval(f"glovar.{word_type}_words")[word]["temp"] >= glovar.limit_temp:
                     eval(f"glovar.{word_type}_words").pop(word)
