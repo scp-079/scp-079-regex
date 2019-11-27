@@ -81,7 +81,7 @@ try:
     backup = config["custom"].get("backup", backup)
     backup = eval(backup)
     date_reset = config["custom"].get("date_reset", date_reset)
-    limit_temp = config["custom"].get("limit_temp", limit_temp)
+    limit_temp = int(config["custom"].get("limit_temp", limit_temp))
     per_page = int(config["custom"].get("per_page", per_page))
     project_link = config["custom"].get("project_link", project_link)
     project_name = config["custom"].get("project_name", project_name)
