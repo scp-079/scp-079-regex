@@ -165,7 +165,8 @@ def check(client: Client, message: Message) -> bool:
             if word in words:
                 count_text = (f"{italic(round(words[word]['average'], 1))} {code('/')} "
                               f"{italic(words[word]['today'])} {code('/')} "
-                              f"{italic(words[word]['total'])}")
+                              f"{italic(words[word]['total'])} {code('/')} "
+                              f"{italic(words[word]['temp'])}")
                 text += (f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n"
                          f"{lang('result')}{lang('colon')}{count_text}\n")
             else:

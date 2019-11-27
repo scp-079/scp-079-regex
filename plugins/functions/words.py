@@ -485,7 +485,8 @@ def words_list_page(aid: int, word_type: str, page: int, desc: bool) -> (str, In
         end_text = f"\n\n".join((f"{code(w)}\n"
                                  f"{italic(round(words[w]['average'], 1))} {code('/')} "
                                  f"{italic(words[w]['today'])} {code('/')} "
-                                 f"{italic(words[w]['total'])}")
+                                 f"{italic(words[w]['total'])} {code('/')} "
+                                 f"{italic(words[w]['temp'])}")
                                 for w in w_list)
         order_text = (lambda x: lang("order_desc") if x else lang("order_asc"))(desc)
 
@@ -719,7 +720,8 @@ def words_search_page(aid: int, key: str, page: int) -> (str, InlineKeyboardMark
             end_text = "\n\n".join((f"{code(w)}\n"
                                     f"{italic(round(words[w]['average'], 1))} {code('/')} "
                                     f"{italic(words[w]['today'])} {code('/')} "
-                                    f"{italic(words[w]['total'])}")
+                                    f"{italic(words[w]['total'])} {code('/')} "
+                                    f"{italic(words[w]['temp'])}")
                                    for w in w_list)
 
         text += f"{lang('result')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}"
