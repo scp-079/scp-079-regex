@@ -19,6 +19,7 @@
 import logging
 import re
 from copy import deepcopy
+from json import dumps
 from typing import List, Optional, Set
 
 from pyrogram import Client, InlineKeyboardMarkup, InlineKeyboardButton, Message
@@ -149,7 +150,7 @@ def get_match(mode: str, regex: str, text: str) -> str:
             if mode == "group":
                 return str(match.group())
             elif mode == "groupdict":
-                return str(match.groupdict())
+                return str(dumps(match.groupdict(), ensure_ascii=False, indent=4))
             elif mode == "groups":
                 return str(match.groups())
     except Exception as e:
