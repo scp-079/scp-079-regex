@@ -418,10 +418,20 @@ def words_list(message: Message) -> (str, InlineKeyboardMarkup):
 
         # Check command format
         if len(command_list) <= 1:
-            end_text = f"\n".join(f"{code(name)}    {italic(lang(name))}" for name in glovar.regex)
+            end_text = ""
+
+            for word_type in glovar.regex:
+                end_text += f"{code(word_type)}    {italic(lang(word_type))}"
+
+                if glovar.comments.get(word_type):
+                    end_text += f"{italic(lang('comma'))}{italic(glovar.comments[word_type])}"
+
+                end_text += "\n"
+
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n"
                      f"{lang('valid_types')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
+
             return text, markup
 
         word_type = command_list[1]

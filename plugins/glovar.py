@@ -248,7 +248,7 @@ for c in ascii_lowercase:
 
 # Init
 
-add_commands: List[str] = ["add"]
+add_commands: List[str] = ["ad", "add"]
 list_commands: List[str] = ["list", "ls"]
 remove_commands: List[str] = ["rm", "remove"]
 same_commands: List[str] = ["copy", "same"]
