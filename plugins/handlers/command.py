@@ -65,6 +65,7 @@ def add_word(client: Client, message: Message) -> bool:
         if f"{word_type}-" in word_type_list or f"{word_type}+" in word_type_list:
             return True
 
+        word_type_list = {w for w in word_type_list if w[-1] not in {"-", "+"}}
         same_word(client, message, "add", word, word_type_list, mid)
 
         return True
@@ -473,6 +474,7 @@ def remove_word(client: Client, message: Message) -> bool:
             if f"{word_type}-" in word_type_list or f"{word_type}+" in word_type_list:
                 return True
 
+            word_type_list = {w for w in word_type_list if w[-1] not in {"-", "+"}}
             same_word(client, message, "remove", word, word_type_list, mid)
         elif not word_type and not word and message.reply_to_message:
             r_message = message.reply_to_message
@@ -490,11 +492,12 @@ def remove_word(client: Client, message: Message) -> bool:
                     and old_command in glovar.add_commands):
                 word_type, word = get_command_context(r_message)
                 word_type_list = get_same_types(word)
+                word_type_list.discard(word_type)
 
                 if f"{word_type}-" in word_type_list or f"{word_type}+" in word_type_list:
                     return True
 
-                word_type_list.discard(word_type)
+                word_type_list = {w for w in word_type_list if w[-1] not in {"-", "+"}}
                 same_word(client, r_message, "remove", word, word_type_list, mid)
 
         return True
