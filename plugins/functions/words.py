@@ -167,7 +167,7 @@ def get_same_types(regex: str) -> Set[str]:
         for comment in comments:
             word_list = comment.split()
 
-            if not all(w in glovar.regex for w in word_list):
+            if not all(w in glovar.regex or w[:-1] in glovar.regex for w in word_list):
                 continue
 
             return set(word_list)
