@@ -20,6 +20,7 @@ import logging
 import re
 from copy import deepcopy
 from json import dumps
+from string import ascii_lowercase
 from typing import List, Optional, Set
 
 from pyrogram import Client, InlineKeyboardMarkup, InlineKeyboardButton, Message
@@ -135,6 +136,36 @@ def get_desc(message: Message) -> bool:
     return True
 
 
+def get_duplicated(word_type: str, word: str) -> Set[str]:
+    # Get duplicated word types
+    result = set()
+    try:
+        if word_type in {f"ad{c}" for c in ascii_lowercase}:
+            word_type = "ad_"
+
+        # Current word type as parent
+        for w_t in glovar.contains.get(word_type):
+            if word in eval(f"glovar.{w_t}_words"):
+                result.add(w_t)
+
+        # Current word type as child
+        for w_t in glovar.contains:
+            if word_type not in glovar.contains[w_t]:
+                continue
+
+            if w_t == "ad_":
+                for c in ascii_lowercase:
+                    if word in eval(f"glovar.ad{c}_words"):
+                        result.add(f"ad{c}")
+            else:
+                if word in eval(f"glovar.{w_t}_words"):
+                    result.add(w_t)
+    except Exception as e:
+        logger.warning(f"Get duplicated error: {e}", exc_info=True)
+
+    return result
+
+
 def get_match(mode: str, regex: str, text: str) -> str:
     # Get match result
     try:
@@ -248,6 +279,15 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
         if eval(f"glovar.{word_type}_words").get(word, {}):
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('reason_existed'))}\n")
+            return text, markup
+
+        # Check if the word duplicated
+        duplicated_list = get_duplicated(word_type, word)
+        if duplicated_list:
+            end_text = italic(lang("comma")).join(lang(d) for d in duplicated_list)
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('reason_duplicated'))}\n"
+                     f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
             return text, markup
 
         # Check if the pattern is correct

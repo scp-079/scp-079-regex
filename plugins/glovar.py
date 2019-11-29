@@ -25,7 +25,7 @@ from shutil import rmtree
 from string import ascii_lowercase
 from threading import Lock
 from time import time
-from typing import Dict, List, Union
+from typing import Dict, List, Set, Union
 
 # Enable logging
 logging.basicConfig(
@@ -223,6 +223,7 @@ lang: Dict[str, str] = {
     "order_asc": (zh_cn and "升序") or "Ascending",
     "order_desc": (zh_cn and "降序") or "Descending",
     "query": (zh_cn and "查询") or "Query",
+    "reason_duplicated": (zh_cn and "跨类别重复") or "Duplicated",
     "reason_existed": (zh_cn and "已存在") or "Existed",
     "reason_not_exist": (zh_cn and "不存在") or "Does Not Exist",
     "reason_not_found": (zh_cn and "没有找到") or "Not Found",
@@ -272,6 +273,14 @@ all_commands += [
     "version",
     "who"
 ]
+
+contains: Dict[str, Set[str]] = {
+    "ad_": {"aff"},
+    "con": {"iml", "pho"},
+    "nm": {"bio"},
+    "wb": {"iml", "pho", "sho", "spc", "tgp"},
+    "wd": {"aff", "con", "spe"}
+}
 
 default_word_status: Dict[str, Union[float, int]] = {
     "time": int(time()),
