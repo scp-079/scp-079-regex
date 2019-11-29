@@ -278,8 +278,8 @@ contains: Dict[str, Set[str]] = {
     "ad_": {"aff"},
     "con": {"iml", "pho"},
     "nm": {"bio"},
-    "wb": {"iml", "pho", "sho", "spc", "tgp"},
-    "wd": {"aff", "con", "spe"}
+    "wb": {"ad", "ad_", "iml", "pho", "sho", "spc"},
+    "wd": {"aff", "con", "spe", "tgp"}
 }
 
 default_word_status: Dict[str, Union[float, int]] = {

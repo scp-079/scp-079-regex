@@ -145,8 +145,13 @@ def get_duplicated(word_type: str, word: str) -> Set[str]:
 
         # Current word type as parent
         for w_t in glovar.contains.get(word_type, set()):
-            if word in eval(f"glovar.{w_t}_words"):
-                result.add(w_t)
+            if w_t == "ad_":
+                for c in ascii_lowercase:
+                    if word in eval(f"glovar.ad{c}_words"):
+                        result.add(f"ad{c}")
+            else:
+                if word in eval(f"glovar.{w_t}_words"):
+                    result.add(w_t)
 
         # Current word type as child
         for w_t in glovar.contains:
