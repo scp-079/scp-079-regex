@@ -162,6 +162,7 @@ def get_match(mode: str, regex: str, text: str) -> str:
 def get_same_types(regex: str) -> Set[str]:
     # Get the same word types from regex
     try:
+        regex = format_word(regex)
         comments = get_comments(regex)
 
         for comment in comments:
