@@ -233,6 +233,9 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
             return text, markup
 
+        # Format the word
+        word = format_word(word)
+
         # Word type and word info text
         text += f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
 
@@ -242,7 +245,6 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
         text += f"{lang('word')}{lang('colon')}{code(word)}\n"
 
         # Check if the word already exits
-        word = format_word(word)
         if eval(f"glovar.{word_type}_words").get(word, {}):
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('reason_existed'))}\n")
@@ -579,11 +581,11 @@ def word_remove_try(client: Client, message: Message) -> (str, Set[int]):
 
             return text, cc_list
 
-        # Word info text
-        text += f"{lang('word')}{lang('colon')}{code(word)}\n"
-
         # Format the word
         word = format_word(word)
+
+        # Word info text
+        text += f"{lang('word')}{lang('colon')}{code(word)}\n"
 
         # Check if the word exists
         if not eval(f"glovar.{word_type}_words").get(word, {}):
