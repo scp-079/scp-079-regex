@@ -284,7 +284,7 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
         # Check if the word duplicated
         duplicated_list = get_duplicated(word_type, word)
         if duplicated_list:
-            end_text = italic(lang("comma")).join(lang(d) for d in duplicated_list)
+            end_text = "\t" * 4 + italic(lang("comma")).join(italic(lang(d)) for d in duplicated_list)
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('reason_duplicated'))}\n"
                      f"{lang('duplicated')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n")
