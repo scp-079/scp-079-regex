@@ -23,7 +23,8 @@ from pyrogram import Client, InlineKeyboardMarkup, Message
 from pyrogram.api.functions.messages import GetStickerSet
 from pyrogram.api.types import InputStickerSetShortName, StickerSet
 from pyrogram.api.types.messages import StickerSet as messages_StickerSet
-from pyrogram.errors import ButtonDataInvalid, ChannelInvalid, ChannelPrivate, FloodWait, PeerIdInvalid, QueryIdInvalid
+from pyrogram.errors import ChatAdminRequired, ButtonDataInvalid, ChannelInvalid, ChannelPrivate, FloodWait
+from pyrogram.errors import PeerIdInvalid, QueryIdInvalid
 
 from .. import glovar
 from .etc import t2t, wait_flood
@@ -56,7 +57,7 @@ def answer_callback(client: Client, callback_query_id: str, text: str, show_aler
     return result
 
 
-def download_media(client: Client, file_id: str, file_ref: str, file_path: str):
+def download_media(client: Client, file_id: str, file_ref: str, file_path: str) -> Optional[str]:
     # Download a media file
     result = None
     try:
@@ -75,7 +76,7 @@ def download_media(client: Client, file_id: str, file_ref: str, file_path: str):
 
 
 def edit_message_reply_markup(client: Client, cid: int, mid: int,
-                              markup: InlineKeyboardMarkup = None) -> Optional[Message]:
+                              markup: InlineKeyboardMarkup = None) -> Union[bool, Message, None]:
     # Edit the message's reply markup
     result = None
     try:
@@ -93,6 +94,8 @@ def edit_message_reply_markup(client: Client, cid: int, mid: int,
                 wait_flood(e)
             except ButtonDataInvalid:
                 logger.warning(f"Edit message {mid} reply markup in {cid} - invalid markup: {markup}")
+            except (ChatAdminRequired, PeerIdInvalid, ChannelInvalid, ChannelPrivate):
+                return False
     except Exception as e:
         logger.warning(f"Edit message {mid} reply markup in {cid} error: {e}", exc_info=True)
 
@@ -100,7 +103,7 @@ def edit_message_reply_markup(client: Client, cid: int, mid: int,
 
 
 def edit_message_text(client: Client, cid: int, mid: int, text: str,
-                      markup: InlineKeyboardMarkup = None) -> Optional[Message]:
+                      markup: InlineKeyboardMarkup = None) -> Union[bool, Message, None]:
     # Edit the message's text
     result = None
     try:
@@ -124,6 +127,8 @@ def edit_message_text(client: Client, cid: int, mid: int, text: str,
                 wait_flood(e)
             except ButtonDataInvalid:
                 logger.warning(f"Edit message {mid} text in {cid} - invalid markup: {markup}")
+            except (ChatAdminRequired, PeerIdInvalid, ChannelInvalid, ChannelPrivate):
+                return False
     except Exception as e:
         logger.warning(f"Edit message {mid} in {cid} error: {e}", exc_info=True)
 
@@ -178,7 +183,7 @@ def get_sticker_title(client: Client, short_name: str, normal: bool = False, cac
 
 
 def send_document(client: Client, cid: int, document: str, file_ref: str = None, caption: str = "", mid: int = None,
-                  markup: InlineKeyboardMarkup = None) -> Optional[Union[bool, Message]]:
+                  markup: InlineKeyboardMarkup = None) -> Union[bool, Message, None]:
     # Send a document to a chat
     result = None
     try:
@@ -198,10 +203,10 @@ def send_document(client: Client, cid: int, document: str, file_ref: str = None,
             except FloodWait as e:
                 flood_wait = True
                 wait_flood(e)
-            except (PeerIdInvalid, ChannelInvalid, ChannelPrivate):
-                return False
             except ButtonDataInvalid:
                 logger.warning(f"Send document {document} to {cid} - invalid markup: {markup}")
+            except (ChatAdminRequired, PeerIdInvalid, ChannelInvalid, ChannelPrivate):
+                return False
     except Exception as e:
         logger.warning(f"Send document {document} to {cid} error: {e}", exec_info=True)
 
@@ -209,7 +214,7 @@ def send_document(client: Client, cid: int, document: str, file_ref: str = None,
 
 
 def send_message(client: Client, cid: int, text: str, mid: int = None,
-                 markup: InlineKeyboardMarkup = None) -> Optional[Union[bool, Message]]:
+                 markup: InlineKeyboardMarkup = None) -> Union[bool, Message, None]:
     # Send a message to a chat
     result = None
     try:
@@ -231,10 +236,10 @@ def send_message(client: Client, cid: int, text: str, mid: int = None,
             except FloodWait as e:
                 flood_wait = True
                 wait_flood(e)
-            except (PeerIdInvalid, ChannelInvalid, ChannelPrivate):
-                return False
             except ButtonDataInvalid:
                 logger.warning(f"Send message to {cid} - invalid markup: {markup}")
+            except (ChatAdminRequired, PeerIdInvalid, ChannelInvalid, ChannelPrivate):
+                return False
     except Exception as e:
         logger.warning(f"Send message to {cid} error: {e}", exc_info=True)
 
