@@ -173,7 +173,6 @@ lang: Dict[str, str] = {
     "more": (zh_cn and "附加信息") or "Extra Info",
     # Regex
     "ad": (zh_cn and "广告用语") or "Ad",
-    "aff": (zh_cn and "推广链接") or "AFF Link",
     "ava": (zh_cn and "头像分析") or "Avatar",
     "bad": (zh_cn and "敏感检测") or "Bad",
     "ban": (zh_cn and "自动封禁") or "Ban",
@@ -275,11 +274,10 @@ all_commands += [
 ]
 
 contains: Dict[str, Set[str]] = {
-    "ad_": {"aff"},
     "con": {"iml", "pho"},
     "nm": {"bio"},
     "wb": {"ad", "ad_", "iml", "pho", "sho", "spc"},
-    "wd": {"aff", "con", "spe", "tgp"}
+    "wd": {"adi", "con", "spe", "tgp"}
 }
 
 default_word_status: Dict[str, Union[float, int]] = {
@@ -298,35 +296,34 @@ locks: Dict[str, Lock] = {
 }
 
 receivers: Dict[str, List[str]] = {
-    "ad": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "aff": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "ad": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
     "ava": ["NOSPAM"],
     "bad": ["NOSPAM"],
-    "ban": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "bio": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "con": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "ban": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
+    "bio": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
+    "con": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
     "del": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "fil": ["CLEAN", "LANG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "iml": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "pho": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "nm": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "iml": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
+    "pho": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
+    "nm": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
     "rm": ["TIP"],
-    "sho": ["CLEAN", "NOSPAM", "WATCH"],
-    "spc": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
-    "spe": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "sho": ["CAPTCHA", "CLEAN", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
+    "spc": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
+    "spe": ["AVATAR", "CAPTCHA", "CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
     "sti": ["CLEAN", "LANG", "LONG", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
     "tgl": ["CLEAN", "NOPORN", "NOSPAM", "WATCH"],
     "tgp": ["CLEAN", "WATCH"],
-    "wb": ["CAPTCHA", "CLEAN", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"],
+    "wb": ["CAPTCHA", "CLEAN", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "TIP", "WATCH"],
     "wd": ["NOSPAM", "WATCH"],
     "test": []
 }
+
 for c in ascii_lowercase:
     receivers[f"ad{c}"] = receivers["ad"]
 
 regex: Dict[str, bool] = {
     "ad": True,
-    "aff": True,
     "ava": True,
     "bad": True,
     "ban": True,
@@ -371,7 +368,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.4.5"
+version: str = "0.4.6"
 
 # Load data from pickle
 
