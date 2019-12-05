@@ -52,6 +52,7 @@ regex_group_id: int = 0
 test_group_id: int = 0
 
 # [custom]
+aio: Union[bool, str] = ""
 backup: Union[bool, str] = ""
 date_reset: str = ""
 limit_temp: int = 0
@@ -78,6 +79,8 @@ try:
     test_group_id = int(config["channels"].get("test_group_id", test_group_id))
     regex_group_id = int(config["channels"].get("regex_group_id", regex_group_id))
     # [custom]
+    aio = config["custom"].get("aio", aio)
+    aio = eval(aio)
     backup = config["custom"].get("backup", backup)
     backup = eval(backup)
     date_reset = config["custom"].get("date_reset", date_reset)
@@ -103,6 +106,7 @@ if (bot_token in {"", "[DATA EXPUNGED]"}
         or hide_channel_id == 0
         or test_group_id == 0
         or regex_group_id == 0
+        or aio not in {False, True}
         or backup not in {False, True}
         or date_reset in {"", "[DATA EXPUNGED]"}
         or limit_temp == 0
@@ -201,6 +205,7 @@ lang: Dict[str, str] = {
     "action_check": (zh_cn and "查询数据") or "Check the Count Data",
     "action_comment": (zh_cn and "添加备注") or "Add Comment",
     "action_count": (zh_cn and "请求统计") or "Request Statistics",
+    "action_escape": (zh_cn and "转义字符") or "Escape",
     "action_list": (zh_cn and "查看列表") or "Show the List",
     "action_match": (zh_cn and "匹配结果") or "Show Match Result",
     "action_push": (zh_cn and "手动推送") or "Push Manually",
@@ -258,6 +263,7 @@ all_commands += [
     "check",
     "comment",
     "count",
+    "escape",
     "findall",
     "group",
     "groupdict",
@@ -368,7 +374,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.4.6"
+version: str = "0.4.7"
 
 # Load data from pickle
 

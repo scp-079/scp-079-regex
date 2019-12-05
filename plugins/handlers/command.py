@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import re
 from copy import deepcopy
 from string import ascii_lowercase
 
@@ -123,6 +124,7 @@ def ask_word(client: Client, message: Message) -> bool:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code('command_usage')}\n")
 
+        # Send the report message
         thread(send_message, (client, cid, text, mid))
 
         return True
@@ -281,6 +283,43 @@ def count_words(client: Client, message: Message) -> bool:
     return False
 
 
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["escape"], glovar.prefix)
+                   & regex_group
+                   & from_user)
+def escape(client: Client, message: Message) -> bool:
+    # Escape pattern
+    try:
+        # Basic data
+        cid = message.chat.id
+        aid = message.from_user.id
+        mid = message.message_id
+
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_escape'))}\n")
+
+        # Check command format
+        pattern = get_command_type(message)
+
+        # Proceed
+        if pattern:
+            result = re.escape(pattern)
+            text += f"{lang('result')}{lang('colon')}" + "-" * 24 + "\n\n"
+            text += code_block(result) + "\n"
+        else:
+            text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                     f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+
+        # Send the report message
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Escape error: {e}", exc_info=True)
+
+    return False
+
+
 @Client.on_message(Filters.incoming & Filters.group & Filters.command(glovar.list_commands, glovar.prefix)
                    & regex_group
                    & from_user)
@@ -332,11 +371,12 @@ def match(client: Client, message: Message) -> bool:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
+        # Send the report message
         thread(send_message, (client, cid, text, mid))
 
         return True
     except Exception as e:
-        logger.warning(f"Text t2t error: {e}", exc_info=True)
+        logger.warning(f"Match error: {e}", exc_info=True)
 
     return False
 
@@ -390,6 +430,7 @@ def page_command(client: Client, message: Message) -> bool:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
+        # Send the report message
         thread(send_message, (client, cid, text, mid))
 
         return True
@@ -437,6 +478,7 @@ def push_words(client: Client, message: Message) -> bool:
                      f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
+        # Send the report message
         thread(send_message, (client, cid, text, mid))
 
         return True
@@ -553,6 +595,7 @@ def reset_words(client: Client, message: Message) -> bool:
                      f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
+        # Send the report message
         thread(send_message, (client, cid, text, mid))
 
         return True
@@ -642,6 +685,7 @@ def same_words(client: Client, message: Message) -> bool:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
+        # Send the report message
         thread(send_message, (client, cid, text, mid))
 
         return True
@@ -719,6 +763,7 @@ def text_t2t(client: Client, message: Message) -> bool:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
 
+        # Send the report message
         thread(send_message, (client, cid, text, mid))
 
         return True
