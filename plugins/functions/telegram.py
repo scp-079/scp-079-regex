@@ -153,7 +153,8 @@ def get_messages(client: Client, cid: int, mids: Iterable[int]) -> List[Message]
     return result
 
 
-def get_sticker_title(client: Client, short_name: str, normal: bool = False, cache: bool = True) -> Optional[str]:
+def get_sticker_title(client: Client, short_name: str, normal: bool = False, printable: bool = True,
+                      cache: bool = True) -> Optional[str]:
     # Get sticker set's title
     result = None
     try:
@@ -170,7 +171,7 @@ def get_sticker_title(client: Client, short_name: str, normal: bool = False, cac
                 if isinstance(the_set, messages_StickerSet):
                     inner_set = the_set.set
                     if isinstance(inner_set, StickerSet):
-                        result = t2t(inner_set.title, normal)
+                        result = t2t(inner_set.title, normal, printable)
             except FloodWait as e:
                 flood_wait = True
                 wait_flood(e)

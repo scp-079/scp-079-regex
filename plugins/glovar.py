@@ -211,6 +211,7 @@ lang: Dict[str, str] = {
     "action_push": (zh_cn and "手动推送") or "Push Manually",
     "action_regex": (zh_cn and "手动测试") or "Test Manually",
     "action_remove": (zh_cn and "删除规则") or "Remove Rule",
+    "action_remove_auto": (zh_cn and "自动移除") or "Auto Remove Rules",
     "action_reset": (zh_cn and "重置计数") or "Reset Count",
     "action_same": (zh_cn and "复制命令") or "Copy Command",
     "action_search": (zh_cn and "查询规则") or "Search Rules",
@@ -234,6 +235,7 @@ lang: Dict[str, str] = {
     "reason_not_found": (zh_cn and "没有找到") or "Not Found",
     "reason_not_specific": (zh_cn and "不具有特殊性") or "Not specific",
     "reason_wait": (zh_cn and "等待确认") or "Wait for Confirmation",
+    "removed": (zh_cn and "移除") or "Removed",
     "replaced": (zh_cn and "替换") or "Replaced",
     "s": (zh_cn and "宽松搜索") or "Loose Search",
     "search": (zh_cn and "正则搜索") or "REGEX Search",
@@ -376,7 +378,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.4.8"
+version: str = "0.4.9"
 
 # Load data from pickle
 

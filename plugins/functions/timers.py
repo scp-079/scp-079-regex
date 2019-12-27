@@ -23,8 +23,9 @@ from pyrogram import Client
 
 from .. import glovar
 from .channel import share_data
-from .etc import get_now
+from .etc import code, get_now, lang, thread
 from .file import save
+from .telegram import send_message
 from .words import words_ask
 
 # Enable logging
@@ -87,11 +88,13 @@ def interval_hour_01(client: Client) -> bool:
     return False
 
 
-def reset_count() -> bool:
+def reset_count(client: Client) -> bool:
     # Reset the daily usage
     glovar.locks["regex"].acquire()
     try:
         for word_type in glovar.regex:
+            deleted_words = []
+
             for word in list(eval(f"glovar.{word_type}_words")):
                 today = eval(f"glovar.{word_type}_words")[word]["today"]
                 eval(f"glovar.{word_type}_words")[word]["today"] = 0
@@ -106,8 +109,24 @@ def reset_count() -> bool:
 
                 if eval(f"glovar.{word_type}_words")[word]["temp"] >= glovar.limit_temp:
                     eval(f"glovar.{word_type}_words").pop(word)
+                    deleted_words.append(word)
 
             save(f"{word_type}_words")
+
+            if not deleted_words:
+                continue
+
+            end_text = "\n\n".join(code(word) for word in deleted_words)
+
+            text = (f"{lang('action')}{lang('colon')}{code(lang('action_remove_auto'))}\n"
+                    f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+
+            if glovar.comments.get(word_type):
+                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+
+            text += f"{lang('removed')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
+
+            thread(send_message, (client, glovar.regex_group_id, text))
 
         return True
     except Exception as e:

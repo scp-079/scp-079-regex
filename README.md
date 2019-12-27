@@ -4,7 +4,7 @@ This project is used to manage regular expression rules adopted by other bots.
 
 ## How to use
 
-See [this article](https://scp-079.org/regex/).
+- See [this article](https://scp-079.org/regex/) to build a bot by yourself
 
 ## Features
 

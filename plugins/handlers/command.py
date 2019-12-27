@@ -778,11 +778,11 @@ def text_t2t(client: Client, message: Message) -> bool:
         if message.reply_to_message:
             result = ""
 
-            forward_name = get_forward_name(message.reply_to_message, True)
+            forward_name = get_forward_name(message.reply_to_message, True, True)
             if forward_name:
                 result += forward_name + "\n\n"
 
-            file_name = get_filename(message.reply_to_message, True)
+            file_name = get_filename(message.reply_to_message, True, True)
             if file_name:
                 result += file_name + "\n\n"
 
@@ -818,11 +818,16 @@ def text_t2t(client: Client, message: Message) -> bool:
 def version(client: Client, message: Message) -> bool:
     # Check the program's version
     try:
+        # Basic data
         cid = message.chat.id
         aid = message.from_user.id
         mid = message.message_id
+
+        # Generate the text
         text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n\n"
                 f"{lang('version')}{lang('colon')}{bold(glovar.version)}\n")
+
+        # Send the report message
         thread(send_message, (client, cid, text, mid))
 
         return True

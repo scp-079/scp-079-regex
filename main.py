@@ -45,7 +45,7 @@ scheduler = BackgroundScheduler(job_defaults={"misfire_grace_time": 60})
 scheduler.add_job(interval_hour_01, "interval", [app], hours=1)
 scheduler.add_job(update_status, "cron", [app, "awake"], minute=30)
 scheduler.add_job(backup_files, "cron", [app], hour=20)
-scheduler.add_job(reset_count, "cron", hour=20, minute=30)
+scheduler.add_job(reset_count, "cron", [app], hour=20, minute=30)
 scheduler.start()
 
 # Hold

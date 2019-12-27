@@ -24,7 +24,7 @@ from string import ascii_lowercase
 from pyrogram import Client, Message
 
 from .. import glovar
-from .etc import code, get_filename, get_forward_name, get_int, get_text, lang, mention_id, thread
+from .etc import code, get_filename, get_forward_name, get_int, get_text, lang, mention_id, t2t, thread
 from .filters import is_regex_text
 from .telegram import get_sticker_title, send_message
 from .words import is_similar
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 def name_test(client: Client, message: Message) -> bool:
     # Test user's or channel's name
     try:
-        text = get_forward_name(message)
+        text = get_forward_name(message, True, True)
 
         if not text:
             return True
@@ -96,6 +96,7 @@ def sticker_test(client: Client, message: Message) -> bool:
 
         sticker_title = get_sticker_title(client, sticker_name)
         result += f"{lang('sticker_title')}{lang('colon')}{code(sticker_title)}\n\n"
+        sticker_title = t2t(sticker_title, True, True)
 
         for word_type in ["ad", "con", "ban", "sti", "test"]:
             if not is_regex_text(word_type, sticker_title):
