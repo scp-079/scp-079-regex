@@ -739,15 +739,15 @@ def text_t2t(client: Client, message: Message) -> bool:
         if message.reply_to_message:
             result = ""
 
-            forward_name = get_forward_name(message.reply_to_message)
+            forward_name = get_forward_name(message.reply_to_message, True)
             if forward_name:
                 result += forward_name + "\n\n"
 
-            file_name = get_filename(message.reply_to_message)
+            file_name = get_filename(message.reply_to_message, True)
             if file_name:
                 result += file_name + "\n\n"
 
-            message_text = get_text(message.reply_to_message)
+            message_text = get_text(message.reply_to_message, True, True)
             if message_text:
                 result += message_text + "\n\n"
 

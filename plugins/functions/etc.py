@@ -377,7 +377,7 @@ def get_now() -> int:
     return result
 
 
-def get_text(message: Message, normal: bool = False, printable: bool = True) -> str:
+def get_text(message: Message, normal: bool = False, printable: bool = False) -> str:
     # Get message's text, including links and buttons
     text = ""
     try:
