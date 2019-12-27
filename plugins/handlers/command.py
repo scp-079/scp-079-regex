@@ -512,9 +512,9 @@ def regex(client: Client, message: Message) -> bool:
 
         # Proceed
         if r_message:
-            name_test(client, message)
-            sticker_test(client, message)
-            text_test(client, message)
+            name_test(client, r_message)
+            sticker_test(client, r_message)
+            text_test(client, r_message)
             return True
 
         # Send the report message
