@@ -32,6 +32,7 @@ from ..functions.file import save
 from ..functions.filters import from_user, regex_group, test_group
 from ..functions.group import get_message
 from ..functions.telegram import edit_message_text, send_message
+from ..functions.tests import name_test, sticker_test, text_test
 from ..functions.words import cc, get_admin, get_desc, get_match, get_same_types, same_word, word_add, words_ask
 from ..functions.words import words_list, words_list_page, word_remove, words_search, words_search_page
 
@@ -484,6 +485,44 @@ def push_words(client: Client, message: Message) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Push words error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
+
+    return False
+
+
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["regex"], glovar.prefix)
+                   & test_group
+                   & from_user)
+def regex(client: Client, message: Message) -> bool:
+    # Force regex test
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        mid = message.message_id
+        uid = message.from_user.id
+        r_message = message.reply_to_message
+
+        # Text prefix
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_regex'))}\n"
+                f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
+                f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
+
+        # Proceed
+        if r_message:
+            name_test(client, message)
+            sticker_test(client, message)
+            text_test(client, message)
+            return True
+
+        # Send the report message
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Regex error: {e}", exc_info=True)
     finally:
         glovar.locks["regex"].release()
 

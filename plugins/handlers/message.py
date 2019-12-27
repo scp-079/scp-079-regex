@@ -129,8 +129,6 @@ def test(client: Client, message: Message) -> bool:
     # Show test results in TEST group
     glovar.locks["test"].acquire()
     try:
-        logger.warning(message)
-
         name_test(client, message)
         sticker_test(client, message)
         text_test(client, message)

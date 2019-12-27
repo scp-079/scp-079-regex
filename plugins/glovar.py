@@ -209,6 +209,7 @@ lang: Dict[str, str] = {
     "action_list": (zh_cn and "查看列表") or "Show the List",
     "action_match": (zh_cn and "匹配结果") or "Show Match Result",
     "action_push": (zh_cn and "手动推送") or "Push Manually",
+    "action_regex": (zh_cn and "手动测试") or "Test Manually",
     "action_remove": (zh_cn and "删除规则") or "Remove Rule",
     "action_reset": (zh_cn and "重置计数") or "Reset Count",
     "action_same": (zh_cn and "复制命令") or "Copy Command",
@@ -273,6 +274,7 @@ all_commands += [
     "mention",
     "print",
     "push",
+    "regex",
     "reset",
     "t2t",
     "version",
@@ -374,7 +376,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.4.7"
+version: str = "0.4.8"
 
 # Load data from pickle
 
