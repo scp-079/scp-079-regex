@@ -23,7 +23,7 @@ from pyrogram import Client
 
 from .. import glovar
 from .channel import share_data
-from .etc import code, get_now, lang, thread
+from .etc import code, get_now, lang, mention_id, thread
 from .file import save
 from .telegram import send_message
 from .words import words_ask
@@ -93,7 +93,7 @@ def reset_count(client: Client) -> bool:
     glovar.locks["regex"].acquire()
     try:
         for word_type in glovar.regex:
-            deleted_words = []
+            deleted_words = {}
 
             for word in list(eval(f"glovar.{word_type}_words")):
                 today = eval(f"glovar.{word_type}_words")[word]["today"]
@@ -108,8 +108,7 @@ def reset_count(client: Client) -> bool:
                     continue
 
                 if eval(f"glovar.{word_type}_words")[word]["temp"] >= glovar.limit_temp:
-                    eval(f"glovar.{word_type}_words").pop(word)
-                    deleted_words.append(word)
+                    deleted_words[word] = eval(f"glovar.{word_type}_words").pop(word, {})
 
             save(f"{word_type}_words")
 
@@ -117,9 +116,13 @@ def reset_count(client: Client) -> bool:
                 continue
 
             end_text = "\n\n".join(code(word) for word in deleted_words)
+            cc_text = "\n".join(f"{lang('action_cc')}{lang('colon')}{mention_id(cc_id)}"
+                                for cc_id in {deleted_words[word]["who"]
+                                              for word in deleted_words if deleted_words[word].get("who", 0)})
 
             text = (f"{lang('action')}{lang('colon')}{code(lang('action_remove_auto'))}\n"
-                    f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n")
+                    f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+                    f"{cc_text}\n")
 
             if glovar.comments.get(word_type):
                 text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
