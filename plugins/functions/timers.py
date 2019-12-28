@@ -26,7 +26,7 @@ from .channel import share_data
 from .etc import code, get_now, lang, mention_id, thread
 from .file import save
 from .telegram import send_message
-from .words import words_ask
+from .words import get_comments, words_ask
 
 # Enable logging
 logger = logging.getLogger(__name__)
@@ -104,7 +104,8 @@ def reset_count(client: Client) -> bool:
                 else:
                     eval(f"glovar.{word_type}_words")[word]["temp"] = 0
 
-                if "(?# temp)" not in word:
+                comments = get_comments(word)
+                if not any("temp" in comment for comment in comments):
                     continue
 
                 if eval(f"glovar.{word_type}_words")[word]["temp"] >= glovar.limit_temp:
