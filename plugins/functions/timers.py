@@ -117,21 +117,26 @@ def reset_count(client: Client) -> bool:
             if not deleted_words:
                 continue
 
-            end_text = "\n\n".join(code(word) for word in deleted_words)
-            cc_text = "\n".join(f"{lang('action_cc')}{lang('colon')}{mention_id(cc_id)}"
-                                for cc_id in {deleted_words[word]["who"]
-                                              for word in deleted_words if deleted_words[word].get("who", 0)})
+            deleted_words_units = list(deleted_words)
+            deleted_words_units_list = [deleted_words_units[i:i + glovar.per_page]
+                                        for i in range(0, len(deleted_words_units), glovar.per_page)]
 
-            text = (f"{lang('action')}{lang('colon')}{code(lang('action_remove_auto'))}\n"
-                    f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
-                    f"{cc_text}\n")
+            for words in deleted_words_units_list:
+                end_text = "\n\n".join(code(word) for word in words)
+                cc_text = "\n".join(f"{lang('action_cc')}{lang('colon')}{mention_id(cc_id)}"
+                                    for cc_id in {deleted_words[word]["who"]
+                                                  for word in words if deleted_words[word].get("who", 0)})
 
-            if glovar.comments.get(word_type):
-                text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
+                text = (f"{lang('action')}{lang('colon')}{code(lang('action_remove_auto'))}\n"
+                        f"{lang('type')}{lang('colon')}{code(lang(word_type))}\n"
+                        f"{cc_text}\n")
 
-            text += f"{lang('removed')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
+                if glovar.comments.get(word_type):
+                    text += f"{lang('comment')}{lang('colon')}{code(glovar.comments[word_type])}\n"
 
-            thread(send_message, (client, glovar.regex_group_id, text))
+                text += f"{lang('removed')}{lang('colon')}" + "-" * 24 + f"\n\n{end_text}\n"
+
+                thread(send_message, (client, glovar.regex_group_id, text))
 
         return True
     except Exception as e:
