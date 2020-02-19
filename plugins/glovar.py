@@ -1,5 +1,5 @@
 # SCP-079-REGEX - Manage the regex patterns
-# Copyright (C) 2019 SCP-079 <https://scp-079.org>
+# Copyright (C) 2019-2020 SCP-079 <https://scp-079.org>
 #
 # This file is part of SCP-079-REGEX.
 #
@@ -68,9 +68,11 @@ password: str = ""
 try:
     config = RawConfigParser()
     config.read("config.ini")
+
     # [basic]
     bot_token = config["basic"].get("bot_token", bot_token)
     prefix = list(config["basic"].get("prefix", prefix_str))
+
     # [channels]
     critical_channel_id = int(config["channels"].get("critical_channel_id", critical_channel_id))
     debug_channel_id = int(config["channels"].get("debug_channel_id", debug_channel_id))
@@ -78,6 +80,7 @@ try:
     hide_channel_id = int(config["channels"].get("hide_channel_id", hide_channel_id))
     test_group_id = int(config["channels"].get("test_group_id", test_group_id))
     regex_group_id = int(config["channels"].get("regex_group_id", regex_group_id))
+
     # [custom]
     aio = config["custom"].get("aio", aio)
     aio = eval(aio)
@@ -90,6 +93,7 @@ try:
     project_name = config["custom"].get("project_name", project_name)
     zh_cn = config["custom"].get("zh_cn", zh_cn)
     zh_cn = eval(zh_cn)
+
     # [encrypt]
     key = config["encrypt"].get("key", key)
     key = key.encode("utf-8")
@@ -355,6 +359,7 @@ regex: Dict[str, bool] = {
     "wd": True,
     "test": False
 }
+
 for c in ascii_lowercase:
     regex[f"ad{c}"] = True
 
@@ -378,7 +383,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.4.9"
+version: str = "0.5.0"
 
 # Load data from pickle
 
@@ -431,6 +436,7 @@ for word_type in regex:
 # Load data
 file_list: List[str] = ["ask_words", "comments"]
 file_list += [f"{f}_words" for f in regex]
+
 for file in file_list:
     try:
         try:
@@ -442,6 +448,7 @@ for file in file_list:
                     pickle.dump(eval(f"{file}"), f)
         except Exception as e:
             logger.error(f"Load data {file} error: {e}", exc_info=True)
+
             with open(f"data/.{file}", "rb") as f:
                 locals()[f"{file}"] = pickle.load(f)
     except Exception as e:
@@ -451,6 +458,7 @@ for file in file_list:
 # Generate special characters dictionary
 for special in ["spc", "spe"]:
     locals()[f"{special}_dict"]: Dict[str, str] = {}
+
     for rule in locals()[f"{special}_words"]:
         # Check keys
         if "[" not in rule:
@@ -462,10 +470,11 @@ for special in ["spc", "spe"]:
 
         keys = rule.split("]")[0][1:]
         value = rule.split("?#")[1][1]
+
         for k in keys:
             locals()[f"{special}_dict"][k] = value
 
 # Start program
-copyright_text = (f"SCP-079-{sender} v{version}, Copyright (C) 2019 SCP-079 <https://scp-079.org>\n"
+copyright_text = (f"SCP-079-{sender} v{version}, Copyright (C) 2019-2020 SCP-079 <https://scp-079.org>\n"
                   "Licensed under the terms of the GNU General Public License v3 or later (GPLv3+)\n")
 print(copyright_text)

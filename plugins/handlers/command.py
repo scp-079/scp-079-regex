@@ -1,5 +1,5 @@
 # SCP-079-REGEX - Manage the regex patterns
-# Copyright (C) 2019 SCP-079 <https://scp-079.org>
+# Copyright (C) 2019-2020 SCP-079 <https://scp-079.org>
 #
 # This file is part of SCP-079-REGEX.
 #
@@ -98,10 +98,13 @@ def ask_word(client: Client, message: Message) -> bool:
 
         # Check the command format
         the_type = get_command_type(message)
+
         if the_type in {"new", "replace", "cancel"} and r_message and r_message.from_user.is_self:
             aid = get_admin(r_message)
+
             if uid == aid:
                 callback_data_list = get_callback_data(r_message)
+
                 if callback_data_list and callback_data_list[0]["a"] == "ask":
                     key = callback_data_list[0]["d"]
                     ask_text = f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
@@ -403,9 +406,11 @@ def page_command(client: Client, message: Message) -> bool:
         # Proceed
         if the_type in {"previous", "next"} and r_message and r_message.from_user.is_self:
             aid = get_admin(r_message)
+
             if uid == aid:
                 callback_data_list = get_callback_data(r_message)
                 i = (lambda x: 0 if x == "previous" else -1)(the_type)
+
                 if callback_data_list and callback_data_list[i]["a"] in {"list", "search"}:
                     action = callback_data_list[i]["a"]
                     action_type = callback_data_list[i]["t"]
@@ -459,6 +464,7 @@ def push_words(client: Client, message: Message) -> bool:
 
         # Proceed
         command_type = get_command_type(message)
+
         if command_type in glovar.regex:
             share_regex_update(client, command_type)
 
@@ -608,6 +614,7 @@ def reset_words(client: Client, message: Message) -> bool:
 
         # Proceed
         command_type = get_command_type(message)
+
         if command_type in glovar.regex:
             for word in list(eval(f"glovar.{command_type}_words")):
                 eval(f"glovar.{command_type}_words")[word] = deepcopy(glovar.default_word_status)
@@ -690,6 +697,7 @@ def same_words(client: Client, message: Message) -> bool:
                       and len(old_command_list) == 1):
                     # Get the message replied by r_message
                     r_message = get_message(client, cid, rid)
+
                     if r_message.reply_to_message:
                         r_message = r_message.reply_to_message
                         aid = r_message.from_user.id
@@ -779,14 +787,17 @@ def text_t2t(client: Client, message: Message) -> bool:
             result = ""
 
             forward_name = get_forward_name(message.reply_to_message, True, True)
+
             if forward_name:
                 result += forward_name + "\n\n"
 
             file_name = get_filename(message.reply_to_message, True, True)
+
             if file_name:
                 result += file_name + "\n\n"
 
             message_text = get_text(message.reply_to_message, True, True)
+
             if message_text:
                 result += message_text + "\n\n"
 

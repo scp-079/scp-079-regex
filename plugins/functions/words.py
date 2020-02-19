@@ -1,5 +1,5 @@
 # SCP-079-REGEX - Manage the regex patterns
-# Copyright (C) 2019 SCP-079 <https://scp-079.org>
+# Copyright (C) 2019-2020 SCP-079 <https://scp-079.org>
 #
 # This file is part of SCP-079-REGEX.
 #
@@ -126,8 +126,10 @@ def get_desc(message: Message) -> bool:
             return True
 
         text_list = message.text.split("\n")
+
         for text in text_list:
             text_units = text.split(f"{lang('colon')}")
+
             if text_units[0] == lang("order"):
                 return text_units[1] == lang("order_desc")
     except Exception as e:
@@ -236,6 +238,7 @@ def same_word(client: Client, message: Message, command: str, word: str, word_ty
     try:
         for word_type in word_type_list:
             message.text = f"{command} {word_type} {word}"
+
             if command in glovar.add_commands:
                 text, markup = word_add(client, message)
                 thread(send_message, (client, glovar.regex_group_id, text, mid, markup))
@@ -264,6 +267,7 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
 
         # Check if the command format is correct
         word_type, word = get_command_context(message)
+
         if not word_type or word_type not in glovar.regex or not word:
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
                      f"{lang('reason')}{lang('colon')}{code(lang('command_usage'))}\n")
@@ -288,6 +292,7 @@ def word_add(client: Client, message: Message) -> (str, InlineKeyboardMarkup):
 
         # Check if the word duplicated
         duplicated_list = get_duplicated(word_type, word)
+
         if duplicated_list:
             end_text = "\t" * 4 + italic(lang("comma")).join(italic(lang(d)) for d in duplicated_list)
             text += (f"{lang('status')}{lang('colon')}{code(lang('status_failed'))}\n"
@@ -574,6 +579,7 @@ def word_remove(client: Client, message: Message) -> (str, Set[int]):
 
         if message.reply_to_message:
             aid = message.reply_to_message.from_user.id
+
             if uid != aid:
                 text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
                         f"{lang('action')}{lang('colon')}{code(lang('action_remove'))}\n"
@@ -582,6 +588,7 @@ def word_remove(client: Client, message: Message) -> (str, Set[int]):
                 return text, cc_list
 
             r_text, cc_list = word_remove_try(client, message.reply_to_message)
+
             if r_text:
                 return r_text, cc_list
 

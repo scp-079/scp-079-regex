@@ -1,5 +1,5 @@
 # SCP-079-REGEX - Manage the regex patterns
-# Copyright (C) 2019 SCP-079 <https://scp-079.org>
+# Copyright (C) 2019-2020 SCP-079 <https://scp-079.org>
 #
 # This file is part of SCP-079-REGEX.
 #
@@ -39,6 +39,7 @@ def is_exchange_channel(_, message: Message) -> bool:
             return False
 
         cid = message.chat.id
+
         if glovar.should_hide:
             return cid == glovar.hide_channel_id
         else:
@@ -67,6 +68,7 @@ def is_hide_channel(_, message: Message) -> bool:
             return False
 
         cid = message.chat.id
+
         if cid == glovar.hide_channel_id:
             return True
     except Exception as e:
@@ -87,6 +89,7 @@ def is_test_group(_, update: Union[CallbackQuery, Message]) -> bool:
             return False
 
         cid = message.chat.id
+
         if cid == glovar.test_group_id:
             return True
     except Exception as e:
@@ -107,6 +110,7 @@ def is_regex_group(_, update: Union[CallbackQuery, Message]) -> bool:
             return False
 
         cid = message.chat.id
+
         if cid == glovar.regex_group_id:
             return True
     except Exception as e:
@@ -156,6 +160,7 @@ def is_regex_text(word_type: str, text: str, ocr: bool = False, again: bool = Fa
             return None
 
         words = list(eval(f"glovar.{word_type}_words"))
+
         for word in words:
             if ocr and "(?# nocr)" in word:
                 continue
@@ -195,6 +200,7 @@ def is_similar(mode: str, a: str, b: str) -> bool:
 
         elif mode == "strict":
             i = 0
+
             while i < 3:
                 if not (re.search(a, xg.xeger(b), re.I | re.M | re.S)
                         or re.search(b, xg.xeger(a), re.I | re.M | re.S)):
@@ -204,8 +210,10 @@ def is_similar(mode: str, a: str, b: str) -> bool:
 
         elif mode == "test":
             b = re.sub(r"\s{2,}", " ", b)
+
             if not re.search(a, b, re.I | re.M | re.S):
                 b = re.sub(r"\s", "", b)
+
                 if not re.search(a, b, re.I | re.M | re.S):
                     return False
 

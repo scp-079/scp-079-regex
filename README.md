@@ -5,6 +5,8 @@ This project is used to manage regular expression rules adopted by other bots.
 ## How to use
 
 - See [this article](https://scp-079.org/regex/) to build a bot by yourself
+- [README](https://github.com/scp-079/scp-079-readme) of the SCP-079 Project
+- Discuss [group](https://t.me/SCP_079_CHAT)
 
 ## Features
 

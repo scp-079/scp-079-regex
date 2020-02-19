@@ -1,5 +1,5 @@
 # SCP-079-REGEX - Manage the regex patterns
-# Copyright (C) 2019 SCP-079 <https://scp-079.org>
+# Copyright (C) 2019-2020 SCP-079 <https://scp-079.org>
 #
 # This file is part of SCP-079-REGEX.
 #
@@ -105,7 +105,8 @@ def reset_count(client: Client) -> bool:
                     eval(f"glovar.{word_type}_words")[word]["temp"] = 0
 
                 comments = get_comments(word)
-                if not any("temp" in comment for comment in comments):
+
+                if not any("temp" in comment for comment in comments) and word_type != "ban":
                     continue
 
                 if eval(f"glovar.{word_type}_words")[word]["temp"] >= glovar.limit_temp:

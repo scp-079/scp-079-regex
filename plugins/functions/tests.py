@@ -1,5 +1,5 @@
 # SCP-079-REGEX - Manage the regex patterns
-# Copyright (C) 2019 SCP-079 <https://scp-079.org>
+# Copyright (C) 2019-2020 SCP-079 <https://scp-079.org>
 #
 # This file is part of SCP-079-REGEX.
 #
@@ -52,6 +52,7 @@ def name_test(client: Client, message: Message) -> bool:
 
             w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if is_similar("test", w, text)]
             result += "\t" * 4 + f"{lang(word_type)}：" + "-" * 16 + "\n\n"
+
             for w in w_list:
                 result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -91,6 +92,7 @@ def sticker_test(client: Client, message: Message) -> bool:
             w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
                       if is_similar("test", w, sticker_name)]
             result += "\t" * 4 + f"{lang(word_type)}：" + "-" * 16 + "\n\n"
+
             for w in w_list:
                 result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -105,6 +107,7 @@ def sticker_test(client: Client, message: Message) -> bool:
             w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words"))
                       if is_similar("test", w, sticker_title)]
             result += "\t" * 4 + f"{lang(word_type)}：" + "-" * 16 + "\n\n"
+
             for w in w_list:
                 result += "\t" * 8 + f"{code(w)}\n\n"
 
@@ -121,12 +124,14 @@ def text_test(client: Client, message: Message) -> bool:
     # Test message text or caption
     try:
         origin_text = get_text(message)
+
         if re.search(f"^{lang('admin')}{lang('colon')}[0-9]", origin_text):
             aid = get_int(origin_text.split("\n\n")[0].split(lang('colon'))[1])
         else:
             aid = message.from_user.id
 
-        except_pattern = (f"^#(bug|done|fixed|todo)|"
+        except_pattern = (f"^/(id|mention)|"
+                          f"^#(bug|done|fixed|todo)|"
                           f"^{lang('version')}{lang('colon')}|"
                           f"^{lang('message_print')}{lang('colon')}")
 
@@ -156,6 +161,7 @@ def text_test(client: Client, message: Message) -> bool:
             if is_regex_text(word_type, text):
                 w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if is_similar("test", w, text)]
                 result_list[-1] += f"{lang(word_type)}：" + "-" * 24 + "\n\n"
+
                 for w in w_list:
                     result_list[-1] += "\t" * 4 + f"{code(w)}\n\n"
 
