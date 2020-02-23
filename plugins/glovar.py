@@ -205,6 +205,8 @@ lang: Dict[str, str] = {
     # Special
     "action_add": (zh_cn and "添加规则") or "Add Rule",
     "action_cancel": (zh_cn and "取消添加") or "Cancel Add",
+    "action_captcha": (zh_cn and "验证未通过数据") or "CAPTCHA Failure Data",
+    "action_captcha_request": (zh_cn and "查询验证未通过数据") or "Request CAPTCHA Failure Data",
     "action_cc": (zh_cn and "抄送") or "CC",
     "action_check": (zh_cn and "查询数据") or "Check the Count Data",
     "action_comment": (zh_cn and "添加备注") or "Add Comment",
@@ -267,6 +269,7 @@ same_commands: List[str] = ["copy", "same"]
 search_commands: List[str] = ["find", "s", "search"]
 all_commands: List[str] = add_commands + list_commands + remove_commands + same_commands + search_commands
 all_commands += [
+    "captcha",
     "check",
     "comment",
     "count",
@@ -383,7 +386,7 @@ sticker_titles: Dict[str, str] = {}
 #     "short_name": "sticker_title"
 # }
 
-version: str = "0.5.0"
+version: str = "0.5.1"
 
 # Load data from pickle
 

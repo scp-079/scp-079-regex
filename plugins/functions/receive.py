@@ -25,11 +25,38 @@ from pyrogram import Client, Message
 
 from .. import glovar
 from .channel import share_data
-from .etc import get_now, get_text, lang, thread
+from .etc import code, get_now, get_text, lang, mention_id, thread
 from .file import crypt_file, data_to_file, delete_file, get_downloaded_path, get_new_path, save
+from .telegram import send_document
 
 # Enable logging
 logger = logging.getLogger(__name__)
+
+
+def receive_captcha_data(client: Client, message: Message, data: dict) -> bool:
+    # Receive captcha data
+    try:
+        if not message.document:
+            return True
+
+        file_id = message.document.file_id
+        file_ref = message.document.file_ref
+
+        if data and data["admin_id"]:
+            text = f"{lang('admin')}{lang('colon')}{mention_id(data['admin_id'])}\n"
+            mid = data["message_id"]
+        else:
+            text = ""
+            mid = None
+
+        text += f"{lang('action')}{lang('colon')}{code(lang('action_captcha'))}\n"
+        thread(send_document, (client, glovar.regex_group_id, file_id, file_ref, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Receive captcha data error: {e}", exc_info=True)
+
+    return False
 
 
 def receive_count(client: Client, message: Message, data: str) -> bool:

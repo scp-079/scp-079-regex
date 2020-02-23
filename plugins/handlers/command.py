@@ -140,6 +140,45 @@ def ask_word(client: Client, message: Message) -> bool:
     return False
 
 
+@Client.on_message(Filters.incoming & Filters.group & Filters.command(["captcha"], glovar.prefix)
+                   & regex_group
+                   & from_user)
+def captcha(client: Client, message: Message) -> bool:
+    # Request CAPTCHA failure data
+    glovar.locks["regex"].acquire()
+    try:
+        # Basic data
+        cid = message.chat.id
+        mid = message.message_id
+        aid = message.from_user.id
+
+        # Send command
+        share_data(
+            client=client,
+            receivers=["CAPTCHA"],
+            action="captcha",
+            action_type="ask",
+            data={
+                "admin_id": aid,
+                "message_id": mid
+            }
+        )
+
+        # Send the report message
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
+                f"{lang('action')}{lang('colon')}{code(lang('action_captcha_request'))}\n"
+                f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
+        thread(send_message, (client, cid, text, mid))
+
+        return True
+    except Exception as e:
+        logger.warning(f"Count words error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
+
+    return False
+
+
 @Client.on_message(Filters.incoming & Filters.group & Filters.command(["check"], glovar.prefix)
                    & regex_group
                    & from_user)
@@ -252,7 +291,7 @@ def count_words(client: Client, message: Message) -> bool:
         # Basic data
         cid = message.chat.id
         mid = message.message_id
-        uid = message.from_user.id
+        aid = message.from_user.id
 
         # Choose receivers
         receivers = []
@@ -273,7 +312,7 @@ def count_words(client: Client, message: Message) -> bool:
         )
 
         # Send the report message
-        text = (f"{lang('admin')}{lang('colon')}{mention_id(uid)}\n"
+        text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
                 f"{lang('action')}{lang('colon')}{code(lang('action_count'))}\n"
                 f"{lang('status')}{lang('colon')}{code(lang('status_succeeded'))}\n")
         thread(send_message, (client, cid, text, mid))
