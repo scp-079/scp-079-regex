@@ -23,7 +23,7 @@ from pyrogram import Client, Filters, Message
 from .. import glovar
 from ..functions.etc import code, general_link, lang, thread
 from ..functions.filters import exchange_channel, from_user, hide_channel, test_group
-from ..functions.receive import receive_count, receive_status_ask, receive_text_data
+from ..functions.receive import receive_captcha_data, receive_count, receive_status_ask, receive_text_data
 from ..functions.telegram import send_message
 from ..functions.tests import name_test, sticker_test, text_test
 
@@ -100,7 +100,59 @@ def process_data(client: Client, message: Message) -> bool:
         # so it is intentionally written like this
         if glovar.sender in receivers:
 
-            if sender in {"CAPTCHA", "CLEAN", "LANG", "LONG", "NOFLOOD", "NOPORN", "NOSPAM", "RECHECK", "WATCH"}:
+            if sender == "CAPTCHA":
+
+                if action == "captcha":
+                    if action_type == "result":
+                        receive_captcha_data(client, message, data)
+
+                if action == "regex":
+                    if action_type == "count":
+                        receive_count(client, message, data)
+
+            elif sender == "CLEAN":
+
+                if action == "regex":
+                    if action_type == "count":
+                        receive_count(client, message, data)
+
+            elif sender == "LANG":
+
+                if action == "regex":
+                    if action_type == "count":
+                        receive_count(client, message, data)
+
+            elif sender == "LONG":
+
+                if action == "regex":
+                    if action_type == "count":
+                        receive_count(client, message, data)
+
+            elif sender == "NOFLOOD":
+
+                if action == "regex":
+                    if action_type == "count":
+                        receive_count(client, message, data)
+
+            elif sender == "NOPORN":
+
+                if action == "regex":
+                    if action_type == "count":
+                        receive_count(client, message, data)
+
+            elif sender == "NOSPAM":
+
+                if action == "regex":
+                    if action_type == "count":
+                        receive_count(client, message, data)
+
+            elif sender == "RECHECK":
+
+                if action == "regex":
+                    if action_type == "count":
+                        receive_count(client, message, data)
+
+            elif sender == "WATCH":
 
                 if action == "regex":
                     if action_type == "count":
