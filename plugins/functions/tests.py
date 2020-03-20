@@ -141,7 +141,6 @@ def text_test(client: Client, message: Message) -> bool:
             return True
 
         result_list = [""]
-        w_list = []
 
         # Make test result in this order
         # ad adx
@@ -159,7 +158,7 @@ def text_test(client: Client, message: Message) -> bool:
             if not is_regex_text(word_type, text):
                 continue
 
-            w_list += [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if is_similar("test", w, text)]
+            w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if is_similar("test", w, text)]
             result_list[-1] += f"{lang(word_type)}：" + "-" * 24 + "\n\n"
 
             for w in w_list:
