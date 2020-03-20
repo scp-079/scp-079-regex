@@ -141,6 +141,7 @@ def text_test(client: Client, message: Message) -> bool:
             return True
 
         result_list = [""]
+        w_list = []
 
         # Make test result in this order
         # ad adx
@@ -155,15 +156,17 @@ def text_test(client: Client, message: Message) -> bool:
         type_list = order_list + list(type_set - order_set)
 
         for word_type in type_list:
-            if len(result_list[-1]) > 2000:
-                result_list.append("")
+            if not is_regex_text(word_type, text):
+                continue
 
-            if is_regex_text(word_type, text):
-                w_list = [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if is_similar("test", w, text)]
-                result_list[-1] += f"{lang(word_type)}：" + "-" * 24 + "\n\n"
+            w_list += [w for w in deepcopy(eval(f"glovar.{word_type}_words")) if is_similar("test", w, text)]
+            result_list[-1] += f"{lang(word_type)}：" + "-" * 24 + "\n\n"
 
-                for w in w_list:
-                    result_list[-1] += "\t" * 4 + f"{code(w)}\n\n"
+            for w in w_list:
+                result_list[-1] += "\t" * 4 + f"{code(w)}\n\n"
+
+                if len(result_list[-1]) > 2000:
+                    result_list.append("")
 
         for result in result_list:
             if result:
