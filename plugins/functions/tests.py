@@ -155,6 +155,9 @@ def text_test(client: Client, message: Message) -> bool:
         type_list = order_list + list(type_set - order_set)
 
         for word_type in type_list:
+            if len(result_list[-1]) > 2000:
+                result_list.append("")
+
             if not is_regex_text(word_type, text):
                 continue
 
