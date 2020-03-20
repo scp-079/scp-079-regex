@@ -812,6 +812,7 @@ def search_words(client: Client, message: Message) -> bool:
                    & from_user)
 def text_t2t(client: Client, message: Message) -> bool:
     # Transfer text
+    glovar.locks["regex"].acquire()
     try:
         # Basic data
         cid = message.chat.id
@@ -823,6 +824,26 @@ def text_t2t(client: Client, message: Message) -> bool:
                 f"{lang('action')}{lang('colon')}{code(lang('t2t'))}\n")
 
         if message.reply_to_message:
+            # Regenerate special characters dictionary if possible
+            for file_name in {"spc_words", "spe_words"}:
+                special = file_name.split("_")[0]
+                exec(f"glovar.{special}_dict = {{}}")
+
+                for rule in list(eval(f"glovar.{file_name}")):
+                    # Check keys
+                    if "[" not in rule:
+                        continue
+
+                    # Check value
+                    if "?#" not in rule:
+                        continue
+
+                    keys = rule.split("]")[0][1:]
+                    value = rule.split("?#")[1][1]
+
+                    for k in keys:
+                        eval(f"glovar.{special}_dict")[k] = value
+
             result = ""
 
             forward_name = get_forward_name(message.reply_to_message, True, True)
@@ -858,6 +879,8 @@ def text_t2t(client: Client, message: Message) -> bool:
         return True
     except Exception as e:
         logger.warning(f"Text t2t error: {e}", exc_info=True)
+    finally:
+        glovar.locks["regex"].release()
 
     return False
 

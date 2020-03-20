@@ -535,7 +535,8 @@ def words_list_page(aid: int, word_type: str, page: int, desc: bool) -> (str, In
         w_list = sorted(keys, key=lambda k: words[k]["average"], reverse=desc)
 
         # Get the list and generate the markup
-        w_list, markup = get_list_page(w_list, "list", word_type, page)
+        per_page = 4000 // max(len(w) for w in w_list)
+        w_list, markup = get_list_page(w_list, "list", word_type, page, per_page)
 
         # Generate the text
         end_text = f"\n\n".join((f"{code(w)}\n"

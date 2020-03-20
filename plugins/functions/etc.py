@@ -294,11 +294,11 @@ def get_int(text: str) -> Optional[int]:
     return result
 
 
-def get_list_page(the_list: list, action: str, action_type: str, page: int) -> (list, InlineKeyboardMarkup):
+def get_list_page(the_list: list, action: str, action_type: str, page: int,
+                  per_page: int = glovar.per_page) -> (list, InlineKeyboardMarkup):
     # Generate a list for elements and markup buttons
     markup = None
     try:
-        per_page = glovar.per_page
         quo = int(len(the_list) / per_page)
 
         if quo == 0:
