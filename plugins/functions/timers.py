@@ -106,7 +106,8 @@ def reset_count(client: Client) -> bool:
 
                 comments = get_comments(word)
 
-                if not any("temp" in comment for comment in comments) and word_type != "ban":
+                if (not any("temp" in comment for comment in comments)
+                        and not (word_type == "ban" and not any("forever" in comment for comment in comments))):
                     continue
 
                 if eval(f"glovar.{word_type}_words")[word]["temp"] >= glovar.limit_temp:
