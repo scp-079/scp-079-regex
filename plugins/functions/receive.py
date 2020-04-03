@@ -1,4 +1,4 @@
-# SCP-079-REGEX - Manage the regex patterns
+# SCP-079-REGEX - Manage regex patterns
 # Copyright (C) 2019-2020 SCP-079 <https://scp-079.org>
 #
 # This file is part of SCP-079-REGEX.
