@@ -823,6 +823,9 @@ def text_t2t(client: Client, message: Message) -> bool:
         text = (f"{lang('admin')}{lang('colon')}{mention_id(aid)}\n"
                 f"{lang('action')}{lang('colon')}{code(lang('t2t'))}\n")
 
+        # Get command type
+        command_type = get_command_type(message)
+
         if message.reply_to_message:
             # Regenerate special characters dictionary if possible
             for file_name in {"spc_words", "spe_words"}:
@@ -862,6 +865,9 @@ def text_t2t(client: Client, message: Message) -> bool:
                 result += message_text + "\n\n"
 
             result = result.strip()
+
+            if result and command_type == "pure":
+                result = re.sub(r"""[^\da-zA-Z一-龥.,:'"?!~;()。，？！～@“”]""", "", result)
 
             if result:
                 text += f"{lang('result')}{lang('colon')}" + "-" * 24 + "\n\n"
