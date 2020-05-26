@@ -22,7 +22,7 @@ from pyrogram import Client, Filters, Message
 
 from .. import glovar
 from ..functions.etc import code, general_link, lang, thread
-from ..functions.filters import exchange_channel, from_user, hide_channel, test_group
+from ..functions.filters import aio, exchange_channel, from_user, hide_channel, test_group
 from ..functions.receive import receive_captcha_data, receive_count, receive_status_ask, receive_text_data
 from ..functions.telegram import send_message
 from ..functions.tests import name_test, sticker_test, text_test
@@ -76,7 +76,7 @@ def exchange_emergency(client: Client, message: Message) -> bool:
     return False
 
 
-@Client.on_message((Filters.incoming or glovar.aio) & Filters.channel
+@Client.on_message((Filters.incoming | aio) & Filters.channel
                    & ~Filters.command(glovar.all_commands, glovar.prefix)
                    & exchange_channel)
 def process_data(client: Client, message: Message) -> bool:
