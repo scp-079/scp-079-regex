@@ -27,14 +27,14 @@ regex_group_id = [DATA EXPUNGED]
 test_group_id = [DATA EXPUNGED]
 
 [custom]
-aio = [DATA EXPUNGED]
-backup = [DATA EXPUNGED]
-date_reset = [DATA EXPUNGED]
+aio = False
+backup = False
+date_reset = 1st mon
 limit_temp = 14
 per_page = 10
 project_link = https://scp-079.org/regex/
 project_name = SCP-079-REGEX
-zh_cn = [DATA EXPUNGED]
+zh_cn = True
 
 [encrypt]
 key = [DATA EXPUNGED]
